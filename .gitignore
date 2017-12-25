@@ -1,0 +1,6 @@
+*.iml
+*.swp
+*.o
+.idea
+
+_obj
