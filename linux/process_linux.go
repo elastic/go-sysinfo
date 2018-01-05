@@ -154,7 +154,7 @@ func (p *process) Environment() (map[string]string, error) {
 			continue
 		}
 
-		env[key] = string(bytes.TrimSpace(parts[1]))
+		env[key] = string(parts[1])
 	}
 
 	return env, nil
