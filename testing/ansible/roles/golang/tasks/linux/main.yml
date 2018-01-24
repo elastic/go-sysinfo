@@ -1,0 +1,8 @@
+---
+
+- include: ../common/unix.yml
+
+- name: Install git
+  apt:
+    name: git
+  become: true

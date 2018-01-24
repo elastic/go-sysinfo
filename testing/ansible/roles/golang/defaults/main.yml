@@ -1,0 +1,5 @@
+---
+
+gvm_go_version: 1.9.3
+global_profile_file: "/etc/profile.d/gvm.sh"
+user_profile_file: ".profile"
