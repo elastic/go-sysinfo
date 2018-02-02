@@ -2,5 +2,10 @@
 *.swp
 *.o
 .idea
-
+.vagrant
 _obj
+
+*TEST.out
+main.retry
+testing/ssh_config
+testing/ve
