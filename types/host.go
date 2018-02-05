@@ -25,11 +25,15 @@ func (host HostInfo) Uptime() time.Duration {
 }
 
 type OSInfo struct {
-	Platform string `json:"platform"`           // OS platform (e.g. linux, darwin, win32, freebsd).
-	Name     string `json:"name"`               // OS Name (e.g. Mac OS X).
+	Family   string `json:"family"`             // OS Family (e.g. redhat, debian, freebsd, windows).
+	Platform string `json:"platform"`           // OS platform (e.g. centos, ubuntu, windows).
+	Name     string `json:"name"`               // OS Name (e.g. Mac OS X, CentOS).
 	Version  string `json:"version"`            // OS version (e.g. 10.12.6).
-	Codename string `json:"codename,omitempty"` // OS codename (e.g. jessie).
+	Major    int    `json:"major"`              // Major release version.
+	Minor    int    `json:"minor"`              // Minor release version.
+	Patch    int    `json:"patch"`              // Patch release version.
 	Build    string `json:"build,omitempty"`    // Build (e.g. 16G1114).
+	Codename string `json:"codename,omitempty"` // OS codename (e.g. jessie).
 }
 
 type LoadAverager interface {

@@ -58,7 +58,9 @@ func TestProcessFeaturesMatrix(t *testing.T) {
 	_, features.Memory = process.(types.Memory)
 
 	assert.Equal(t, expectedProcessFeatures[GOOS], features)
-	logAsJSON(t, features)
+	logAsJSON(t, map[string]interface{}{
+		"features": features,
+	})
 }
 
 func TestSelf(t *testing.T) {
@@ -75,11 +77,12 @@ func TestSelf(t *testing.T) {
 		}
 	}
 
+	output := map[string]interface{}{}
 	info, err := process.Info()
 	if err != nil {
 		t.Fatal(err)
 	}
-	logAsJSON(t, info)
+	output["process.info"] = info
 	assert.EqualValues(t, os.Getpid(), info.PID)
 	assert.EqualValues(t, os.Getppid(), info.PPID)
 	assert.Equal(t, os.Args, info.Args)
@@ -115,20 +118,20 @@ func TestSelf(t *testing.T) {
 			t.Fatal(err)
 		}
 		assert.Equal(t, expectedEnv, actualEnv)
-		logAsJSON(t, actualEnv)
+		output["process.env"] = actualEnv
 	}
 
 	if v, ok := process.(types.Memory); ok {
 		memInfo := v.Memory()
 		assert.NotZero(t, memInfo.Virtual)
 		assert.NotZero(t, memInfo.Resident)
-		logAsJSON(t, memInfo)
+		output["process.mem"] = memInfo
 	}
 
 	if v, ok := process.(types.CPUTimer); ok {
 		cpuTimes := v.CPUTime()
 		assert.NotZero(t, cpuTimes)
-		logAsJSON(t, cpuTimes)
+		output["process.cpu"] = cpuTimes
 	}
 
 	if v, ok := process.(types.FileDescriptor); ok {
@@ -138,9 +141,11 @@ func TestSelf(t *testing.T) {
 		}
 		fds, err := v.FileDescriptors()
 		if assert.NoError(t, err) {
-			logAsJSON(t, fds)
+			output["process.fd"] = fds
 		}
 	}
+
+	logAsJSON(t, output)
 }
 
 func TestHost(t *testing.T) {
@@ -152,8 +157,9 @@ func TestHost(t *testing.T) {
 	info := host.Info()
 	assert.NotZero(t, info)
 
-	data, _ := json.MarshalIndent(info, "", "  ")
-	t.Log(string(data))
+	logAsJSON(t, map[string]interface{}{
+		"host": info,
+	})
 }
 
 func logAsJSON(t testing.TB, v interface{}) {
