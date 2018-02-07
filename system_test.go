@@ -81,6 +81,8 @@ func TestSelf(t *testing.T) {
 	process, err := Self()
 	if err == types.ErrNotImplemented {
 		t.Skip("process provider not implemented on", runtime.GOOS)
+	} else if err != nil {
+		t.Fatal(err)
 	}
 
 	if runtime.GOOS == "linux" {
@@ -166,13 +168,15 @@ func TestHost(t *testing.T) {
 	host, err := Host()
 	if err == types.ErrNotImplemented {
 		t.Skip("host provider not implemented on", runtime.GOOS)
+	} else if err != nil {
+		t.Fatal(err)
 	}
 
 	info := host.Info()
 	assert.NotZero(t, info)
 
 	logAsJSON(t, map[string]interface{}{
-		"host": info,
+		"host.info": info,
 	})
 }
 

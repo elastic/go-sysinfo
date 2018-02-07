@@ -24,6 +24,7 @@ import (
 	// Register host and process providers.
 	_ "github.com/elastic/go-sysinfo/darwin"
 	_ "github.com/elastic/go-sysinfo/linux"
+	_ "github.com/elastic/go-sysinfo/windows"
 )
 
 // Go returns information about the Go runtime.
