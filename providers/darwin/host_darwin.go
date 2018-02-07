@@ -22,7 +22,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/go-sysinfo/internal/registry"
-	"github.com/elastic/go-sysinfo/linux"
+	"github.com/elastic/go-sysinfo/providers/shared"
 	"github.com/elastic/go-sysinfo/types"
 )
 
@@ -104,7 +104,7 @@ func (r *reader) hostname(h *host) {
 }
 
 func (r *reader) network(h *host) {
-	ips, macs, err := linux.Network()
+	ips, macs, err := shared.Network()
 	if r.addErr(err) {
 		return
 	}

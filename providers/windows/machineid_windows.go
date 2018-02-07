@@ -15,31 +15,28 @@
 package windows
 
 import (
-	"net"
+	"github.com/pkg/errors"
+	"golang.org/x/sys/windows/registry"
 )
 
-func Network() (ips, macs []string, err error) {
-	ifcs, err := net.Interfaces()
+func MachineID() (string, error) {
+	return getMachineGUID()
+}
+
+func getMachineGUID() (string, error) {
+	const key = registry.LOCAL_MACHINE
+	const path = `SOFTWARE\Microsoft\Cryptography`
+	const name = "MachineGuid"
+
+	k, err := registry.OpenKey(key, path, registry.READ|registry.WOW64_64KEY)
 	if err != nil {
-		return nil, nil, err
+		return "", errors.Wrapf(err, `failed to open HKLM\%v`, path)
 	}
 
-	ips = make([]string, 0, len(ifcs))
-	macs = make([]string, 0, len(ifcs))
-	for _, ifc := range ifcs {
-		addrs, err := ifc.Addrs()
-		if err != nil {
-			return nil, nil, err
-		}
-		for _, addr := range addrs {
-			ips = append(ips, addr.String())
-		}
-
-		mac := ifc.HardwareAddr.String()
-		if mac != "" {
-			macs = append(macs, mac)
-		}
+	guid, _, err := k.GetStringValue(name)
+	if err != nil {
+		return "", errors.Wrapf(err, `failed to get value of HKLM\%v\%v`, path, name)
 	}
 
-	return ips, macs, nil
+	return guid, nil
 }
