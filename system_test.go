@@ -33,6 +33,8 @@ type ProcessFeatures struct {
 	FileDescriptor bool
 	CPUTimer       bool
 	Memory         bool
+	Seccomp        bool
+	Capabilities   bool
 }
 
 var expectedProcessFeatures = map[string]*ProcessFeatures{
@@ -49,6 +51,8 @@ var expectedProcessFeatures = map[string]*ProcessFeatures{
 		FileDescriptor: true,
 		CPUTimer:       true,
 		Memory:         true,
+		Seccomp:        true,
+		Capabilities:   true,
 	},
 }
 
@@ -58,7 +62,7 @@ func TestProcessFeaturesMatrix(t *testing.T) {
 
 	process, err := Self()
 	if err == types.ErrNotImplemented {
-		assert.Nil(t, expectedProcessFeatures[GOOS], "expected to find a ProcessProvider for %v", GOOS)
+		assert.Nil(t, expectedProcessFeatures[GOOS], "unexpected ErrNotImplemented for %v", GOOS)
 		return
 	} else if err != nil {
 		t.Fatal(err)
@@ -69,6 +73,8 @@ func TestProcessFeaturesMatrix(t *testing.T) {
 	_, features.FileDescriptor = process.(types.FileDescriptor)
 	_, features.CPUTimer = process.(types.CPUTimer)
 	_, features.Memory = process.(types.Memory)
+	_, features.Seccomp = process.(types.Seccomp)
+	_, features.Capabilities = process.(types.Capabilities)
 
 	assert.Equal(t, expectedProcessFeatures[GOOS], &features)
 	logAsJSON(t, map[string]interface{}{
@@ -160,6 +166,22 @@ func TestSelf(t *testing.T) {
 		}
 	}
 
+	if v, ok := process.(types.Seccomp); ok {
+		seccompInfo, err := v.Seccomp()
+		if assert.NoError(t, err) {
+			assert.NotZero(t, seccompInfo)
+			output["process.seccomp"] = seccompInfo
+		}
+	}
+
+	if v, ok := process.(types.Capabilities); ok {
+		capInfo, err := v.Capabilities()
+		if assert.NoError(t, err) {
+			assert.NotZero(t, capInfo)
+			output["process.capabilities"] = capInfo
+		}
+	}
+
 	logAsJSON(t, output)
 }
 
@@ -174,8 +196,20 @@ func TestHost(t *testing.T) {
 	info := host.Info()
 	assert.NotZero(t, info)
 
+	memory, err := host.Memory()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cpu, err := host.CPUTime()
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	logAsJSON(t, map[string]interface{}{
-		"host.info": info,
+		"host.info":   info,
+		"host.memory": memory,
+		"host.cpu":    cpu,
 	})
 }
 

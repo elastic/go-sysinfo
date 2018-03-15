@@ -17,6 +17,9 @@ package linux
 import (
 	"encoding/json"
 	"testing"
+	"time"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/go-sysinfo/internal/registry"
 )
@@ -24,7 +27,7 @@ import (
 var _ registry.HostProvider = linuxSystem{}
 
 func TestHost(t *testing.T) {
-	host, err := linuxSystem{}.Host()
+	host, err := newLinuxSystem("").Host()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -32,4 +35,20 @@ func TestHost(t *testing.T) {
 	info := host.Info()
 	data, _ := json.MarshalIndent(info, "", "  ")
 	t.Log(string(data))
+}
+
+func TestHostMemoryInfo(t *testing.T) {
+	host, err := newLinuxSystem("testdata/ubuntu1710").Host()
+	if err != nil {
+		t.Fatal(err)
+	}
+	m, err := host.Memory()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.WithinDuration(t, time.Now(), m.Timestamp, time.Minute)
+	assert.EqualValues(t, 4139057152, m.Total)
+	assert.NotContains(t, m.Metrics, "MemTotal")
+	assert.Contains(t, m.Metrics, "Slab")
 }

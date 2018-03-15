@@ -15,8 +15,6 @@
 package linux
 
 import (
-	"os"
-	"path/filepath"
 	"strconv"
 
 	"github.com/elastic/go-sysinfo/types"
@@ -43,47 +41,26 @@ func (m SeccompMode) String() string {
 	}
 }
 
-func Seccomp() (*types.SeccompInfo, error) {
-	mode, err := seccompMode()
-	if err != nil {
-		return nil, err
-	}
+func readSeccompFields(content []byte) (*types.SeccompInfo, error) {
+	var seccomp types.SeccompInfo
 
-	info := &types.SeccompInfo{
-		Mode: mode.String(),
-	}
+	err := parseKeyValue(content, ":", func(key, value []byte) error {
+		switch string(key) {
+		case "Seccomp":
+			mode, err := strconv.ParseUint(string(value), 10, 8)
+			if err != nil {
+				return err
+			}
+			seccomp.Mode = SeccompMode(mode).String()
+		case "NoNewPrivs":
+			noNewPrivs, err := strconv.ParseBool(string(value))
+			if err != nil {
+				return err
+			}
+			seccomp.NoNewPrivs = &noNewPrivs
+		}
+		return nil
+	})
 
-	noNewPrivs, err := noNewPrivs()
-	if err == nil {
-		info.NoNewPrivs = &noNewPrivs
-	}
-
-	return info, nil
-}
-
-func seccompMode() (SeccompMode, error) {
-	v, err := findValue(statusFile(), ":", "Seccomp")
-	if err != nil {
-		return 0, err
-	}
-
-	mode, err := strconv.ParseUint(v, 10, 8)
-	if err != nil {
-		return 0, err
-	}
-
-	return SeccompMode(mode), nil
-}
-
-func noNewPrivs() (bool, error) {
-	v, err := findValue(statusFile(), ":", "NoNewPrivs")
-	if err != nil {
-		return false, err
-	}
-
-	return strconv.ParseBool(v)
-}
-
-func statusFile() string {
-	return filepath.Join("/proc", strconv.Itoa(os.Getpid()), "status")
+	return &seccomp, err
 }

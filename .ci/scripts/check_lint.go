@@ -26,7 +26,7 @@ import (
 )
 
 var ignoreWarnings = []string{
-	`don't use underscores in Go names'`,
+	`don't use underscores in Go names`,
 }
 
 var ignoreWarningsRe = regexp.MustCompile(strings.Join(ignoreWarnings, "|"))
@@ -70,16 +70,14 @@ func main() {
 }
 
 func filterIgnores(out []byte) ([]byte, error) {
-	var lines [][]byte
+	var buffer bytes.Buffer
 	s := bufio.NewScanner(bytes.NewReader(out))
 	for s.Scan() {
 		if !ignoreWarningsRe.Match(s.Bytes()) {
-			lines = append(lines, s.Bytes())
+			buffer.Write(s.Bytes())
+			buffer.WriteByte('\n')
 		}
 	}
-	var filtered []byte
-	if len(lines) > 0 {
-		filtered = append(bytes.Join(lines, []byte("\n")), []byte("\n")...)
-	}
-	return filtered, s.Err()
+
+	return buffer.Bytes(), s.Err()
 }

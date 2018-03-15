@@ -22,23 +22,23 @@ import (
 )
 
 var (
-	bootTime     time.Time
-	bootTimeLock sync.Mutex
+	bootTimeValue time.Time  // Cached boot time.
+	bootTimeLock  sync.Mutex // Lock that guards access to bootTime.
 )
 
-func BootTime() (time.Time, error) {
+func bootTime(fs procfs.FS) (time.Time, error) {
 	bootTimeLock.Lock()
 	defer bootTimeLock.Unlock()
 
-	if !bootTime.IsZero() {
-		return bootTime, nil
+	if !bootTimeValue.IsZero() {
+		return bootTimeValue, nil
 	}
 
-	stat, err := procfs.NewStat()
+	stat, err := fs.NewStat()
 	if err != nil {
 		return time.Time{}, nil
 	}
 
-	bootTime = time.Unix(int64(stat.BootTime), 0)
-	return bootTime, nil
+	bootTimeValue = time.Unix(int64(stat.BootTime), 0)
+	return bootTimeValue, nil
 }

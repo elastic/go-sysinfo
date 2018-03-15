@@ -18,6 +18,7 @@ package darwin
 
 /*
 #include <libproc.h>
+#include <mach/mach_host.h>
 */
 import "C"
 
@@ -48,3 +49,18 @@ type vnodeInfo C.struct_vnode_info
 type vnodeInfoPath C.struct_vnode_info_path
 
 type procVnodePathInfo C.struct_proc_vnodepathinfo
+
+type vmStatisticsData C.vm_statistics_data_t
+
+type vmStatistics64Data C.vm_statistics64_data_t
+
+type vmSize C.vm_size_t
+
+const (
+	cpuStateUser   = C.CPU_STATE_USER
+	cpuStateSystem = C.CPU_STATE_SYSTEM
+	cpuStateIdle   = C.CPU_STATE_IDLE
+	cpuStateNice   = C.CPU_STATE_NICE
+)
+
+type hostCPULoadInfo C.host_cpu_load_info_data_t
