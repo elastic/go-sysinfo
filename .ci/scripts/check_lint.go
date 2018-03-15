@@ -44,7 +44,7 @@ func main() {
 		golintArgs = strings.Split(string(out), "\n")
 	}
 
-	out, err := exec.Command("go", "get", "-u", "github.com/golang/lint/golint").Output()
+	out, err := exec.Command("go", "get", "github.com/golang/lint/golint").Output()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "error", err)
 		os.Exit(1)

@@ -33,16 +33,16 @@ func main() {
 		paths = flag.Args()
 	}
 
-	out, err := exec.Command("go", "get", "-u", "golang.org/x/tools/cmd/goimports").Output()
+	out, err := exec.Command("go", "get", "golang.org/x/tools/cmd/goimports").Output()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "error", err)
+		fmt.Fprintf(os.Stderr, "error executing goimports: %v", string(err.(*exec.ExitError).Stderr))
 		os.Exit(1)
 	}
 
 	args := append([]string{"-l", "-local", localPkgs}, paths...)
 	out, err = exec.Command("goimports", args...).Output()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "error", err)
+		fmt.Fprintln(os.Stderr, "error", err.(*exec.ExitError))
 		os.Exit(1)
 	}
 	if len(out) > 0 {

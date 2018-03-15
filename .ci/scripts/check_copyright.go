@@ -52,8 +52,7 @@ func main() {
 
 	args := flag.Args()
 	if len(args) == 0 {
-		fmt.Fprintln(os.Stderr, "No directories specified.")
-		os.Exit(1)
+		args = []string{"."}
 	}
 
 	for _, dir := range args {
