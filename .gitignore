@@ -4,6 +4,7 @@
 .idea
 .vagrant
 _obj
+.DS_Store
 
 *TEST.out
 main.retry

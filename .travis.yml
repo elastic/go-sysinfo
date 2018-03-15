@@ -18,3 +18,4 @@ script:
 - go-licenser -d
 - go run .ci/scripts/check_format.go
 - go test -v ./...
+- make -C testing crosscompile

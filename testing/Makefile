@@ -5,6 +5,8 @@ ANSIBLE_LIMIT?=all:!localhost
 # Extra flags to pass to Ansible (e.g. --skip-tags filebeat).
 ANSIBLE_EXTRA_FLAGS?=--tags run_tests
 
+BUILD_DIR=build
+
 .PHONY:ansible
 ansible: ve
 	ANSIBLE_HOST_KEY_CHECKING=false \
@@ -32,3 +34,9 @@ clean:
 	-vagrant destroy -f
 	-rm -r .vagrant
 	-rm -f ssh_config
+
+.PHONY: crosscompile
+crosscompile:
+	go get github.com/mitchellh/gox
+	mkdir -p ${BUILD_DIR}
+	gox -output="${BUILD_DIR}/bin/{{.Dir}}-{{.OS}}-{{.Arch}}"
