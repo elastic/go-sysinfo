@@ -12,30 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// +build darwin,amd64,cgo
+
 package darwin
 
 import (
-	"os"
-	"testing"
+	"syscall"
+	"time"
 
-	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/go-sysinfo/internal/registry"
+	"github.com/pkg/errors"
 )
 
-var _ registry.HostProvider = darwinSystem{}
-var _ registry.ProcessProvider = darwinSystem{}
+const kernBoottimeMIB = "kern.boottime"
 
-func TestKernProcInfo(t *testing.T) {
-	var p process
-	if err := kern_procargs(os.Getpid(), &p); err != nil {
-		t.Fatal(err)
+func BootTime() (time.Time, error) {
+	var tv syscall.Timeval
+	if err := sysctlByName(kernBoottimeMIB, &tv); err != nil {
+		return time.Time{}, errors.Wrap(err, "failed to get host uptime")
 	}
 
-	exe, err := os.Executable()
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.Equal(t, exe, p.exe)
-	assert.Equal(t, os.Args, p.args)
+	bootTime := time.Unix(int64(tv.Sec), int64(tv.Usec)*int64(time.Microsecond))
+	return bootTime, nil
 }
