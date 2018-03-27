@@ -21,6 +21,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
 )
 
@@ -30,7 +31,7 @@ var ignores = []string{
 	`^testing/`,
 }
 
-var ignoreRe = regexp.MustCompile(strings.Join(ignores, "|"))
+var ignoreRe *regexp.Regexp
 
 // File extensions to check
 var checkExts = map[string]bool{
@@ -46,6 +47,17 @@ var copyrightRegexps = []string{
 }
 
 var copyrightRe = regexp.MustCompile(strings.Join(copyrightRegexps, "|"))
+
+func init() {
+	ignorePattern := strings.Join(ignores, "|")
+
+	if runtime.GOOS == "windows" {
+		// Modify file separators for Windows.
+		ignorePattern = strings.Replace(ignorePattern, "/", `\\`, -1)
+	}
+
+	ignoreRe = regexp.MustCompile(ignorePattern)
+}
 
 func main() {
 	flag.Parse()

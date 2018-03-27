@@ -35,15 +35,15 @@ type ProcessFeatures struct {
 	Memory         bool
 }
 
-var expectedProcessFeatures = map[string]ProcessFeatures{
-	"darwin": ProcessFeatures{
+var expectedProcessFeatures = map[string]*ProcessFeatures{
+	"darwin": &ProcessFeatures{
 		ProcessInfo:    true,
 		Environment:    true,
 		FileDescriptor: false,
 		CPUTimer:       true,
 		Memory:         true,
 	},
-	"linux": ProcessFeatures{
+	"linux": &ProcessFeatures{
 		ProcessInfo:    true,
 		Environment:    true,
 		FileDescriptor: true,
@@ -59,7 +59,6 @@ func TestProcessFeaturesMatrix(t *testing.T) {
 	process, err := Self()
 	if err == types.ErrNotImplemented {
 		assert.Nil(t, expectedProcessFeatures[GOOS], "expected to find a ProcessProvider for %v", GOOS)
-		logAsJSON(t, features)
 		return
 	} else if err != nil {
 		t.Fatal(err)
@@ -71,7 +70,7 @@ func TestProcessFeaturesMatrix(t *testing.T) {
 	_, features.CPUTimer = process.(types.CPUTimer)
 	_, features.Memory = process.(types.Memory)
 
-	assert.Equal(t, expectedProcessFeatures[GOOS], features)
+	assert.Equal(t, expectedProcessFeatures[GOOS], &features)
 	logAsJSON(t, map[string]interface{}{
 		"features": features,
 	})
