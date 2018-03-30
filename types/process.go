@@ -66,13 +66,28 @@ func (cpu CPUTimes) Total() time.Duration {
 
 type MemoryInfo struct {
 	Timestamp time.Time         `json:"timestamp"` // Time at which samples were collected.
-	Resident  uint64            `json:"resident"`
-	Virtual   uint64            `json:"virtual"`
+	Resident  uint64            `json:"resident_bytes"`
+	Virtual   uint64            `json:"virtual_bytes"`
 	Metrics   map[string]uint64 `json:"raw,omitempty"` // Other memory related metrics.
 }
 
 type SeccompInfo struct {
-	Mode          string   `json:"mode"`
-	EffectiveCaps []string `json:"effective_capabilities"`
-	NoNewPrivs    *bool    `json:"no_new_privs"`
+	Mode       string `json:"mode"`
+	NoNewPrivs *bool  `json:"no_new_privs,omitempty"` // Added in kernel 4.10.
+}
+
+type CapabilityInfo struct {
+	Inheritable []string `json:"inheritable"`
+	Permitted   []string `json:"permitted"`
+	Effective   []string `json:"effective"`
+	Bounding    []string `json:"bounding"`
+	Ambient     []string `json:"ambient"`
+}
+
+type Capabilities interface {
+	Capabilities() (*CapabilityInfo, error)
+}
+
+type Seccomp interface {
+	Seccomp() (*SeccompInfo, error)
 }

@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"strconv"
 	"time"
 
@@ -31,37 +30,41 @@ import (
 const userHz = 100
 
 func (s linuxSystem) Processes() ([]types.Process, error) {
-	procs, err := procfs.AllProcs()
+	procs, err := s.procFS.AllProcs()
 	if err != nil {
 		return nil, err
 	}
+	s.procFS.Path()
 
 	processes := make([]types.Process, 0, len(procs))
 	for _, proc := range procs {
-		processes = append(processes, &process{Proc: proc})
+		processes = append(processes, &process{Proc: proc, fs: s.procFS})
 	}
 	return processes, nil
 }
 
 func (s linuxSystem) Process(pid int) (types.Process, error) {
-	proc, err := procfs.NewProc(pid)
+	proc, err := s.procFS.NewProc(pid)
 	if err != nil {
 		return nil, err
 	}
 
-	return &process{Proc: proc}, nil
+	return &process{Proc: proc, fs: s.procFS}, nil
 }
 
 type process struct {
 	procfs.Proc
+	fs   procfs.FS
 	info *types.ProcessInfo
+}
+
+func (p *process) path(pa ...string) string {
+	return p.fs.Path(append([]string{strconv.Itoa(p.PID)}, pa...)...)
 }
 
 func (p *process) CWD() (string, error) {
 	// TODO: add CWD to procfs
-	link := filepath.Join(procfs.DefaultMountPoint, strconv.Itoa(p.PID), "cwd")
-
-	cwd, err := os.Readlink(link)
+	cwd, err := os.Readlink(p.path("cwd"))
 	if os.IsNotExist(err) {
 		return "", nil
 	}
@@ -94,7 +97,7 @@ func (p *process) Info() (types.ProcessInfo, error) {
 		return types.ProcessInfo{}, err
 	}
 
-	bootTime, err := BootTime()
+	bootTime, err := bootTime(p.fs)
 	if err != nil {
 		return types.ProcessInfo{}, err
 	}
@@ -149,8 +152,7 @@ func (p *process) FileDescriptorCount() (int, error) {
 
 func (p *process) Environment() (map[string]string, error) {
 	// TODO: add Environment to procfs
-	filename := filepath.Join(procfs.DefaultMountPoint, strconv.Itoa(p.PID), "environ")
-	content, err := ioutil.ReadFile(filename)
+	content, err := ioutil.ReadFile(p.path("environ"))
 	if err != nil {
 		return nil, err
 	}
@@ -172,6 +174,24 @@ func (p *process) Environment() (map[string]string, error) {
 	}
 
 	return env, nil
+}
+
+func (p *process) Seccomp() (*types.SeccompInfo, error) {
+	content, err := ioutil.ReadFile(p.path("status"))
+	if err != nil {
+		return nil, err
+	}
+
+	return readSeccompFields(content)
+}
+
+func (p *process) Capabilities() (*types.CapabilityInfo, error) {
+	content, err := ioutil.ReadFile(p.path("status"))
+	if err != nil {
+		return nil, err
+	}
+
+	return readCapabilities(content)
 }
 
 func ticksToDuration(ticks uint64) time.Duration {
