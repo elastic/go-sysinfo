@@ -15,7 +15,6 @@
 package system
 
 import (
-	"os"
 	"runtime"
 
 	"github.com/elastic/go-sysinfo/internal/registry"
@@ -75,5 +74,9 @@ func Processes() ([]types.Process, error) {
 // information collection is not implemented for this platform then
 // types.ErrNotImplemented is returned.
 func Self() (types.Process, error) {
-	return Process(os.Getpid())
+	provider := registry.GetProcessProvider()
+	if provider == nil {
+		return nil, types.ErrNotImplemented
+	}
+	return provider.Self()
 }
