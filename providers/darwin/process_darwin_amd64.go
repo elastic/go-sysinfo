@@ -27,6 +27,7 @@ import "C"
 import (
 	"bytes"
 	"encoding/binary"
+	"os"
 	"time"
 	"unsafe"
 
@@ -45,6 +46,10 @@ func (s darwinSystem) Process(pid int) (types.Process, error) {
 	p := process{pid: pid}
 
 	return &p, nil
+}
+
+func (s darwinSystem) Self() (types.Process, error) {
+	return s.Process(os.Getpid())
 }
 
 type process struct {

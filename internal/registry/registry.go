@@ -33,8 +33,9 @@ type HostProvider interface {
 }
 
 type ProcessProvider interface {
-	Process(pid int) (types.Process, error)
 	Processes() ([]types.Process, error)
+	Process(pid int) (types.Process, error)
+	Self() (types.Process, error)
 }
 
 func Register(provider interface{}) {

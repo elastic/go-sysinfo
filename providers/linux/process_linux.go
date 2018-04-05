@@ -55,6 +55,15 @@ func (s linuxSystem) Process(pid int) (types.Process, error) {
 	return &process{Proc: proc, fs: s.procFS}, nil
 }
 
+func (s linuxSystem) Self() (types.Process, error) {
+	proc, err := s.procFS.Self()
+	if err != nil {
+		return nil, err
+	}
+
+	return &process{Proc: proc, fs: s.procFS}, nil
+}
+
 type process struct {
 	procfs.Proc
 	fs   procfs.FS
