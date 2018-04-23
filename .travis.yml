@@ -11,7 +11,10 @@ go:
 
 go_import_path: github.com/elastic/go-sysinfo
 
+before_install:
+- go get -u github.com/elastic/go-licenser
+
 script:
-- go run .ci/scripts/check_copyright.go .
+- go-licenser -d
 - go run .ci/scripts/check_format.go
 - go test -v ./...
