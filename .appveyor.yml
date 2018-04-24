@@ -33,7 +33,8 @@ install:
   - go env
   - python --version
 before_build:
-- go run .ci/scripts/check_copyright.go
+- go get -u github.com/elastic/go-licenser
+- go-licenser -d
 - go run .ci/scripts/check_format.go
 
 build_script:
