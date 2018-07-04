@@ -19,7 +19,6 @@ package linux
 
 import (
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"strconv"
@@ -146,7 +145,6 @@ func (p *process) CPUTime() types.CPUTimes {
 		return types.CPUTimes{}
 	}
 
-	fmt.Println("UTime", stat.UTime, "STime", stat.STime)
 	return types.CPUTimes{
 		Timestamp: time.Now(),
 		User:      ticksToDuration(uint64(stat.UTime)),
