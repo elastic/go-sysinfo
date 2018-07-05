@@ -20,7 +20,6 @@ package linux
 import (
 	"encoding/json"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -50,7 +49,6 @@ func TestHostMemoryInfo(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.WithinDuration(t, time.Now(), m.Timestamp, time.Minute)
 	assert.EqualValues(t, 4139057152, m.Total)
 	assert.NotContains(t, m.Metrics, "MemTotal")
 	assert.Contains(t, m.Metrics, "Slab")

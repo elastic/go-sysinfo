@@ -76,15 +76,14 @@ func (h *host) CPUTime() (*types.CPUTimes, error) {
 	}
 
 	return &types.CPUTimes{
-		Timestamp: time.Now(),
-		User:      time.Duration(stat.CPUTotal.User * float64(time.Second)),
-		System:    time.Duration(stat.CPUTotal.System * float64(time.Second)),
-		Idle:      time.Duration(stat.CPUTotal.Idle * float64(time.Second)),
-		IOWait:    time.Duration(stat.CPUTotal.Iowait * float64(time.Second)),
-		IRQ:       time.Duration(stat.CPUTotal.IRQ * float64(time.Second)),
-		Nice:      time.Duration(stat.CPUTotal.Nice * float64(time.Second)),
-		SoftIRQ:   time.Duration(stat.CPUTotal.SoftIRQ * float64(time.Second)),
-		Steal:     time.Duration(stat.CPUTotal.Steal * float64(time.Second)),
+		User:    time.Duration(stat.CPUTotal.User * float64(time.Second)),
+		System:  time.Duration(stat.CPUTotal.System * float64(time.Second)),
+		Idle:    time.Duration(stat.CPUTotal.Idle * float64(time.Second)),
+		IOWait:  time.Duration(stat.CPUTotal.Iowait * float64(time.Second)),
+		IRQ:     time.Duration(stat.CPUTotal.IRQ * float64(time.Second)),
+		Nice:    time.Duration(stat.CPUTotal.Nice * float64(time.Second)),
+		SoftIRQ: time.Duration(stat.CPUTotal.SoftIRQ * float64(time.Second)),
+		Steal:   time.Duration(stat.CPUTotal.Steal * float64(time.Second)),
 	}, nil
 }
 

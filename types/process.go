@@ -51,15 +51,14 @@ type Memory interface {
 }
 
 type CPUTimes struct {
-	Timestamp time.Time     `json:"timestamp"` // Time at which samples were collected.
-	User      time.Duration `json:"user"`
-	System    time.Duration `json:"system"`
-	Idle      time.Duration `json:"idle,omitempty"`
-	IOWait    time.Duration `json:"iowait,omitempty"`
-	IRQ       time.Duration `json:"irq,omitempty"`
-	Nice      time.Duration `json:"nice,omitempty"`
-	SoftIRQ   time.Duration `json:"soft_irq,omitempty"`
-	Steal     time.Duration `json:"steal,omitempty"`
+	User    time.Duration `json:"user"`
+	System  time.Duration `json:"system"`
+	Idle    time.Duration `json:"idle,omitempty"`
+	IOWait  time.Duration `json:"iowait,omitempty"`
+	IRQ     time.Duration `json:"irq,omitempty"`
+	Nice    time.Duration `json:"nice,omitempty"`
+	SoftIRQ time.Duration `json:"soft_irq,omitempty"`
+	Steal   time.Duration `json:"steal,omitempty"`
 }
 
 func (cpu CPUTimes) Total() time.Duration {
@@ -68,10 +67,9 @@ func (cpu CPUTimes) Total() time.Duration {
 }
 
 type MemoryInfo struct {
-	Timestamp time.Time         `json:"timestamp"` // Time at which samples were collected.
-	Resident  uint64            `json:"resident_bytes"`
-	Virtual   uint64            `json:"virtual_bytes"`
-	Metrics   map[string]uint64 `json:"raw,omitempty"` // Other memory related metrics.
+	Resident uint64            `json:"resident_bytes"`
+	Virtual  uint64            `json:"virtual_bytes"`
+	Metrics  map[string]uint64 `json:"raw,omitempty"` // Other memory related metrics.
 }
 
 type SeccompInfo struct {

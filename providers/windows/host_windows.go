@@ -55,10 +55,9 @@ func (h *host) CPUTime() (*types.CPUTimes, error) {
 	}
 
 	return &types.CPUTimes{
-		Timestamp: time.Now(),
-		System:    kernel,
-		User:      user,
-		Idle:      idle,
+		System: kernel,
+		User:   user,
+		Idle:   idle,
 	}, nil
 }
 
@@ -69,7 +68,6 @@ func (h *host) Memory() (*types.HostMemoryInfo, error) {
 	}
 
 	return &types.HostMemoryInfo{
-		Timestamp:    time.Now(),
 		Total:        mem.TotalPhys,
 		Used:         mem.TotalPhys - mem.AvailPhys,
 		Free:         mem.AvailPhys,

@@ -58,16 +58,15 @@ func (h *host) CPUTime() (*types.CPUTimes, error) {
 	ticksPerSecond := time.Duration(getClockTicks())
 
 	return &types.CPUTimes{
-		Timestamp: time.Now(),
-		User:      time.Duration(cpu.User) * time.Second / ticksPerSecond,
-		System:    time.Duration(cpu.System) * time.Second / ticksPerSecond,
-		Idle:      time.Duration(cpu.Idle) * time.Second / ticksPerSecond,
-		Nice:      time.Duration(cpu.Nice) * time.Second / ticksPerSecond,
+		User:   time.Duration(cpu.User) * time.Second / ticksPerSecond,
+		System: time.Duration(cpu.System) * time.Second / ticksPerSecond,
+		Idle:   time.Duration(cpu.Idle) * time.Second / ticksPerSecond,
+		Nice:   time.Duration(cpu.Nice) * time.Second / ticksPerSecond,
 	}, nil
 }
 
 func (h *host) Memory() (*types.HostMemoryInfo, error) {
-	mem := &types.HostMemoryInfo{Timestamp: time.Now()}
+	var mem types.HostMemoryInfo
 
 	// Total physical memory.
 	if err := sysctlByName("hw.memsize", &mem.Total); err != nil {
@@ -127,7 +126,7 @@ func (h *host) Memory() (*types.HostMemoryInfo, error) {
 	mem.VirtualUsed = swap.Used
 	mem.VirtualFree = swap.Available
 
-	return mem, nil
+	return &mem, nil
 }
 
 func newHost() (*host, error) {
