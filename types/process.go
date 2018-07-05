@@ -43,11 +43,17 @@ type FileDescriptor interface {
 }
 
 type CPUTimer interface {
-	CPUTime() CPUTimes
+	// CPUTime returns a CPUTimes structure for
+	// the host or some process.
+	//
+	// The User and System fields are guaranteed
+	// to be populated for all platforms, and
+	// for both hosts and processes.
+	CPUTime() (CPUTimes, error)
 }
 
 type Memory interface {
-	Memory() MemoryInfo
+	Memory() (MemoryInfo, error)
 }
 
 type CPUTimes struct {

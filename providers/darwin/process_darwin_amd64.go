@@ -91,14 +91,18 @@ func (p *process) Environment() (map[string]string, error) {
 	return p.env, nil
 }
 
-func (p *process) CPUTime() types.CPUTimes {
+func (p *process) CPUTime() (types.CPUTimes, error) {
+	// TODO p.task is unset until Info() returns successfully.
+	// Should this be getting its own process info, like on Linux?
 	return types.CPUTimes{
 		User:   time.Duration(p.task.Ptinfo.Total_user),
 		System: time.Duration(p.task.Ptinfo.Total_system),
-	}
+	}, nil
 }
 
-func (p *process) Memory() types.MemoryInfo {
+func (p *process) Memory() (types.MemoryInfo, error) {
+	// TODO p.task is unset until Info() returns successfully.
+	// Should this be getting its own process info, like on Linux?
 	return types.MemoryInfo{
 		Virtual:  p.task.Ptinfo.Virtual_size,
 		Resident: p.task.Ptinfo.Resident_size,
@@ -106,7 +110,7 @@ func (p *process) Memory() types.MemoryInfo {
 			"page_ins":    uint64(p.task.Ptinfo.Pageins),
 			"page_faults": uint64(p.task.Ptinfo.Faults),
 		},
-	}
+	}, nil
 }
 
 func getProcTaskAllInfo(pid int, info *procTaskAllInfo) error {

@@ -69,13 +69,13 @@ func (h *host) Memory() (*types.HostMemoryInfo, error) {
 	return parseMemInfo(content)
 }
 
-func (h *host) CPUTime() (*types.CPUTimes, error) {
+func (h *host) CPUTime() (types.CPUTimes, error) {
 	stat, err := h.procFS.NewStat()
 	if err != nil {
-		return nil, err
+		return types.CPUTimes{}, err
 	}
 
-	return &types.CPUTimes{
+	return types.CPUTimes{
 		User:    time.Duration(stat.CPUTotal.User * float64(time.Second)),
 		System:  time.Duration(stat.CPUTotal.System * float64(time.Second)),
 		Idle:    time.Duration(stat.CPUTotal.Idle * float64(time.Second)),
