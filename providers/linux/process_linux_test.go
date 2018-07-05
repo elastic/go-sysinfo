@@ -17,7 +17,13 @@
 
 package linux
 
-import "github.com/elastic/go-sysinfo/internal/registry"
+import (
+	"github.com/elastic/go-sysinfo/internal/registry"
+	"github.com/elastic/go-sysinfo/types"
+)
 
 var _ registry.HostProvider = linuxSystem{}
 var _ registry.ProcessProvider = linuxSystem{}
+
+var _ types.CPUTimer = (*process)(nil)
+var _ types.Memory = (*process)(nil)

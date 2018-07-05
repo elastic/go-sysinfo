@@ -20,9 +20,9 @@ package types
 import "time"
 
 type Host interface {
+	CPUTimer
 	Info() HostInfo
 	Memory() (*HostMemoryInfo, error)
-	CPUTime() (*CPUTimes, error)
 }
 
 type HostInfo struct {

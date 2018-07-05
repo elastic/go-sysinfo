@@ -26,6 +26,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/go-sysinfo/types"
 )
@@ -146,14 +147,16 @@ func TestSelf(t *testing.T) {
 	}
 
 	if v, ok := process.(types.Memory); ok {
-		memInfo := v.Memory()
+		memInfo, err := v.Memory()
+		require.NoError(t, err)
 		assert.NotZero(t, memInfo.Virtual)
 		assert.NotZero(t, memInfo.Resident)
 		output["process.mem"] = memInfo
 	}
 
 	if v, ok := process.(types.CPUTimer); ok {
-		cpuTimes := v.CPUTime()
+		cpuTimes, err := v.CPUTime()
+		require.NoError(t, err)
 		assert.NotZero(t, cpuTimes)
 		output["process.cpu"] = cpuTimes
 	}

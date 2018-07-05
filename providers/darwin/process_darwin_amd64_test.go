@@ -26,10 +26,14 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/go-sysinfo/internal/registry"
+	"github.com/elastic/go-sysinfo/types"
 )
 
 var _ registry.HostProvider = darwinSystem{}
 var _ registry.ProcessProvider = darwinSystem{}
+
+var _ types.CPUTimer = (*process)(nil)
+var _ types.Memory = (*process)(nil)
 
 func TestKernProcInfo(t *testing.T) {
 	var p process

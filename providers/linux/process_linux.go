@@ -126,28 +126,28 @@ func (p *process) Info() (types.ProcessInfo, error) {
 	return *p.info, nil
 }
 
-func (p *process) Memory() types.MemoryInfo {
+func (p *process) Memory() (types.MemoryInfo, error) {
 	stat, err := p.NewStat()
 	if err != nil {
-		return types.MemoryInfo{}
+		return types.MemoryInfo{}, err
 	}
 
 	return types.MemoryInfo{
 		Resident: uint64(stat.ResidentMemory()),
 		Virtual:  uint64(stat.VirtualMemory()),
-	}
+	}, nil
 }
 
-func (p *process) CPUTime() types.CPUTimes {
+func (p *process) CPUTime() (types.CPUTimes, error) {
 	stat, err := p.NewStat()
 	if err != nil {
-		return types.CPUTimes{}
+		return types.CPUTimes{}, err
 	}
 
 	return types.CPUTimes{
 		User:   ticksToDuration(uint64(stat.UTime)),
 		System: ticksToDuration(uint64(stat.STime)),
-	}
+	}, nil
 }
 
 func (p *process) FileDescriptors() ([]string, error) {
