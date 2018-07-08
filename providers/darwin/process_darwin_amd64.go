@@ -93,17 +93,15 @@ func (p *process) Environment() (map[string]string, error) {
 
 func (p *process) CPUTime() types.CPUTimes {
 	return types.CPUTimes{
-		Timestamp: time.Now(),
-		User:      time.Duration(p.task.Ptinfo.Total_user),
-		System:    time.Duration(p.task.Ptinfo.Total_system),
+		User:   time.Duration(p.task.Ptinfo.Total_user),
+		System: time.Duration(p.task.Ptinfo.Total_system),
 	}
 }
 
 func (p *process) Memory() types.MemoryInfo {
 	return types.MemoryInfo{
-		Timestamp: time.Now(),
-		Virtual:   p.task.Ptinfo.Virtual_size,
-		Resident:  p.task.Ptinfo.Resident_size,
+		Virtual:  p.task.Ptinfo.Virtual_size,
+		Resident: p.task.Ptinfo.Resident_size,
 		Metrics: map[string]uint64{
 			"page_ins":    uint64(p.task.Ptinfo.Pageins),
 			"page_faults": uint64(p.task.Ptinfo.Faults),

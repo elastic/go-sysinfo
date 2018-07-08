@@ -133,9 +133,8 @@ func (p *process) Memory() types.MemoryInfo {
 	}
 
 	return types.MemoryInfo{
-		Timestamp: time.Now(),
-		Resident:  uint64(stat.ResidentMemory()),
-		Virtual:   uint64(stat.VirtualMemory()),
+		Resident: uint64(stat.ResidentMemory()),
+		Virtual:  uint64(stat.VirtualMemory()),
 	}
 }
 
@@ -146,9 +145,8 @@ func (p *process) CPUTime() types.CPUTimes {
 	}
 
 	return types.CPUTimes{
-		Timestamp: time.Now(),
-		User:      ticksToDuration(uint64(stat.UTime)),
-		System:    ticksToDuration(uint64(stat.STime)),
+		User:   ticksToDuration(uint64(stat.UTime)),
+		System: ticksToDuration(uint64(stat.STime)),
 	}
 }
 

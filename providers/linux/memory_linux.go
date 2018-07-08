@@ -20,7 +20,6 @@ package linux
 import (
 	"bytes"
 	"strconv"
-	"time"
 
 	"github.com/pkg/errors"
 
@@ -29,8 +28,7 @@ import (
 
 func parseMemInfo(content []byte) (*types.HostMemoryInfo, error) {
 	memInfo := &types.HostMemoryInfo{
-		Timestamp: time.Now().UTC(),
-		Metrics:   map[string]uint64{},
+		Metrics: map[string]uint64{},
 	}
 
 	hasAvailable := false

@@ -67,7 +67,6 @@ type LoadAverageInfo struct {
 
 // HostMemoryInfo (all values are specified in bytes).
 type HostMemoryInfo struct {
-	Timestamp    time.Time         `json:"timestamp"`           // Time at which samples were collected.
 	Total        uint64            `json:"total_bytes"`         // Total physical memory.
 	Used         uint64            `json:"used_bytes"`          // Total - Free
 	Available    uint64            `json:"available_bytes"`     // Amount of memory available without swapping.
