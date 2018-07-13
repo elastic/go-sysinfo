@@ -53,21 +53,21 @@ func (s darwinSystem) Self() (types.Process, error) {
 }
 
 type process struct {
-	pid   int
-	cwd   string
-	exe   string
-	args  []string
-	env   map[string]string
-	task  procTaskAllInfo
-	vnode procVnodePathInfo
+	pid  int
+	cwd  string
+	exe  string
+	args []string
+	env  map[string]string
 }
 
 func (p *process) Info() (types.ProcessInfo, error) {
-	if err := getProcTaskAllInfo(p.pid, &p.task); err != nil {
+	var task procTaskAllInfo
+	if err := getProcTaskAllInfo(p.pid, &task); err != nil {
 		return types.ProcessInfo{}, err
 	}
 
-	if err := getProcVnodePathInfo(p.pid, &p.vnode); err != nil {
+	var vnode procVnodePathInfo
+	if err := getProcVnodePathInfo(p.pid, &vnode); err != nil {
 		return types.ProcessInfo{}, err
 	}
 
@@ -76,14 +76,14 @@ func (p *process) Info() (types.ProcessInfo, error) {
 	}
 
 	return types.ProcessInfo{
-		Name: int8SliceToString(p.task.Pbsd.Pbi_name[:]),
+		Name: int8SliceToString(task.Pbsd.Pbi_name[:]),
 		PID:  p.pid,
-		PPID: int(p.task.Pbsd.Pbi_ppid),
-		CWD:  int8SliceToString(p.vnode.Cdir.Path[:]),
+		PPID: int(task.Pbsd.Pbi_ppid),
+		CWD:  int8SliceToString(vnode.Cdir.Path[:]),
 		Exe:  p.exe,
 		Args: p.args,
-		StartTime: time.Unix(int64(p.task.Pbsd.Pbi_start_tvsec),
-			int64(p.task.Pbsd.Pbi_start_tvusec)*int64(time.Microsecond)),
+		StartTime: time.Unix(int64(task.Pbsd.Pbi_start_tvsec),
+			int64(task.Pbsd.Pbi_start_tvusec)*int64(time.Microsecond)),
 	}, nil
 }
 
@@ -92,23 +92,27 @@ func (p *process) Environment() (map[string]string, error) {
 }
 
 func (p *process) CPUTime() (types.CPUTimes, error) {
-	// TODO p.task is unset until Info() returns successfully.
-	// Should this be getting its own process info, like on Linux?
+	var task procTaskAllInfo
+	if err := getProcTaskAllInfo(p.pid, &task); err != nil {
+		return types.CPUTimes{}, err
+	}
 	return types.CPUTimes{
-		User:   time.Duration(p.task.Ptinfo.Total_user),
-		System: time.Duration(p.task.Ptinfo.Total_system),
+		User:   time.Duration(task.Ptinfo.Total_user),
+		System: time.Duration(task.Ptinfo.Total_system),
 	}, nil
 }
 
 func (p *process) Memory() (types.MemoryInfo, error) {
-	// TODO p.task is unset until Info() returns successfully.
-	// Should this be getting its own process info, like on Linux?
+	var task procTaskAllInfo
+	if err := getProcTaskAllInfo(p.pid, &task); err != nil {
+		return types.MemoryInfo{}, err
+	}
 	return types.MemoryInfo{
-		Virtual:  p.task.Ptinfo.Virtual_size,
-		Resident: p.task.Ptinfo.Resident_size,
+		Virtual:  task.Ptinfo.Virtual_size,
+		Resident: task.Ptinfo.Resident_size,
 		Metrics: map[string]uint64{
-			"page_ins":    uint64(p.task.Ptinfo.Pageins),
-			"page_faults": uint64(p.task.Ptinfo.Faults),
+			"page_ins":    uint64(task.Ptinfo.Pageins),
+			"page_faults": uint64(task.Ptinfo.Faults),
 		},
 	}, nil
 }
