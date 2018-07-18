@@ -23,8 +23,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/elastic/go-sysinfo/types"
 	"github.com/elastic/go-windows"
+
+	"github.com/elastic/go-sysinfo/types"
 )
 
 var (
