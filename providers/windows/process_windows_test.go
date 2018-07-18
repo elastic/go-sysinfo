@@ -19,11 +19,7 @@ package windows
 
 import (
 	"github.com/elastic/go-sysinfo/internal/registry"
-	"github.com/elastic/go-sysinfo/types"
 )
 
 var _ registry.HostProvider = windowsSystem{}
 var _ registry.ProcessProvider = windowsSystem{}
-
-var _ types.CPUTimer = (*process)(nil)
-var _ types.Memory = (*process)(nil)

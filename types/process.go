@@ -20,7 +20,9 @@ package types
 import "time"
 
 type Process interface {
+	CPUTimer
 	Info() (ProcessInfo, error)
+	Memory() (MemoryInfo, error)
 }
 
 type ProcessInfo struct {
@@ -50,10 +52,6 @@ type CPUTimer interface {
 	// to be populated for all platforms, and
 	// for both hosts and processes.
 	CPUTime() (CPUTimes, error)
-}
-
-type Memory interface {
-	Memory() (MemoryInfo, error)
 }
 
 type CPUTimes struct {

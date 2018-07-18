@@ -35,8 +35,6 @@ type ProcessFeatures struct {
 	ProcessInfo    bool
 	Environment    bool
 	FileDescriptor bool
-	CPUTimer       bool
-	Memory         bool
 	Seccomp        bool
 	Capabilities   bool
 }
@@ -46,15 +44,11 @@ var expectedProcessFeatures = map[string]*ProcessFeatures{
 		ProcessInfo:    true,
 		Environment:    true,
 		FileDescriptor: false,
-		CPUTimer:       true,
-		Memory:         true,
 	},
 	"linux": &ProcessFeatures{
 		ProcessInfo:    true,
 		Environment:    true,
 		FileDescriptor: true,
-		CPUTimer:       true,
-		Memory:         true,
 		Seccomp:        true,
 		Capabilities:   true,
 	},
@@ -75,8 +69,6 @@ func TestProcessFeaturesMatrix(t *testing.T) {
 
 	_, features.Environment = process.(types.Environment)
 	_, features.FileDescriptor = process.(types.FileDescriptor)
-	_, features.CPUTimer = process.(types.CPUTimer)
-	_, features.Memory = process.(types.Memory)
 	_, features.Seccomp = process.(types.Seccomp)
 	_, features.Capabilities = process.(types.Capabilities)
 
@@ -146,13 +138,11 @@ func TestSelf(t *testing.T) {
 		output["process.env"] = actualEnv
 	}
 
-	if v, ok := process.(types.Memory); ok {
-		memInfo, err := v.Memory()
-		require.NoError(t, err)
-		assert.NotZero(t, memInfo.Virtual)
-		assert.NotZero(t, memInfo.Resident)
-		output["process.mem"] = memInfo
-	}
+	memInfo, err := process.Memory()
+	require.NoError(t, err)
+	assert.NotZero(t, memInfo.Virtual)
+	assert.NotZero(t, memInfo.Resident)
+	output["process.mem"] = memInfo
 
 	if v, ok := process.(types.CPUTimer); ok {
 		cpuTimes, err := v.CPUTime()
