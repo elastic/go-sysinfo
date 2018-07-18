@@ -52,6 +52,9 @@ var expectedProcessFeatures = map[string]*ProcessFeatures{
 		Seccomp:        true,
 		Capabilities:   true,
 	},
+	"windows": &ProcessFeatures{
+		ProcessInfo: true,
+	},
 }
 
 func TestProcessFeaturesMatrix(t *testing.T) {
@@ -140,15 +143,25 @@ func TestSelf(t *testing.T) {
 
 	memInfo, err := process.Memory()
 	require.NoError(t, err)
-	assert.NotZero(t, memInfo.Virtual)
+	if runtime.GOOS != "windows" {
+		// Virtual memory may be reported as
+		// zero on some versions of Windows.
+		assert.NotZero(t, memInfo.Virtual)
+	}
 	assert.NotZero(t, memInfo.Resident)
 	output["process.mem"] = memInfo
 
-	if v, ok := process.(types.CPUTimer); ok {
-		cpuTimes, err := v.CPUTime()
+	for {
+		cpuTimes, err := process.CPUTime()
 		require.NoError(t, err)
-		assert.NotZero(t, cpuTimes)
-		output["process.cpu"] = cpuTimes
+		if cpuTimes.Total() != 0 {
+			output["process.cpu"] = cpuTimes
+			break
+		}
+		// Spin until CPU times are non-zero.
+		// Some operating systems have a very
+		// low resolution on process CPU
+		// measurement.
 	}
 
 	if v, ok := process.(types.FileDescriptor); ok {
