@@ -49,15 +49,8 @@ var (
 	procGetProcessMemoryInfo    = modpsapi.NewProc("GetProcessMemoryInfo")
 )
 
-func _GetNativeSystemInfo(systemInfo *SystemInfo) (err error) {
-	r1, _, e1 := syscall.Syscall(procGetNativeSystemInfo.Addr(), 1, uintptr(unsafe.Pointer(systemInfo)), 0, 0)
-	if r1 == 0 {
-		if e1 != 0 {
-			err = errnoErr(e1)
-		} else {
-			err = syscall.EINVAL
-		}
-	}
+func _GetNativeSystemInfo(systemInfo *SystemInfo) {
+	syscall.Syscall(procGetNativeSystemInfo.Addr(), 1, uintptr(unsafe.Pointer(systemInfo)), 0, 0)
 	return
 }
 
