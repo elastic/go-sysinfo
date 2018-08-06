@@ -230,3 +230,26 @@ func logAsJSON(t testing.TB, v interface{}) {
 	j, _ := json.MarshalIndent(v, "", "  ")
 	t.Log(string(j))
 }
+
+func TestProcesses(t *testing.T) {
+	if runtime.GOOS != "windows" {
+		// This test fails CI under Linux due to /proc/$pid permissions.
+		t.Skip("Run only under Windows")
+	}
+	start := time.Now()
+	procs, err := Processes()
+	took := time.Now().Sub(start)
+	t.Log("took", took)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log("found", len(procs), "processes")
+	for _, proc := range procs {
+		info, err := proc.Info()
+		if err != nil {
+			t.Fatal(err)
+		}
+		t.Logf("pid=%v name='%s' exe='%s' args=%+v ppid=%d cwd='%s' start_time=%v", info.PID, info.Name, info.Exe, info.Args, info.PPID, info.CWD, info.StartTime)
+	}
+
+}
