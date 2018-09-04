@@ -276,3 +276,14 @@ func (p *process) CPUTime() (types.CPUTimes, error) {
 		System: windows.FiletimeToDuration(&kernelTime),
 	}, nil
 }
+
+func (p *process) OpenHandlesCount() (int, error) {
+	handle, err := p.open()
+	if err != nil {
+		return 0, err
+	}
+	defer syscall.CloseHandle(handle)
+
+	count, err := windows.GetProcessHandleCount(handle)
+	return int(count), err
+}

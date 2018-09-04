@@ -44,6 +44,10 @@ type FileDescriptor interface {
 	FileDescriptorCount() (int, error)
 }
 
+type OpenHandles interface {
+	OpenHandlesCount() (int, error)
+}
+
 type CPUTimer interface {
 	// CPUTime returns a CPUTimes structure for
 	// the host or some process.
