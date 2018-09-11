@@ -32,28 +32,33 @@ import (
 )
 
 type ProcessFeatures struct {
-	ProcessInfo    bool
-	Environment    bool
-	FileDescriptor bool
-	Seccomp        bool
-	Capabilities   bool
+	ProcessInfo          bool
+	Environment          bool
+	OpenHandleEnumerator bool
+	OpenHandleCounter    bool
+	Seccomp              bool
+	Capabilities         bool
 }
 
 var expectedProcessFeatures = map[string]*ProcessFeatures{
 	"darwin": &ProcessFeatures{
-		ProcessInfo:    true,
-		Environment:    true,
-		FileDescriptor: false,
+		ProcessInfo:          true,
+		Environment:          true,
+		OpenHandleEnumerator: false,
+		OpenHandleCounter:    false,
 	},
 	"linux": &ProcessFeatures{
-		ProcessInfo:    true,
-		Environment:    true,
-		FileDescriptor: true,
-		Seccomp:        true,
-		Capabilities:   true,
+		ProcessInfo:          true,
+		Environment:          true,
+		OpenHandleEnumerator: true,
+		OpenHandleCounter:    true,
+		Seccomp:              true,
+		Capabilities:         true,
 	},
 	"windows": &ProcessFeatures{
-		ProcessInfo: true,
+		ProcessInfo:          true,
+		OpenHandleEnumerator: false,
+		OpenHandleCounter:    true,
 	},
 }
 
@@ -71,7 +76,8 @@ func TestProcessFeaturesMatrix(t *testing.T) {
 	features.ProcessInfo = true
 
 	_, features.Environment = process.(types.Environment)
-	_, features.FileDescriptor = process.(types.FileDescriptor)
+	_, features.OpenHandleEnumerator = process.(types.OpenHandleEnumerator)
+	_, features.OpenHandleCounter = process.(types.OpenHandleCounter)
 	_, features.Seccomp = process.(types.Seccomp)
 	_, features.Capabilities = process.(types.Capabilities)
 
@@ -164,14 +170,17 @@ func TestSelf(t *testing.T) {
 		// measurement.
 	}
 
-	if v, ok := process.(types.FileDescriptor); ok {
-		count, err := v.FileDescriptorCount()
-		if assert.NoError(t, err) {
-			t.Log("file descriptor count:", count)
-		}
-		fds, err := v.FileDescriptors()
+	if v, ok := process.(types.OpenHandleEnumerator); ok {
+		fds, err := v.OpenHandles()
 		if assert.NoError(t, err) {
 			output["process.fd"] = fds
+		}
+	}
+
+	if v, ok := process.(types.OpenHandleCounter); ok {
+		count, err := v.OpenHandleCount()
+		if assert.NoError(t, err) {
+			t.Log("open handles count:", count)
 		}
 	}
 
