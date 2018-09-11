@@ -277,6 +277,7 @@ func (p *process) CPUTime() (types.CPUTimes, error) {
 	}, nil
 }
 
+// OpenHandles returns the number of open file handles of the process.
 func (p *process) OpenHandleCount() (int, error) {
 	handle, err := p.open()
 	if err != nil {

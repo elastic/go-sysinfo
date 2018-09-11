@@ -39,10 +39,12 @@ type Environment interface {
 	Environment() (map[string]string, error)
 }
 
+// OpenHandleEnumerator lists the open file handles.
 type OpenHandleEnumerator interface {
 	OpenHandles() ([]string, error)
 }
 
+// OpenHandleCount returns the number the open file handles.
 type OpenHandleCounter interface {
 	OpenHandleCount() (int, error)
 }
