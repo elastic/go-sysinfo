@@ -150,11 +150,11 @@ func (p *process) CPUTime() (types.CPUTimes, error) {
 	}, nil
 }
 
-func (p *process) FileDescriptors() ([]string, error) {
+func (p *process) OpenHandles() ([]string, error) {
 	return p.Proc.FileDescriptorTargets()
 }
 
-func (p *process) FileDescriptorCount() (int, error) {
+func (p *process) OpenHandleCount() (int, error) {
 	return p.Proc.FileDescriptorsLen()
 }
 

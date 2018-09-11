@@ -277,7 +277,7 @@ func (p *process) CPUTime() (types.CPUTimes, error) {
 	}, nil
 }
 
-func (p *process) OpenHandlesCount() (int, error) {
+func (p *process) OpenHandleCount() (int, error) {
 	handle, err := p.open()
 	if err != nil {
 		return 0, err

@@ -39,13 +39,12 @@ type Environment interface {
 	Environment() (map[string]string, error)
 }
 
-type FileDescriptor interface {
-	FileDescriptors() ([]string, error)
-	FileDescriptorCount() (int, error)
+type OpenHandleEnumerator interface {
+	OpenHandles() ([]string, error)
 }
 
-type OpenHandles interface {
-	OpenHandlesCount() (int, error)
+type OpenHandleCounter interface {
+	OpenHandleCount() (int, error)
 }
 
 type CPUTimer interface {
