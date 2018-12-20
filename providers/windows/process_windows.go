@@ -27,7 +27,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/go-windows"
+	windows "github.com/elastic/go-windows"
 
 	"github.com/elastic/go-sysinfo/types"
 )
