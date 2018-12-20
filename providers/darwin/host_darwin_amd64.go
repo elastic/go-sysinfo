@@ -19,9 +19,15 @@
 
 package darwin
 
+// #include <unistd.h>
+import "C"
+
 import (
+	"encoding/hex"
+	"fmt"
 	"os"
 	"time"
+	"unsafe"
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
@@ -218,5 +224,23 @@ func (r *reader) time(h *host) {
 }
 
 func (r *reader) uniqueID(h *host) {
-	// TODO: call gethostuuid(uuid [16]byte, timespec)
+	var uuidC C.uuid_t
+	const size = unsafe.Sizeof(uuidC)
+	var id [size]C.uchar
+	wait := C.struct_timespec{5, 0} // 5 seconds
+
+	ret, err := C.gethostuuid(&id[0], &wait)
+	if ret == 0 && err == nil {
+		bytes := C.GoBytes(unsafe.Pointer(&id[0]), C.int(size))
+		h.info.UniqueID = hex.EncodeToString(bytes)
+		return
+	}
+
+	if ret != 0 {
+		r.addErr(fmt.Errorf("gethostuuid() returned %v", ret))
+	}
+
+	if err != nil {
+		r.addErr(errors.Wrap(err, "gethostuuid() returned error"))
+	}
 }
