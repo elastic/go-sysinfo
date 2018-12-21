@@ -29,6 +29,9 @@ import (
 	"github.com/pkg/errors"
 )
 
+// MachineID returns the Hardware UUID also accessible via
+// About this Mac -> System Report and as the field
+// IOPlatformUUID in the output of "ioreg -d2 -c IOPlatformExpertDevice".
 func MachineID() (string, error) {
 	return getHostUUID()
 }
