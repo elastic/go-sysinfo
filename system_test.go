@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"os"
 	"runtime"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -129,6 +130,16 @@ func TestSelf(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.WithinDuration(t, info.StartTime, time.Now(), 10*time.Second)
+
+	user, err := process.User()
+	if err != nil {
+		t.Fatal(err)
+	}
+	output["process.user"] = user
+	assert.EqualValues(t, strconv.Itoa(os.Getuid()), user.UID)
+	assert.EqualValues(t, strconv.Itoa(os.Geteuid()), user.EUID)
+	assert.EqualValues(t, strconv.Itoa(os.Getgid()), user.GID)
+	assert.EqualValues(t, strconv.Itoa(os.Getegid()), user.EGID)
 
 	if v, ok := process.(types.Environment); ok {
 		expectedEnv := map[string]string{}

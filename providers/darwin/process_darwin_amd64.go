@@ -85,12 +85,22 @@ func (p *process) Info() (types.ProcessInfo, error) {
 		Args: p.args,
 		StartTime: time.Unix(int64(task.Pbsd.Pbi_start_tvsec),
 			int64(task.Pbsd.Pbi_start_tvusec)*int64(time.Microsecond)),
-		UID:   strconv.Itoa(int(task.Pbsd.Pbi_uid)),
-		RUID:  strconv.Itoa(int(task.Pbsd.Pbi_ruid)),
-		SVUID: strconv.Itoa(int(task.Pbsd.Pbi_svuid)),
-		GID:   strconv.Itoa(int(task.Pbsd.Pbi_gid)),
-		RGID:  strconv.Itoa(int(task.Pbsd.Pbi_rgid)),
-		SVGID: strconv.Itoa(int(task.Pbsd.Pbi_svgid)),
+	}, nil
+}
+
+func (p *process) User() (types.UserInfo, error) {
+	var task procTaskAllInfo
+	if err := getProcTaskAllInfo(p.pid, &task); err != nil {
+		return types.UserInfo{}, err
+	}
+
+	return types.UserInfo{
+		UID:  strconv.Itoa(int(task.Pbsd.Pbi_ruid)),
+		EUID: strconv.Itoa(int(task.Pbsd.Pbi_uid)),
+		SUID: strconv.Itoa(int(task.Pbsd.Pbi_svuid)),
+		GID:  strconv.Itoa(int(task.Pbsd.Pbi_rgid)),
+		EGID: strconv.Itoa(int(task.Pbsd.Pbi_gid)),
+		SGID: strconv.Itoa(int(task.Pbsd.Pbi_svgid)),
 	}, nil
 }
 

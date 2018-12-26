@@ -23,6 +23,7 @@ type Process interface {
 	CPUTimer
 	Info() (ProcessInfo, error)
 	Memory() (MemoryInfo, error)
+	User() (UserInfo, error)
 }
 
 type ProcessInfo struct {
@@ -33,12 +34,17 @@ type ProcessInfo struct {
 	Exe       string    `json:"exe"`
 	Args      []string  `json:"args"`
 	StartTime time.Time `json:"start_time"`
-	UID       string    `json:"uid"`
-	RUID      string    `json:"ruid"`
-	SVUID     string    `json:"svuid"`
-	GID       string    `json:"gid"`
-	RGID      string    `json:"rgid"`
-	SVGID     string    `json:"svgid"`
+}
+
+// UserInfo contains information about the UID and GID
+// values of a process.
+type UserInfo struct {
+	UID  string `json:"uid"`  /* real user ID */
+	EUID string `json:"euid"` /* effective user ID */
+	SUID string `json:"suid"` /* saved user ID */
+	GID  string `json:"gid"`  /* real group ID */
+	EGID string `json:"egid"` /* effective group ID */
+	SGID string `json:"sgid"` /* saved group ID */
 }
 
 type Environment interface {
