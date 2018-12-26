@@ -28,6 +28,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"os"
+	"strconv"
 	"time"
 	"unsafe"
 
@@ -84,6 +85,12 @@ func (p *process) Info() (types.ProcessInfo, error) {
 		Args: p.args,
 		StartTime: time.Unix(int64(task.Pbsd.Pbi_start_tvsec),
 			int64(task.Pbsd.Pbi_start_tvusec)*int64(time.Microsecond)),
+		UID:   strconv.Itoa(int(task.Pbsd.Pbi_uid)),
+		RUID:  strconv.Itoa(int(task.Pbsd.Pbi_ruid)),
+		SVUID: strconv.Itoa(int(task.Pbsd.Pbi_svuid)),
+		GID:   strconv.Itoa(int(task.Pbsd.Pbi_gid)),
+		RGID:  strconv.Itoa(int(task.Pbsd.Pbi_rgid)),
+		SVGID: strconv.Itoa(int(task.Pbsd.Pbi_svgid)),
 	}, nil
 }
 

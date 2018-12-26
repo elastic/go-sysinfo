@@ -33,6 +33,12 @@ type ProcessInfo struct {
 	Exe       string    `json:"exe"`
 	Args      []string  `json:"args"`
 	StartTime time.Time `json:"start_time"`
+	UID       string    `json:"uid"`
+	RUID      string    `json:"ruid"`
+	SVUID     string    `json:"svuid"`
+	GID       string    `json:"gid"`
+	RGID      string    `json:"rgid"`
+	SVGID     string    `json:"svgid"`
 }
 
 type Environment interface {
