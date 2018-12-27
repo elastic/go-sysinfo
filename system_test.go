@@ -20,6 +20,7 @@ package sysinfo
 import (
 	"encoding/json"
 	"os"
+	osUser "os/user"
 	"runtime"
 	"strconv"
 	"strings"
@@ -136,10 +137,18 @@ func TestSelf(t *testing.T) {
 		t.Fatal(err)
 	}
 	output["process.user"] = user
-	assert.EqualValues(t, strconv.Itoa(os.Getuid()), user.UID)
-	assert.EqualValues(t, strconv.Itoa(os.Geteuid()), user.EUID)
-	assert.EqualValues(t, strconv.Itoa(os.Getgid()), user.GID)
-	assert.EqualValues(t, strconv.Itoa(os.Getegid()), user.EGID)
+
+	currentUser, err := osUser.Current()
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.EqualValues(t, currentUser.Uid, user.UID)
+	assert.EqualValues(t, currentUser.Gid, user.GID)
+
+	if runtime.GOOS != "windows" {
+		assert.EqualValues(t, strconv.Itoa(os.Geteuid()), user.EUID)
+		assert.EqualValues(t, strconv.Itoa(os.Getegid()), user.EGID)
+	}
 
 	if v, ok := process.(types.Environment); ok {
 		expectedEnv := map[string]string{}

@@ -39,10 +39,10 @@ type ProcessInfo struct {
 // UserInfo contains information about the UID and GID
 // values of a process.
 type UserInfo struct {
-	UID  string `json:"uid"`  /* real user ID */
+	UID  string `json:"uid"`  /* real user ID (user SID on Windows) */
 	EUID string `json:"euid"` /* effective user ID */
 	SUID string `json:"suid"` /* saved user ID */
-	GID  string `json:"gid"`  /* real group ID */
+	GID  string `json:"gid"`  /* real group ID (primary group SID on Windows) */
 	EGID string `json:"egid"` /* effective group ID */
 	SGID string `json:"sgid"` /* saved group ID */
 }

@@ -26,10 +26,10 @@ import (
 	"unsafe"
 
 	"github.com/pkg/errors"
-
-	windows "github.com/elastic/go-windows"
+	syswin "golang.org/x/sys/windows"
 
 	"github.com/elastic/go-sysinfo/types"
+	windows "github.com/elastic/go-windows"
 )
 
 var (
@@ -239,6 +239,41 @@ func (p *process) open() (handle syscall.Handle, err error) {
 
 func (p *process) Info() (types.ProcessInfo, error) {
 	return p.info, nil
+}
+
+func (p *process) User() (types.UserInfo, error) {
+	handle, err := p.open()
+	if err != nil {
+		return types.UserInfo{}, err
+	}
+	defer syscall.CloseHandle(handle)
+
+	// Filling types.UserInfo
+	var token syswin.Token
+	syswin.OpenProcessToken(syswin.Handle(handle), syscall.TOKEN_QUERY, &token)
+	tokenUser, err := token.GetTokenUser()
+	if err != nil {
+		return types.UserInfo{}, errors.Wrapf(err, "GetTokenUser failed for PID %v", p.pid)
+	}
+
+	sid, err := tokenUser.User.Sid.String()
+	if err != nil {
+		return types.UserInfo{}, errors.Wrapf(err, "failed to look up user SID for PID %v", p.pid)
+	}
+
+	tokenGroup, err := token.GetTokenPrimaryGroup()
+	if err != nil {
+		return types.UserInfo{}, errors.Wrapf(err, "GetTokenPrimaryGroup failed for PID %v", p.pid)
+	}
+	gsid, err := tokenGroup.PrimaryGroup.String()
+	if err != nil {
+		return types.UserInfo{}, errors.Wrapf(err, "failed to look up primary group SID for PID %v", p.pid)
+	}
+
+	return types.UserInfo{
+		UID: sid,
+		GID: gsid,
+	}, nil
 }
 
 func (p *process) Memory() (types.MemoryInfo, error) {
