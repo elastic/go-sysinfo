@@ -248,10 +248,10 @@ func (p *process) User() (types.UserInfo, error) {
 	}
 	defer syscall.CloseHandle(handle)
 
-	// Filling types.UserInfo
-	var token syswin.Token
-	syswin.OpenProcessToken(syswin.Handle(handle), syscall.TOKEN_QUERY, &token)
-	tokenUser, err := token.GetTokenUser()
+	var accessToken syswin.Token
+	syswin.OpenProcessToken(syswin.Handle(handle), syscall.TOKEN_QUERY, &accessToken)
+	defer accessToken.Close()
+	tokenUser, err := accessToken.GetTokenUser()
 	if err != nil {
 		return types.UserInfo{}, errors.Wrapf(err, "GetTokenUser failed for PID %v", p.pid)
 	}
@@ -261,7 +261,7 @@ func (p *process) User() (types.UserInfo, error) {
 		return types.UserInfo{}, errors.Wrapf(err, "failed to look up user SID for PID %v", p.pid)
 	}
 
-	tokenGroup, err := token.GetTokenPrimaryGroup()
+	tokenGroup, err := accessToken.GetTokenPrimaryGroup()
 	if err != nil {
 		return types.UserInfo{}, errors.Wrapf(err, "GetTokenPrimaryGroup failed for PID %v", p.pid)
 	}
