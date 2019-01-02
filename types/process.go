@@ -41,7 +41,8 @@ type ProcessInfo struct {
 type UserInfo struct {
 	// Uid is the user ID.
 	// On Linux and Darwin (macOS) this is the real user ID.
-	// On Windows, this is a security identifier (SID).
+	// On Windows, this is the security identifier (SID) of the
+	// user account of the process access token.
 	Uid string `json:"uid"`
 
 	// On Linux and Darwin (macOS) this is the effective user ID.
@@ -54,7 +55,8 @@ type UserInfo struct {
 
 	// Gid is the primary group ID.
 	// On Linux and Darwin (macOS) this is the real group ID.
-	// On Windows, this is a security identifier (SID).
+	// On Windows, this is the security identifier (SID) of the
+	// primary group of the process access token.
 	Gid string `json:"gid"`
 
 	// On Linux and Darwin (macOS) this is the effective group ID.
