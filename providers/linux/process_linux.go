@@ -217,14 +217,14 @@ func (p *process) User() (types.UserInfo, error) {
 		switch string(key) {
 		case "Uid":
 			ids := strings.Split(string(value), "\t")
-			user.UID = ids[0]
-			user.EUID = ids[1]
-			user.SUID = ids[2]
+			user.Uid = ids[0]
+			user.Euid = ids[1]
+			user.Suid = ids[2]
 		case "Gid":
 			ids := strings.Split(string(value), "\t")
-			user.GID = ids[0]
-			user.EGID = ids[1]
-			user.SGID = ids[2]
+			user.Gid = ids[0]
+			user.Egid = ids[1]
+			user.Sgid = ids[2]
 		}
 		return nil
 	})

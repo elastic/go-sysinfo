@@ -142,12 +142,12 @@ func TestSelf(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.EqualValues(t, currentUser.Uid, user.UID)
-	assert.EqualValues(t, currentUser.Gid, user.GID)
+	assert.EqualValues(t, currentUser.Uid, user.Uid)
+	assert.EqualValues(t, currentUser.Gid, user.Gid)
 
 	if runtime.GOOS != "windows" {
-		assert.EqualValues(t, strconv.Itoa(os.Geteuid()), user.EUID)
-		assert.EqualValues(t, strconv.Itoa(os.Getegid()), user.EGID)
+		assert.EqualValues(t, strconv.Itoa(os.Geteuid()), user.Euid)
+		assert.EqualValues(t, strconv.Itoa(os.Getegid()), user.Egid)
 	}
 
 	if v, ok := process.(types.Environment); ok {
