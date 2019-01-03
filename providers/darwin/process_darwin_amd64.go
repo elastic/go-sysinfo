@@ -95,12 +95,12 @@ func (p *process) User() (types.UserInfo, error) {
 	}
 
 	return types.UserInfo{
-		Uid:  strconv.Itoa(int(task.Pbsd.Pbi_ruid)),
-		Euid: strconv.Itoa(int(task.Pbsd.Pbi_uid)),
-		Suid: strconv.Itoa(int(task.Pbsd.Pbi_svuid)),
-		Gid:  strconv.Itoa(int(task.Pbsd.Pbi_rgid)),
-		Egid: strconv.Itoa(int(task.Pbsd.Pbi_gid)),
-		Sgid: strconv.Itoa(int(task.Pbsd.Pbi_svgid)),
+		UID:  strconv.Itoa(int(task.Pbsd.Pbi_ruid)),
+		EUID: strconv.Itoa(int(task.Pbsd.Pbi_uid)),
+		SUID: strconv.Itoa(int(task.Pbsd.Pbi_svuid)),
+		GID:  strconv.Itoa(int(task.Pbsd.Pbi_rgid)),
+		EGID: strconv.Itoa(int(task.Pbsd.Pbi_gid)),
+		SGID: strconv.Itoa(int(task.Pbsd.Pbi_svgid)),
 	}, nil
 }
 

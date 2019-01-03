@@ -276,8 +276,8 @@ func (p *process) User() (types.UserInfo, error) {
 	}
 
 	return types.UserInfo{
-		Uid: sid,
-		Gid: gsid,
+		UID: sid,
+		GID: gsid,
 	}, nil
 }
 

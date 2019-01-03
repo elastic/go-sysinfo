@@ -39,33 +39,33 @@ type ProcessInfo struct {
 // UserInfo contains information about the UID and GID
 // values of a process.
 type UserInfo struct {
-	// Uid is the user ID.
+	// UID is the user ID.
 	// On Linux and Darwin (macOS) this is the real user ID.
 	// On Windows, this is the security identifier (SID) of the
 	// user account of the process access token.
-	Uid string `json:"uid"`
+	UID string `json:"uid"`
 
 	// On Linux and Darwin (macOS) this is the effective user ID.
 	// On Windows, this is empty.
-	Euid string `json:"euid"`
+	EUID string `json:"euid"`
 
 	// On Linux and Darwin (macOS) this is the saved user ID.
 	// On Windows, this is empty.
-	Suid string `json:"suid"`
+	SUID string `json:"suid"`
 
-	// Gid is the primary group ID.
+	// GID is the primary group ID.
 	// On Linux and Darwin (macOS) this is the real group ID.
 	// On Windows, this is the security identifier (SID) of the
 	// primary group of the process access token.
-	Gid string `json:"gid"`
+	GID string `json:"gid"`
 
 	// On Linux and Darwin (macOS) this is the effective group ID.
 	// On Windows, this is empty.
-	Egid string `json:"egid"`
+	EGID string `json:"egid"`
 
 	// On Linux and Darwin (macOS) this is the saved group ID.
 	// On Windows, this is empty.
-	Sgid string `json:"sgid"`
+	SGID string `json:"sgid"`
 }
 
 type Environment interface {
