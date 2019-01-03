@@ -40,7 +40,38 @@ import (
 //go:generate sh -c "go tool cgo -godefs defs_darwin.go > ztypes_darwin_amd64.go"
 
 func (s darwinSystem) Processes() ([]types.Process, error) {
-	return nil, nil
+	n, err := C.proc_listallpids(nil, 0)
+	if err != nil {
+		return nil, errors.Wrapf(err, "error getting process count from proc_listallpids (n = %v)", n)
+	} else if n <= 0 {
+		return nil, errors.Errorf("proc_listallpids returned %v", n)
+	}
+
+	var pid C.int
+	bufsize := n * C.int(unsafe.Sizeof(pid))
+	buf := make([]byte, bufsize)
+	n, err = C.proc_listallpids(unsafe.Pointer(&buf[0]), bufsize)
+	if err != nil {
+		return nil, errors.Wrapf(err, "error getting processes from proc_listallpids (n = %v)", n)
+	} else if n <= 0 {
+		return nil, errors.Errorf("proc_listallpids returned %v", n)
+	}
+
+	bbuf := bytes.NewBuffer(buf)
+	processes := make([]types.Process, 0, n)
+	for i := 0; i < int(n); i++ {
+		err = binary.Read(bbuf, binary.LittleEndian, &pid)
+		if err != nil {
+			return nil, errors.Wrap(err, "error reading binary list of PIDs")
+		}
+
+		if pid == 0 {
+			continue
+		}
+
+		processes = append(processes, &process{pid: int(pid)})
+	}
+	return processes, nil
 }
 
 func (s darwinSystem) Process(pid int) (types.Process, error) {
@@ -138,8 +169,10 @@ func getProcTaskAllInfo(pid int, info *procTaskAllInfo) error {
 	size := C.int(unsafe.Sizeof(*info))
 	ptr := unsafe.Pointer(info)
 
-	n := C.proc_pidinfo(C.int(pid), C.PROC_PIDTASKALLINFO, 0, ptr, size)
-	if n != size {
+	n, err := C.proc_pidinfo(C.int(pid), C.PROC_PIDTASKALLINFO, 0, ptr, size)
+	if err != nil {
+		return err
+	} else if n != size {
 		return errors.New("failed to read process info with proc_pidinfo")
 	}
 
