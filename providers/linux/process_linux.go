@@ -217,14 +217,18 @@ func (p *process) User() (types.UserInfo, error) {
 		switch string(key) {
 		case "Uid":
 			ids := strings.Split(string(value), "\t")
-			user.UID = ids[0]
-			user.EUID = ids[1]
-			user.SUID = ids[2]
+			if len(ids) >= 3 {
+				user.UID = ids[0]
+				user.EUID = ids[1]
+				user.SUID = ids[2]
+			}
 		case "Gid":
 			ids := strings.Split(string(value), "\t")
-			user.GID = ids[0]
-			user.EGID = ids[1]
-			user.SGID = ids[2]
+			if len(ids) >= 3 {
+				user.GID = ids[0]
+				user.EGID = ids[1]
+				user.SGID = ids[2]
+			}
 		}
 		return nil
 	})
