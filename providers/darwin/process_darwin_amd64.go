@@ -61,6 +61,10 @@ type process struct {
 	env  map[string]string
 }
 
+func (p *process) PID() int {
+	return p.pid
+}
+
 func (p *process) Info() (types.ProcessInfo, error) {
 	var task procTaskAllInfo
 	if err := getProcTaskAllInfo(p.pid, &task); err != nil {
