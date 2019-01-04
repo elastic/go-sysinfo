@@ -69,8 +69,12 @@ type process struct {
 	info *types.ProcessInfo
 }
 
+func (p *process) PID() int {
+	return p.Proc.PID
+}
+
 func (p *process) path(pa ...string) string {
-	return p.fs.Path(append([]string{strconv.Itoa(p.PID)}, pa...)...)
+	return p.fs.Path(append([]string{strconv.Itoa(p.PID())}, pa...)...)
 }
 
 func (p *process) CWD() (string, error) {
@@ -115,7 +119,7 @@ func (p *process) Info() (types.ProcessInfo, error) {
 
 	p.info = &types.ProcessInfo{
 		Name:      stat.Comm,
-		PID:       p.PID,
+		PID:       p.PID(),
 		PPID:      stat.PPID,
 		CWD:       cwd,
 		Exe:       exe,
