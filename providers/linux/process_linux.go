@@ -37,7 +37,6 @@ func (s linuxSystem) Processes() ([]types.Process, error) {
 	if err != nil {
 		return nil, err
 	}
-	s.procFS.Path()
 
 	processes := make([]types.Process, 0, len(procs))
 	for _, proc := range procs {

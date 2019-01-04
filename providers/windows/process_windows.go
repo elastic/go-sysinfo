@@ -46,6 +46,12 @@ func (s windowsSystem) Processes() (procs []types.Process, err error) {
 	procs = make([]types.Process, 0, len(pids))
 	var proc types.Process
 	for _, pid := range pids {
+		if pid == 0 || pid == 4 {
+			// The Idle and System processes (PIDs 0 and 4) can never be
+			// opened by user-level code (see documentation for OpenProcess).
+			continue
+		}
+
 		if proc, err = s.Process(int(pid)); err == nil {
 			procs = append(procs, proc)
 		}
