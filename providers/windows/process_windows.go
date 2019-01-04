@@ -75,6 +75,10 @@ type process struct {
 	info types.ProcessInfo
 }
 
+func (p *process) PID() int {
+	return p.pid
+}
+
 func newProcess(pid int) (*process, error) {
 	p := &process{pid: pid}
 	if err := p.init(); err != nil {
