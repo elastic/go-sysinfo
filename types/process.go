@@ -24,6 +24,7 @@ type Process interface {
 	Info() (ProcessInfo, error)
 	Memory() (MemoryInfo, error)
 	User() (UserInfo, error)
+	PID() int
 }
 
 type ProcessInfo struct {

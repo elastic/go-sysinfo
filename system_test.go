@@ -96,6 +96,7 @@ func TestSelf(t *testing.T) {
 	} else if err != nil {
 		t.Fatal(err)
 	}
+	assert.EqualValues(t, os.Getpid(), process.PID())
 
 	if runtime.GOOS == "linux" {
 		// Do some dummy work to spend user CPU time.
