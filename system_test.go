@@ -262,13 +262,9 @@ func logAsJSON(t testing.TB, v interface{}) {
 }
 
 func TestProcesses(t *testing.T) {
-	if runtime.GOOS != "windows" {
-		// This test fails CI under Linux due to /proc/$pid permissions.
-		t.Skip("Run only under Windows")
-	}
 	start := time.Now()
 	procs, err := Processes()
-	took := time.Now().Sub(start)
+	took := time.Since(start)
 	t.Log("took", took)
 	if err != nil {
 		t.Fatal(err)
@@ -277,6 +273,9 @@ func TestProcesses(t *testing.T) {
 	for _, proc := range procs {
 		info, err := proc.Info()
 		if err != nil {
+			if os.IsPermission(err) {
+				continue
+			}
 			t.Fatal(err)
 		}
 		t.Logf("pid=%v name='%s' exe='%s' args=%+v ppid=%d cwd='%s' start_time=%v", info.PID, info.Name, info.Exe, info.Args, info.PPID, info.CWD, info.StartTime)
