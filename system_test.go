@@ -65,7 +65,7 @@ var expectedProcessFeatures = map[string]*ProcessFeatures{
 	},
 	"freebsd": &ProcessFeatures{
 		ProcessInfo:          true,
-		Environment:          false,
+		Environment:          true,
 		OpenHandleEnumerator: true,
 		OpenHandleCounter:    true,
 	},

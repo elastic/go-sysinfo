@@ -48,7 +48,6 @@ package freebsd
 import "C"
 
 import (
-	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -111,7 +110,6 @@ func makeMap(from []string) map[string]string {
 		}
 	}
 
-	fmt.Printf("makeMap: %v\n", out)
 	return out
 }
 
@@ -310,6 +308,10 @@ func (p *process) OpenHandleCount() (int, error) {
 	fs := C.procstat_getfiles(procstat, &p.kinfo, 0)
 	defer C.procstat_freefiles(procstat, fs)
 	return int(C.countFileStats(fs)), nil
+}
+
+func (p *process) Environment() (map[string]string, error) {
+	return getProcEnv(p)
 }
 
 func (s freebsdSystem) Processes() ([]types.Process, error) {
