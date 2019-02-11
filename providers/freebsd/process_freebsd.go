@@ -276,6 +276,42 @@ func (p *process) PID() int {
 	return p.pid
 }
 
+func (p *process) OpenHandles() ([]string, error) {
+	procstat := C.procstat_open_sysctl()
+
+	if procstat == nil {
+		return nil, errors.New("failed to open procstat sysctl")
+	}
+	defer C.procstat_close(procstat)
+
+	fs := C.procstat_getfiles(procstat, &p.kinfo, 0)
+	defer C.procstat_freefiles(procstat, fs)
+
+	files := getFileStats(fs)
+	names := make([]string, 0, len(files))
+
+	for _, file := range files {
+		if file.fs_uflags == 0 {
+			names = append(names, C.GoString(file.fs_path))
+		}
+	}
+
+	return names, nil
+}
+
+func (p *process) OpenHandleCount() (int, error) {
+	procstat := C.procstat_open_sysctl()
+
+	if procstat == nil {
+		return 0, errors.New("failed to open procstat sysctl")
+	}
+	defer C.procstat_close(procstat)
+
+	fs := C.procstat_getfiles(procstat, &p.kinfo, 0)
+	defer C.procstat_freefiles(procstat, fs)
+	return int(C.countFileStats(fs)), nil
+}
+
 func (s freebsdSystem) Processes() ([]types.Process, error) {
 	procs, err := getProcInfo(C.KERN_PROC_PROC, 0)
 	out := make([]types.Process, 0, len(procs))
