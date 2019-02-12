@@ -19,6 +19,7 @@
 
 package freebsd
 
+// #cgo LDFLAGS: -lkvm
 //#include <kvm.h>
 //#include <sys/vmmeter.h>
 import "C"

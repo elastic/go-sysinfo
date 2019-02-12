@@ -19,6 +19,7 @@
 
 package freebsd
 
+// #cgo LDFLAGS: -lkvm
 //#include <sys/cdefs.h>
 //#include <sys/types.h>
 //#include <sys/sysctl.h>

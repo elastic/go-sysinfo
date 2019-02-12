@@ -15,11 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build freebsd,cgo
-
 package freebsd
-
-import "C"
 
 import (
 	"strconv"

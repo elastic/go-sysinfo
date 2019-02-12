@@ -19,11 +19,8 @@
 
 package freebsd
 
-/*
-#cgo LDFLAGS:-lc
-#include <sys/sysctl.h>
-#include <stdlib.h>
-*/
+//#include <sys/sysctl.h>
+//#include <stdlib.h>
 import "C"
 
 import (
