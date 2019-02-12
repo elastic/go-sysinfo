@@ -19,6 +19,7 @@ package sysinfo
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	osUser "os/user"
 	"runtime"
@@ -62,6 +63,12 @@ var expectedProcessFeatures = map[string]*ProcessFeatures{
 		OpenHandleEnumerator: false,
 		OpenHandleCounter:    true,
 	},
+	"freebsd": &ProcessFeatures{
+		ProcessInfo:          true,
+		Environment:          true,
+		OpenHandleEnumerator: true,
+		OpenHandleCounter:    true,
+	},
 }
 
 func TestProcessFeaturesMatrix(t *testing.T) {
@@ -90,6 +97,7 @@ func TestProcessFeaturesMatrix(t *testing.T) {
 }
 
 func TestSelf(t *testing.T) {
+	fmt.Printf("Getting Self()...\n")
 	process, err := Self()
 	if err == types.ErrNotImplemented {
 		t.Skip("process provider not implemented on", runtime.GOOS)
@@ -107,6 +115,7 @@ func TestSelf(t *testing.T) {
 	}
 
 	output := map[string]interface{}{}
+	fmt.Printf("Getting ProcessInfo...\n")
 	info, err := process.Info()
 	if err != nil {
 		t.Fatal(err)
@@ -120,7 +129,18 @@ func TestSelf(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.EqualValues(t, wd, info.CWD)
+
+	wdStat, err := os.Stat(wd)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cwdStat, err := os.Stat(info.CWD)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.EqualValues(t, os.SameFile(wdStat, cwdStat), true)
 
 	exe, err := os.Executable()
 	if err != nil {
@@ -133,6 +153,7 @@ func TestSelf(t *testing.T) {
 	}
 	assert.WithinDuration(t, info.StartTime, time.Now(), 10*time.Second)
 
+	fmt.Printf("Getting UserInfo...\n")
 	user, err := process.User()
 	if err != nil {
 		t.Fatal(err)
@@ -151,6 +172,7 @@ func TestSelf(t *testing.T) {
 		assert.EqualValues(t, strconv.Itoa(os.Getegid()), user.EGID)
 	}
 
+	fmt.Printf("Getting Environment...\n")
 	if v, ok := process.(types.Environment); ok {
 		expectedEnv := map[string]string{}
 		for _, keyValue := range os.Environ() {
@@ -168,6 +190,7 @@ func TestSelf(t *testing.T) {
 		output["process.env"] = actualEnv
 	}
 
+	fmt.Printf("Getting MemoryInfo...\n")
 	memInfo, err := process.Memory()
 	require.NoError(t, err)
 	if runtime.GOOS != "windows" {
@@ -178,6 +201,7 @@ func TestSelf(t *testing.T) {
 	assert.NotZero(t, memInfo.Resident)
 	output["process.mem"] = memInfo
 
+	fmt.Printf("Getting CPUTimes...\n")
 	for {
 		cpuTimes, err := process.CPUTime()
 		require.NoError(t, err)
@@ -191,6 +215,7 @@ func TestSelf(t *testing.T) {
 		// measurement.
 	}
 
+	fmt.Printf("Getting OpenHandleEnumerator...\n")
 	if v, ok := process.(types.OpenHandleEnumerator); ok {
 		fds, err := v.OpenHandles()
 		if assert.NoError(t, err) {
