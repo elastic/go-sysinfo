@@ -19,7 +19,6 @@
 
 package freebsd
 
-//#cgo LDFLAGS:-lkvm
 //#include <sys/cdefs.h>
 //#include <sys/types.h>
 //#include <sys/sysctl.h>
@@ -40,6 +39,8 @@ const hwPagesizeMIB = "hw.pagesize"
 const vmVmtotalMIB = "vm.vmtotal"
 const vmSwapmaxpagesMIB = "vm.swap_maxpages"
 const vfsNumfreebuffersMIB = "vfs.numfreebuffers"
+const devNull = "/dev/null"
+const kvmOpen = "kvm_open"
 
 func PageSize() (uint32, error) {
 	var pageSize uint32
@@ -89,12 +90,12 @@ func NumFreeBuffers() (uint32, error) {
 func KvmGetSwapInfo() (kvmSwap, error) {
 	var kdC *C.struct_kvm_t
 
-	devNull := C.CString("/dev/null")
-	defer C.free(unsafe.Pointer(devNull))
-	kvmOpen := C.CString("kvm_open")
-	defer C.free(unsafe.Pointer(kvmOpen))
+	devNullC := C.CString(devNull)
+	defer C.free(unsafe.Pointer(devNullC))
+	kvmOpenC := C.CString(kvmOpen)
+	defer C.free(unsafe.Pointer(kvmOpenC))
 
-	if kdC, err := C.kvm_open(nil, devNull, nil, syscall.O_RDONLY, kvmOpen); kdC == nil {
+	if kdC, err := C.kvm_open(nil, devNullC, nil, syscall.O_RDONLY, kvmOpenC); kdC == nil {
 		return kvmSwap{}, errors.Wrap(err, "failed to open kvm")
 	}
 

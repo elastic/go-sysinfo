@@ -62,6 +62,9 @@ func OperatingSystem() (*types.OSInfo, error) {
 		info.Minor, _ = strconv.Atoi(majorminor[1])
 	}
 
-	info.Patch, _ = strconv.Atoi(strings.TrimPrefix(elems[2], "p"))
+	if len(elems) > 1 {
+		info.Patch, _ = strconv.Atoi(strings.TrimPrefix(elems[2], "p"))
+	}
+
 	return info, nil
 }

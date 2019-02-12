@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 //+build,freebsd,cgo
 
 package freebsd
@@ -60,17 +77,17 @@ import (
 )
 
 func getProcInfo(op int, arg int) ([]process, error) {
-	procstat := C.procstat_open_sysctl()
+	procstat, err := C.procstat_open_sysctl()
 
 	if procstat == nil {
-		return nil, errors.New("failed to open procstat sysctl")
+		return nil, errors.Wrap(err, "failed to open procstat sysctl")
 	}
 	defer C.procstat_close(procstat)
 
 	var count C.uint = 0
-	kprocs := C.procstat_getprocs(procstat, C.int(op), C.int(arg), &count)
+	kprocs, err := C.procstat_getprocs(procstat, C.int(op), C.int(arg), &count)
 	if kprocs == nil {
-		return nil, errors.New("getprocs failed")
+		return nil, errors.Wrap(err, "getprocs failed")
 	}
 	defer C.procstat_freeprocs(procstat, kprocs)
 
@@ -114,42 +131,42 @@ func makeMap(from []string) map[string]string {
 }
 
 func getProcEnv(p *process) (map[string]string, error) {
-	procstat := C.procstat_open_sysctl()
+	procstat, err := C.procstat_open_sysctl()
 
 	if procstat == nil {
-		return nil, errors.New("failed to open procstat sysctl")
+		return nil, errors.Wrap(err, "failed to open procstat sysctl")
 	}
 	defer C.procstat_close(procstat)
 
-	env := C.procstat_getenvv(procstat, &p.kinfo, 0)
+	env, err := C.procstat_getenvv(procstat, &p.kinfo, 0)
 	defer C.procstat_freeenvv(procstat)
 
-	return makeMap(copyArray(env)), nil
+	return makeMap(copyArray(env)), err
 }
 
 func getProcArgs(p *process) ([]string, error) {
-	procstat := C.procstat_open_sysctl()
+	procstat, err := C.procstat_open_sysctl()
 
 	if procstat == nil {
-		return nil, errors.New("failed to open procstat sysctl")
+		return nil, errors.Wrap(err, "failed to open procstat sysctl")
 	}
 	defer C.procstat_close(procstat)
 
-	args := C.procstat_getargv(procstat, &p.kinfo, 0)
+	args, err := C.procstat_getargv(procstat, &p.kinfo, 0)
 	defer C.procstat_freeargv(procstat)
 
-	return copyArray(args), nil
+	return copyArray(args), err
 }
 
 func getProcPathname(p *process) (string, error) {
-	procstat := C.procstat_open_sysctl()
+	procstat, err := C.procstat_open_sysctl()
 
 	if procstat == nil {
-		return "", errors.New("failed to open procstat sysctl")
+		return "", errors.Wrap(err, "failed to open procstat sysctl")
 	}
 	defer C.procstat_close(procstat)
 
-	maxlen := 4096
+	const maxlen = uint(1024)
 	out := make([]C.char, maxlen)
 	if res, err := C.procstat_getpathname(procstat, &p.kinfo, &out[0], C.ulong(maxlen)); res != 0 {
 		return "", err
@@ -171,14 +188,18 @@ func getFileStats(fileStats *C.struct_filestat_list) []C.struct_filestat {
 }
 
 func getProcCWD(p *process) (string, error) {
-	procstat := C.procstat_open_sysctl()
+	procstat, err := C.procstat_open_sysctl()
 
 	if procstat == nil {
-		return "", errors.New("failed to open procstat sysctl")
+		return "", errors.Wrap(err, "failed to open procstat sysctl")
 	}
 	defer C.procstat_close(procstat)
 
-	fs := C.procstat_getfiles(procstat, &p.kinfo, 0)
+	fs, err := C.procstat_getfiles(procstat, &p.kinfo, 0)
+	if fs == nil {
+		return "", errors.Wrap(err, "failed to get files")
+	}
+
 	defer C.procstat_freefiles(procstat, fs)
 
 	files := getFileStats(fs)
@@ -223,8 +244,16 @@ func (p *process) Info() (types.ProcessInfo, error) {
 	p.kinfo = procs[0].kinfo
 
 	cwd, err := getProcCWD(p)
+	if err != nil {
+		return types.ProcessInfo{}, err
+	}
+
 	args, err := getProcArgs(p)
-	exe, err := getProcPathname(p)
+	if err != nil {
+		return types.ProcessInfo{}, err
+	}
+
+	exe, _ := getProcPathname(p)
 
 	return types.ProcessInfo{
 		Name:      C.GoString(&p.kinfo.ki_comm[0]),

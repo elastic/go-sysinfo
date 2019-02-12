@@ -33,10 +33,6 @@ import (
 	"unsafe"
 )
 
-// Single-word zero for use when we need a valid pointer to 0 bytes.
-// See mksyscall.pl.
-var _zero uintptr
-
 // Buffer Pool
 
 var bufferPool = sync.Pool{
@@ -84,7 +80,6 @@ func sysctlbyname(name string, value interface{}) error {
 	default:
 		return binary.Read(bytes.NewReader(data), binary.LittleEndian, v)
 	}
-
 }
 
 func sysctlByName(name string, out interface{}) error {
