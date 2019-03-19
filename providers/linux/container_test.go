@@ -68,6 +68,8 @@ const containerHostPIDNamespaceCgroup = `14:name=systemd:/
 1:name=openrc:/
 `
 
+const emptyCgroup = ``
+
 func TestIsContainerized(t *testing.T) {
 	containerized, err := isContainerizedCgroup([]byte(nonContainerizedCgroup))
 	if err != nil {
@@ -85,5 +87,11 @@ func TestIsContainerized(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.True(t, containerized)
+	assert.False(t, containerized)
+
+	containerized, err = isContainerizedCgroup([]byte(emptyCgroup))
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.False(t, containerized)
 }
