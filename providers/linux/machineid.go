@@ -30,14 +30,14 @@ import (
 var (
 	// Possible (current and historic) locations of the machine-id file.
 	// These will be searched in order.
-	machineIdFiles = []string{"/etc/machine-id", "/var/lib/dbus/machine-id", "/var/db/dbus/machine-id"}
+	machineIDFiles = []string{"/etc/machine-id", "/var/lib/dbus/machine-id", "/var/db/dbus/machine-id"}
 )
 
 func MachineID() (string, error) {
 	var contents []byte
 	var err error
 
-	for _, file := range machineIdFiles {
+	for _, file := range machineIDFiles {
 		contents, err = ioutil.ReadFile(file)
 		if err != nil {
 			if os.IsNotExist(err) {
