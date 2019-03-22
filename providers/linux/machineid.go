@@ -47,10 +47,10 @@ func MachineID() (string, error) {
 
 			// Return with error on any other error
 			return "", errors.Wrapf(err, "failed to read %v", file)
-		} else {
-			// Found it
-			break
 		}
+
+		// Found it
+		break
 	}
 
 	if os.IsNotExist(err) {
