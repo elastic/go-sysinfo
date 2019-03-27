@@ -26,6 +26,22 @@ import (
 )
 
 func TestOperatingSystem(t *testing.T) {
+	t.Run("amazon2017.03", func(t *testing.T) {
+		os, err := getOSInfo("testdata/amazon2017.03")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Family:   "redhat",
+			Platform: "amzn",
+			Name:     "Amazon Linux AMI",
+			Version:  "2017.03",
+			Major:    2017,
+			Minor:    3,
+			Patch:    0,
+		}, *os)
+		t.Logf("%#v", os)
+	})
 	t.Run("centos6", func(t *testing.T) {
 		os, err := getOSInfo("testdata/centos6")
 		if err != nil {
@@ -71,6 +87,37 @@ func TestOperatingSystem(t *testing.T) {
 			Version:  "9 (stretch)",
 			Major:    9,
 			Codename: "stretch",
+		}, *os)
+		t.Logf("%#v", os)
+	})
+	t.Run("raspbian9", func(t *testing.T) {
+		os, err := getOSInfo("testdata/raspbian9")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Family:   "debian",
+			Platform: "raspbian",
+			Name:     "Raspbian GNU/Linux",
+			Version:  "9 (stretch)",
+			Major:    9,
+			Codename: "stretch",
+		}, *os)
+		t.Logf("%#v", os)
+	})
+	t.Run("redhat7", func(t *testing.T) {
+		os, err := getOSInfo("testdata/redhat7")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Family:   "redhat",
+			Platform: "rhel",
+			Name:     "Red Hat Enterprise Linux Server",
+			Version:  "7.6 (Maipo)",
+			Major:    7,
+			Minor:    6,
+			Codename: "Maipo",
 		}, *os)
 		t.Logf("%#v", os)
 	})
