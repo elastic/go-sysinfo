@@ -90,6 +90,21 @@ func TestOperatingSystem(t *testing.T) {
 		}, *os)
 		t.Logf("%#v", os)
 	})
+	t.Run("raspbian9", func(t *testing.T) {
+		os, err := getOSInfo("testdata/raspbian9")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Family:   "debian",
+			Platform: "raspbian",
+			Name:     "Raspbian GNU/Linux",
+			Version:  "9 (stretch)",
+			Major:    9,
+			Codename: "stretch",
+		}, *os)
+		t.Logf("%#v", os)
+	})
 	t.Run("ubuntu1404", func(t *testing.T) {
 		os, err := getOSInfo("testdata/ubuntu1404")
 		if err != nil {
