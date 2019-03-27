@@ -234,6 +234,7 @@ func TestHost(t *testing.T) {
 
 	info := host.Info()
 	assert.NotZero(t, info)
+	assert.NotZero(t, info.UniqueID)
 
 	memory, err := host.Memory()
 	if err != nil {
