@@ -105,6 +105,22 @@ func TestOperatingSystem(t *testing.T) {
 		}, *os)
 		t.Logf("%#v", os)
 	})
+	t.Run("redhat7", func(t *testing.T) {
+		os, err := getOSInfo("testdata/redhat7")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Family:   "redhat",
+			Platform: "rhel",
+			Name:     "Red Hat Enterprise Linux Server",
+			Version:  "7.6 (Maipo)",
+			Major:    7,
+			Minor:    6,
+			Codename: "Maipo",
+		}, *os)
+		t.Logf("%#v", os)
+	})
 	t.Run("ubuntu1404", func(t *testing.T) {
 		os, err := getOSInfo("testdata/ubuntu1404")
 		if err != nil {
