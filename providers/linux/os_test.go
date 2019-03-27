@@ -26,6 +26,22 @@ import (
 )
 
 func TestOperatingSystem(t *testing.T) {
+	t.Run("amazon2017.03", func(t *testing.T) {
+		os, err := getOSInfo("testdata/amazon2017.03")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Family:   "redhat",
+			Platform: "amzn",
+			Name:     "Amazon Linux AMI",
+			Version:  "2017.03",
+			Major:    2017,
+			Minor:    3,
+			Patch:    0,
+		}, *os)
+		t.Logf("%#v", os)
+	})
 	t.Run("centos6", func(t *testing.T) {
 		os, err := getOSInfo("testdata/centos6")
 		if err != nil {

@@ -47,8 +47,9 @@ var (
 	versionRegexp = regexp.MustCompile(versionGrok)
 )
 
+// familyMap contains a mapping of family -> []platforms.
 var familyMap = map[string][]string{
-	"redhat": {"redhat", "fedora", "centos", "scientific", "oraclelinux", "amazon"},
+	"redhat": {"redhat", "fedora", "centos", "scientific", "oraclelinux", "amzn"},
 	"debian": {"debian", "ubuntu"},
 	"suse":   {"suse", "sles", "opensuse"},
 }
