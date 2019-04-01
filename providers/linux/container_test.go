@@ -68,6 +68,18 @@ const containerHostPIDNamespaceCgroup = `14:name=systemd:/
 1:name=openrc:/
 `
 
+const lxcCgroup = `9:hugetlb:/lxc/81438f4655cd771c425607dcf7654f4dc03c073c0123edc45fcfad28132e8c60
+8:perf_event:/lxc/81438f4655cd771c425607dcf7654f4dc03c073c0123edc45fcfad28132e8c60
+7:blkio:/lxc/81438f4655cd771c425607dcf7654f4dc03c073c0123edc45fcfad28132e8c60
+6:freezer:/lxc/81438f4655cd771c425607dcf7654f4dc03c073c0123edc45fcfad28132e8c60
+5:devices:/lxc/81438f4655cd771c425607dcf7654f4dc03c073c0123edc45fcfad28132e8c60
+4:memory:/lxc/81438f4655cd771c425607dcf7654f4dc03c073c0123edc45fcfad28132e8c60
+3:cpuacct:/lxc/81438f4655cd771c425607dcf7654f4dc03c073c0123edc45fcfad28132e8c60
+2:cpu:/lxc/81438f4655cd771c425607dcf7654f4dc03c073c0123edc45fcfad28132e8c60
+1:cpuset:/lxc/81438f4655cd771c425607dcf7654f4dc03c073c0123edc45fcfad28132e8c60`
+
+const emptyCgroup = ``
+
 func TestIsContainerized(t *testing.T) {
 	containerized, err := isContainerizedCgroup([]byte(nonContainerizedCgroup))
 	if err != nil {
@@ -85,5 +97,17 @@ func TestIsContainerized(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	assert.False(t, containerized)
+
+	containerized, err = isContainerizedCgroup([]byte(lxcCgroup))
+	if err != nil {
+		t.Fatal(err)
+	}
 	assert.True(t, containerized)
+
+	containerized, err = isContainerizedCgroup([]byte(emptyCgroup))
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.False(t, containerized)
 }
