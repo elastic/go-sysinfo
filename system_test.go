@@ -115,6 +115,7 @@ func TestSelf(t *testing.T) {
 	assert.EqualValues(t, os.Getpid(), info.PID)
 	assert.EqualValues(t, os.Getppid(), info.PPID)
 	assert.Equal(t, os.Args, info.Args)
+	assert.WithinDuration(t, info.StartTime, time.Now(), 10*time.Second)
 
 	wd, err := os.Getwd()
 	if err != nil {
@@ -128,10 +129,11 @@ func TestSelf(t *testing.T) {
 	}
 	assert.Equal(t, exe, info.Exe)
 
+	parent, err := process.Parent()
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.WithinDuration(t, info.StartTime, time.Now(), 10*time.Second)
+	assert.EqualValues(t, os.Getppid(), parent.PID())
 
 	user, err := process.User()
 	if err != nil {
