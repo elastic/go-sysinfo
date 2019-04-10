@@ -73,6 +73,20 @@ func (p *process) PID() int {
 	return p.Proc.PID
 }
 
+func (p *process) Parent() (types.Process, error) {
+	info, err := p.Info()
+	if err != nil {
+		return nil, err
+	}
+
+	proc, err := p.fs.NewProc(info.PPID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &process{Proc: proc, fs: p.fs}, nil
+}
+
 func (p *process) path(pa ...string) string {
 	return p.fs.Path(append([]string{strconv.Itoa(p.PID())}, pa...)...)
 }
