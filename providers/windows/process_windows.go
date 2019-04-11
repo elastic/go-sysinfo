@@ -79,6 +79,15 @@ func (p *process) PID() int {
 	return p.pid
 }
 
+func (p *process) Parent() (types.Process, error) {
+	info, err := p.Info()
+	if err != nil {
+		return nil, err
+	}
+
+	return newProcess(info.PPID)
+}
+
 func newProcess(pid int) (*process, error) {
 	p := &process{pid: pid}
 	if err := p.init(); err != nil {
