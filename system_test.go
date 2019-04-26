@@ -24,9 +24,11 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"syscall"
 	"testing"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -267,21 +269,26 @@ func logAsJSON(t testing.TB, v interface{}) {
 func TestProcesses(t *testing.T) {
 	start := time.Now()
 	procs, err := Processes()
-	took := time.Since(start)
-	t.Log("took", took)
+	t.Log("Processes() took", time.Since(start))
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Log("found", len(procs), "processes")
+
+	t.Log("Found", len(procs), "processes.")
 	for _, proc := range procs {
 		info, err := proc.Info()
 		if err != nil {
-			if os.IsPermission(err) {
+			cause := errors.Cause(err)
+			if os.IsPermission(cause) || syscall.ESRCH == cause {
+				// The process may no longer exist by the time we try fetching
+				// additional information so ignore ESRCH (no such process).
 				continue
 			}
 			t.Fatal(err)
 		}
-		t.Logf("pid=%v name='%s' exe='%s' args=%+v ppid=%d cwd='%s' start_time=%v", info.PID, info.Name, info.Exe, info.Args, info.PPID, info.CWD, info.StartTime)
+		t.Logf("pid=%v name='%s' exe='%s' args=%+v ppid=%d cwd='%s' start_time=%v",
+			info.PID, info.Name, info.Exe, info.Args, info.PPID, info.CWD,
+			info.StartTime)
 	}
 
 }
