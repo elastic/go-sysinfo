@@ -39,4 +39,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed the host containerized check to reduce false positives. [#42](https://github.com/elastic/go-sysinfo/pull/42) [#43](https://github.com/elastic/go-sysinfo/pull/43)
 
 [Unreleased]: https://github.com/elastic/go-sysinfo/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/elastic/go-sysinfo/v1.0.0
+[1.0.0]: https://github.com/elastic/go-sysinfo/releases/tag/v1.0.0
