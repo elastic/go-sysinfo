@@ -22,6 +22,7 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"regexp"
@@ -30,43 +31,38 @@ import (
 
 var ignoreWarnings = []string{
 	`don't use underscores in Go names`,
+	`don't use ALL_CAPS in Go names`,
 }
 
 var ignoreWarningsRe = regexp.MustCompile(strings.Join(ignoreWarnings, "|"))
 
 func main() {
+	log.SetFlags(0)
 	flag.Parse()
 
-	golintArgs := flag.Args()
-	if len(golintArgs) == 0 {
-		out, err := exec.Command("go", "list", "./...").Output()
-		if err != nil {
-			fmt.Fprintln(os.Stderr, "error", err)
-			os.Exit(1)
-		}
-		golintArgs = strings.Split(string(out), "\n")
-	}
-
-	out, err := exec.Command("go", "get", "github.com/golang/lint/golint").Output()
+	goGet := exec.Command("go", "get", "-u", "golang.org/x/lint/golint")
+	goGet.Env = os.Environ()
+	goGet.Env = append(goGet.Env, "GO111MODULE=off")
+	out, err := goGet.Output()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "error", err)
-		os.Exit(1)
+		log.Fatalf("failed to %v: %v", strings.Join(goGet.Args, " "), err)
 	}
 
-	golint := exec.Command("golint", golintArgs...)
+	golint := exec.Command("golint", flag.Args()...)
+	golint.Env = os.Environ()
+	golint.Env = append(golint.Env, "GOOS=windows")
 	out, err = golint.Output()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "error", err)
-		os.Exit(1)
+		log.Fatalf("failed to %v: %v", strings.Join(golint.Args, " "), err)
 	}
 
 	out, err = filterIgnores(out)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "error", err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 
 	if len(out) > 0 {
+		log.Println("There are golint warnings.")
 		fmt.Printf(string(out))
 		os.Exit(1)
 	}

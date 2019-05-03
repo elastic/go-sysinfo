@@ -20,8 +20,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	"go/build"
+	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"strings"
 )
 
 const localPkgs = "github.com/elastic/go-sysinfo"
@@ -29,6 +33,7 @@ const localPkgs = "github.com/elastic/go-sysinfo"
 var defaultPaths = []string{"."}
 
 func main() {
+	log.SetFlags(0)
 	flag.Parse()
 
 	paths := defaultPaths
@@ -36,17 +41,19 @@ func main() {
 		paths = flag.Args()
 	}
 
-	out, err := exec.Command("go", "get", "golang.org/x/tools/cmd/goimports").Output()
+	goGet := exec.Command("go", "get", "-u", "golang.org/x/tools/cmd/goimports")
+	goGet.Env = os.Environ()
+	goGet.Env = append(goGet.Env, "GO111MODULE=off")
+	out, err := goGet.Output()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error executing goimports: %v", string(err.(*exec.ExitError).Stderr))
-		os.Exit(1)
+		log.Fatalf("failed to %v: %v", strings.Join(goGet.Args, " "), err)
 	}
 
-	args := append([]string{"-l", "-local", localPkgs}, paths...)
-	out, err = exec.Command("goimports", args...).Output()
+	goimports := exec.Command(filepath.Join(build.Default.GOPATH, "bin", "goimports"),
+		append([]string{"-l", "-local", localPkgs}, paths...)...)
+	out, err = goimports.Output()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "error", err.(*exec.ExitError))
-		os.Exit(1)
+		log.Fatalf("failed to %v: %v", strings.Join(goimports.Args, " "), err)
 	}
 	if len(out) > 0 {
 		fmt.Fprintln(os.Stderr, "Run goimports on the code.")
