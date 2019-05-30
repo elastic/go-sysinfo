@@ -72,7 +72,7 @@ func (h *host) Memory() (*types.HostMemoryInfo, error) {
 }
 
 func (h *host) CPUTime() (types.CPUTimes, error) {
-	stat, err := h.procFS.NewStat()
+	stat, err := procfs.NewStat()
 	if err != nil {
 		return types.CPUTimes{}, err
 	}
@@ -90,7 +90,7 @@ func (h *host) CPUTime() (types.CPUTimes, error) {
 }
 
 func newHost(fs procFS) (*host, error) {
-	stat, err := fs.NewStat()
+	stat, err := procfs.NewStat()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to read proc stat")
 	}

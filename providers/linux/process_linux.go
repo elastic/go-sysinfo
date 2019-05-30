@@ -46,7 +46,7 @@ func (s linuxSystem) Processes() ([]types.Process, error) {
 }
 
 func (s linuxSystem) Process(pid int) (types.Process, error) {
-	proc, err := s.procFS.NewProc(pid)
+	proc, err := procfs.NewProc(pid)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +79,7 @@ func (p *process) Parent() (types.Process, error) {
 		return nil, err
 	}
 
-	proc, err := p.fs.NewProc(info.PPID)
+	proc, err := procfs.NewProc(info.PPID)
 	if err != nil {
 		return nil, err
 	}
