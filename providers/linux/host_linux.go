@@ -72,7 +72,7 @@ func (h *host) Memory() (*types.HostMemoryInfo, error) {
 }
 
 func (h *host) CPUTime() (types.CPUTimes, error) {
-	stat, err := procfs.NewStat()
+	stat, err := h.procFS.Stat()
 	if err != nil {
 		return types.CPUTimes{}, err
 	}
