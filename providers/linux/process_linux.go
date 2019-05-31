@@ -46,7 +46,7 @@ func (s linuxSystem) Processes() ([]types.Process, error) {
 }
 
 func (s linuxSystem) Process(pid int) (types.Process, error) {
-	proc, err := procfs.NewProc(pid)
+	proc, err := s.procFS.Proc(pid)
 	if err != nil {
 		return nil, err
 	}
