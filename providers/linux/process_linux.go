@@ -79,7 +79,7 @@ func (p *process) Parent() (types.Process, error) {
 		return nil, err
 	}
 
-	proc, err := procfs.NewProc(info.PPID)
+	proc, err := p.fs.Proc(info.PPID)
 	if err != nil {
 		return nil, err
 	}
