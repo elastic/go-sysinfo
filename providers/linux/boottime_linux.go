@@ -20,8 +20,6 @@ package linux
 import (
 	"sync"
 	"time"
-
-	"github.com/prometheus/procfs"
 )
 
 var (
@@ -29,7 +27,7 @@ var (
 	bootTimeLock  sync.Mutex // Lock that guards access to bootTime.
 )
 
-func bootTime(fs procfs.FS) (time.Time, error) {
+func bootTime(fs procFS) (time.Time, error) {
 	bootTimeLock.Lock()
 	defer bootTimeLock.Unlock()
 

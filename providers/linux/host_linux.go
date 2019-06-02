@@ -139,7 +139,7 @@ func (r *reader) architecture(h *host) {
 }
 
 func (r *reader) bootTime(h *host) {
-	v, err := bootTime(h.procFS.FS)
+	v, err := bootTime(h.procFS)
 	if r.addErr(err) {
 		return
 	}
@@ -207,4 +207,46 @@ type procFS struct {
 func (fs *procFS) path(p ...string) string {
 	elem := append([]string{fs.mountPoint}, p...)
 	return filepath.Join(elem...)
+}
+
+// Stat delegates to p.FS.Stat or p.FS.NewStat, depending on
+// which version of the prometheus/procfs package is used.
+func (fs *procFS) Stat() (procfs.Stat, error) {
+	switch fs := (interface{})(fs.FS).(type) {
+	case stater:
+		return fs.Stat()
+	case newStater:
+		return fs.NewStat()
+	default:
+		return procfs.Stat{}, errors.Errorf("type %T has no Stat or NewStat method", fs)
+	}
+}
+
+type stater interface {
+	Stat() (procfs.Stat, error)
+}
+
+type newStater interface {
+	NewStat() (procfs.Stat, error)
+}
+
+// Proc delegates to p.FS.Proc or p.FS.NewProc, depending on
+// which version of the prometheus/procfs package is used.
+func (fs *procFS) Proc(pid int) (procfs.Proc, error) {
+	switch fs := (interface{})(fs.FS).(type) {
+	case procer:
+		return fs.Proc(pid)
+	case newProcer:
+		return fs.NewProc(pid)
+	default:
+		return procfs.Proc{}, errors.Errorf("type %T has no Proc or NewProc method", fs)
+	}
+}
+
+type procer interface {
+	Proc(pid int) (procfs.Proc, error)
+}
+
+type newProcer interface {
+	NewProc(pid int) (procfs.Proc, error)
 }

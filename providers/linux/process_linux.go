@@ -126,7 +126,7 @@ func (p *process) Info() (types.ProcessInfo, error) {
 		return types.ProcessInfo{}, err
 	}
 
-	bootTime, err := bootTime(p.fs.FS)
+	bootTime, err := bootTime(p.fs)
 	if err != nil {
 		return types.ProcessInfo{}, err
 	}
