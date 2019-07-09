@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed a leak when calling the CommandLineToArgv function. [#51](https://github.com/elastic/go-sysinfo/pull/51)
+- Fixed a crash when calling the CommandLineToArgv function [#58](https://github.com/elastic/go-sysinfo/pull/58)
 
 ### Security
 
