@@ -20,8 +20,9 @@ package linux
 import (
 	"reflect"
 
-	"github.com/elastic/go-sysinfo/types"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/go-sysinfo/types"
 )
 
 // parseVMStat parses the contents of /proc/vmstat
