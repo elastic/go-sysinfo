@@ -21,9 +21,9 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/elastic/go-sysinfo/internal/registry"
+	"github.com/elastic/go-sysinfo/types"
+	"github.com/stretchr/testify/assert"
 )
 
 var _ registry.HostProvider = linuxSystem{}
@@ -59,12 +59,12 @@ func TestHostVMStat(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	s, err := host.VMStat()
+	s, err := host.(types.VMStat).VMStat()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	data, err := json.MarshalIndent(info, "", "  ")
+	data, err := json.MarshalIndent(s, "", "  ")
 	if err != nil {
 		t.Fatal(err)
 	}

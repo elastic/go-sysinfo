@@ -28,7 +28,7 @@ type Host interface {
 
 // VMStat is the interface wrapper for platforms that support /proc/vmstat
 type VMStat interface {
-	VMStat() (VMStatInfo, error)
+	VMStat() (*VMStatInfo, error)
 }
 
 // HostInfo contains basic host information
