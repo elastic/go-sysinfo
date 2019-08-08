@@ -19,6 +19,7 @@ package types
 
 import "time"
 
+// Process is the interface type for returning information on a process
 type Process interface {
 	CPUTimer
 	Info() (ProcessInfo, error)
@@ -28,6 +29,7 @@ type Process interface {
 	PID() int
 }
 
+// ProcessInfo contains basic stats about a process
 type ProcessInfo struct {
 	Name      string    `json:"name"`
 	PID       int       `json:"pid"`
@@ -70,6 +72,7 @@ type UserInfo struct {
 	SGID string `json:"sgid"`
 }
 
+// Environment is the interface type that returns the environment variables for a process
 type Environment interface {
 	Environment() (map[string]string, error)
 }
@@ -79,11 +82,12 @@ type OpenHandleEnumerator interface {
 	OpenHandles() ([]string, error)
 }
 
-// OpenHandleCount returns the number the open file handles.
+// OpenHandleCounter is the interface type returns the number the open file handles.
 type OpenHandleCounter interface {
 	OpenHandleCount() (int, error)
 }
 
+// CPUTimer is the interface type for returning CPU time info
 type CPUTimer interface {
 	// CPUTime returns a CPUTimes structure for
 	// the host or some process.
@@ -94,6 +98,7 @@ type CPUTimer interface {
 	CPUTime() (CPUTimes, error)
 }
 
+// CPUTimes contains CPU timing stats for a process
 type CPUTimes struct {
 	User    time.Duration `json:"user"`
 	System  time.Duration `json:"system"`
@@ -105,22 +110,26 @@ type CPUTimes struct {
 	Steal   time.Duration `json:"steal,omitempty"`
 }
 
+// Total returns the total CPU time
 func (cpu CPUTimes) Total() time.Duration {
 	return cpu.User + cpu.System + cpu.Idle + cpu.IOWait + cpu.IRQ + cpu.Nice +
 		cpu.SoftIRQ + cpu.Steal
 }
 
+// MemoryInfo contains memory stats for a process
 type MemoryInfo struct {
 	Resident uint64            `json:"resident_bytes"`
 	Virtual  uint64            `json:"virtual_bytes"`
 	Metrics  map[string]uint64 `json:"raw,omitempty"` // Other memory related metrics.
 }
 
+// SeccompInfo contains seccomp info for a process
 type SeccompInfo struct {
 	Mode       string `json:"mode"`
 	NoNewPrivs *bool  `json:"no_new_privs,omitempty"` // Added in kernel 4.10.
 }
 
+// CapabilityInfo contains capability set info.
 type CapabilityInfo struct {
 	Inheritable []string `json:"inheritable"`
 	Permitted   []string `json:"permitted"`
@@ -129,10 +138,12 @@ type CapabilityInfo struct {
 	Ambient     []string `json:"ambient"`
 }
 
+// Capabilities is the interface type for returning capabilities for a process
 type Capabilities interface {
 	Capabilities() (*CapabilityInfo, error)
 }
 
+// Seccomp is the interface type for returning Seccomp info
 type Seccomp interface {
 	Seccomp() (*SeccompInfo, error)
 }
