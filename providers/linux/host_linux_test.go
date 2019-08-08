@@ -53,3 +53,20 @@ func TestHostMemoryInfo(t *testing.T) {
 	assert.NotContains(t, m.Metrics, "MemTotal")
 	assert.Contains(t, m.Metrics, "Slab")
 }
+
+func TestHostVMStat(t *testing.T) {
+	host, err := newLinuxSystem("testdata/ubuntu1710").Host()
+	if err != nil {
+		t.Fatal(err)
+	}
+	s, err := host.VMStat()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	data, err := json.MarshalIndent(info, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(string(data))
+}

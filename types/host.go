@@ -26,6 +26,11 @@ type Host interface {
 	Memory() (*HostMemoryInfo, error)
 }
 
+// VMStat is the interface wrapper for platforms that support /proc/vmstat
+type VMStat interface {
+	VMStat() (VMStatInfo, error)
+}
+
 // HostInfo contains basic host information
 type HostInfo struct {
 	Architecture      string    `json:"architecture"`            // Hardware architecture (e.g. x86_64, arm, ppc, mips).
@@ -82,4 +87,182 @@ type HostMemoryInfo struct {
 	VirtualUsed  uint64            `json:"virtual_used_bytes"`  // VirtualTotal - VirtualFree
 	VirtualFree  uint64            `json:"virtual_free_bytes"`  // Virtual memory that is not used.
 	Metrics      map[string]uint64 `json:"raw,omitempty"`       // Other memory related metrics.
+}
+
+// VMStatInfo contains parsed info from /proc/vmstat
+// This procfs file has expanded much over the years
+// with different kernel versions. If we don't have a field in vmstat,
+// the field in the struct will just be blank. The comments represent kernel versions.
+type VMStatInfo struct {
+	NrFreePages                uint64 `vmstat:"nr_free_pages"`                 // (since Linux 2.6.31)
+	NrAllocBatch               uint64 `vmstat:"nr_alloc_batch"`                // (since Linux 3.12)
+	NrInactiveAnon             uint64 `vmstat:"nr_inactive_anon"`              // (since Linux 2.6.28)
+	NrActiveAnon               uint64 `vmstat:"nr_active_anon"`                // (since Linux 2.6.28)
+	NrInactiveFile             uint64 `vmstat:"nr_inactive_file"`              // (since Linux 2.6.28)
+	NrActiveFile               uint64 `vmstat:"nr_active_file"`                // (since Linux 2.6.28)
+	NrUnevictable              uint64 `vmstat:"nr_unevictable"`                // (since Linux 2.6.28)
+	NrMlock                    uint64 `vmstat:"nr_mlock"`                      // (since Linux 2.6.28)
+	NrAnonPages                uint64 `vmstat:"nr_anon_pages"`                 // (since Linux 2.6.18)
+	NrMapped                   uint64 `vmstat:"nr_mapped"`                     // (since Linux 2.6.0)
+	NrFilePages                uint64 `vmstat:"nr_file_pages"`                 // (since Linux 2.6.18)
+	NrDirty                    uint64 `vmstat:"nr_dirty"`                      // (since Linux 2.6.0)
+	NrWriteback                uint64 `vmstat:"nr_writeback"`                  // (since Linux 2.6.0)
+	NrSlabReclaimable          uint64 `vmstat:"nr_slab_reclaimable"`           // (since Linux 2.6.19)
+	NrSlabUnreclaimable        uint64 `vmstat:"nr_slab_unreclaimable"`         // (since Linux 2.6.19)
+	NrPageTablePages           uint64 `vmstat:"nr_page_table_pages"`           // (since Linux 2.6.0)
+	NrKernelStack              uint64 `vmstat:"nr_kernel_stack"`               // (since Linux 2.6.32)  Amount of memory allocated to kernel stacks.
+	NrUnstable                 uint64 `vmstat:"nr_unstable"`                   // (since Linux 2.6.0)
+	NrBounce                   uint64 `vmstat:"nr_bounce"`                     // (since Linux 2.6.12)
+	NrVmscanWrite              uint64 `vmstat:"nr_vmscan_write"`               // (since Linux 2.6.19)
+	NrVmscanImmediateReclaim   uint64 `vmstat:"nr_vmscan_immediate_reclaim"`   // (since Linux 3.2)
+	NrWritebackTemp            uint64 `vmstat:"nr_writeback_temp"`             // (since Linux 2.6.26)
+	NrIsolatedAnon             uint64 `vmstat:"nr_isolated_anon"`              // (since Linux 2.6.32)
+	NrIsolatedFile             uint64 `vmstat:"nr_isolated_file"`              // (since Linux 2.6.32)
+	NrShmem                    uint64 `vmstat:"nr_shmem"`                      // (since Linux 2.6.32) Pages used by shmem and tmpfs(5).
+	NrDirtied                  uint64 `vmstat:"nr_dirtied"`                    // (since Linux 2.6.37)
+	NrWritten                  uint64 `vmstat:"nr_written"`                    // (since Linux 2.6.37)
+	NrPagesScanned             uint64 `vmstat:"nr_pages_scanned"`              // (since Linux 3.17)
+	NumaHit                    uint64 `vmstat:"numa_hit"`                      // (since Linux 2.6.18)
+	NumaMiss                   uint64 `vmstat:"numa_miss"`                     // (since Linux 2.6.18)
+	NumaForeign                uint64 `vmstat:"numa_foreign"`                  // (since Linux 2.6.18)
+	NumaInterleave             uint64 `vmstat:"numa_interleave"`               // (since Linux 2.6.18)
+	NumaLocal                  uint64 `vmstat:"numa_local"`                    // (since Linux 2.6.18)
+	NumaOther                  uint64 `vmstat:"numa_other"`                    // (since Linux 2.6.18)
+	WorkingsetRefault          uint64 `vmstat:"workingset_refault"`            // (since Linux 3.15)
+	WorkingsetActivate         uint64 `vmstat:"workingset_activate"`           // (since Linux 3.15)
+	WorkingsetNodereclaim      uint64 `vmstat:"workingset_nodereclaim"`        // (since Linux 3.15)
+	NrAnonTransparentHugepages uint64 `vmstat:"nr_anon_transparent_hugepages"` // (since Linux 2.6.38)
+	NrFreeCma                  uint64 `vmstat:"nr_free_cma"`                   // (since Linux 3.7)  Number of free CMA (Contiguous Memory Allocator) pages.
+	NrDirtyThreshold           uint64 `vmstat:"nr_dirty_threshold"`            // (since Linux 2.6.37)
+	NrDirtyBackgroundThreshold uint64 `vmstat:"nr_dirty_background_threshold"` // (since Linux 2.6.37)
+	Pgpgin                     uint64 `vmstat:"pgpgin"`                        // (since Linux 2.6.0)
+	Pgpgout                    uint64 `vmstat:"pgpgout"`                       // (since Linux 2.6.0)
+	Pswpin                     uint64 `vmstat:"pswpin"`                        // (since Linux 2.6.0)
+	Pswpout                    uint64 `vmstat:"pswpout"`                       // (since Linux 2.6.0)
+	PgallocDma                 uint64 `vmstat:"pgalloc_dma"`                   // (since Linux 2.6.5)
+	PgallocDma32               uint64 `vmstat:"pgalloc_dma32"`                 // (since Linux 2.6.16)
+	PgallocNormal              uint64 `vmstat:"pgalloc_normal"`                // (since Linux 2.6.5)
+	PgallocHigh                uint64 `vmstat:"pgalloc_high"`                  // (since Linux 2.6.5)
+	PgallocMovable             uint64 `vmstat:"pgalloc_movable"`               // (since Linux 2.6.23)
+	Pgfree                     uint64 `vmstat:"pgfree"`                        // (since Linux 2.6.0)
+	Pgactivate                 uint64 `vmstat:"pgactivate"`                    // (since Linux 2.6.0)
+	Pgdeactivate               uint64 `vmstat:"pgdeactivate"`                  // (since Linux 2.6.0)
+	Pgfault                    uint64 `vmstat:"pgfault"`                       // (since Linux 2.6.0)
+	Pgmajfault                 uint64 `vmstat:"pgmajfault"`                    // (since Linux 2.6.0)
+	PgrefillDma                uint64 `vmstat:"pgrefill_dma"`                  // (since Linux 2.6.5)
+	PgrefillDma32              uint64 `vmstat:"pgrefill_dma32"`                // (since Linux 2.6.16)
+	PgrefillNormal             uint64 `vmstat:"pgrefill_normal"`               // (since Linux 2.6.5)
+	PgrefillHigh               uint64 `vmstat:"pgrefill_high"`                 // (since Linux 2.6.5)
+	PgrefillMovable            uint64 `vmstat:"pgrefill_movable"`              // (since Linux 2.6.23)
+	PgstealKswapdDma           uint64 `vmstat:"pgsteal_kswapd_dma"`            // (since Linux 3.4)
+	PgstealKswapdDma32         uint64 `vmstat:"pgsteal_kswapd_dma32"`          // (since Linux 3.4)
+	PgstealKswapdNormal        uint64 `vmstat:"pgsteal_kswapd_normal"`         // (since Linux 3.4)
+	PgstealKswapdHigh          uint64 `vmstat:"pgsteal_kswapd_high"`           // (since Linux 3.4)
+	PgstealKswapdMovable       uint64 `vmstat:"pgsteal_kswapd_movable"`        // (since Linux 3.4)
+	PgstealDirectDma           uint64 `vmstat:"pgsteal_direct_dma"`
+	PgstealDirectDma32         uint64 `vmstat:"pgsteal_direct_dma32"`   // (since Linux 3.4)
+	PgstealDirectNormal        uint64 `vmstat:"pgsteal_direct_normal"`  // (since Linux 3.4)
+	PgstealDirectHigh          uint64 `vmstat:"pgsteal_direct_high"`    // (since Linux 3.4)
+	PgstealDirectMovable       uint64 `vmstat:"pgsteal_direct_movable"` // (since Linux 2.6.23)
+	PgscanKswapdDma            uint64 `vmstat:"pgscan_kswapd_dma"`
+	PgscanKswapdDma32          uint64 `vmstat:"pgscan_kswapd_dma32"`  // (since Linux 2.6.16)
+	PgscanKswapdNormal         uint64 `vmstat:"pgscan_kswapd_normal"` // (since Linux 2.6.5)
+	PgscanKswapdHigh           uint64 `vmstat:"pgscan_kswapd_high"`
+	PgscanKswapdMovable        uint64 `vmstat:"pgscan_kswapd_movable"` // (since Linux 2.6.23)
+	PgscanDirectDma            uint64 `vmstat:"pgscan_direct_dma"`     //
+	PgscanDirectDma32          uint64 `vmstat:"pgscan_direct_dma32"`   // (since Linux 2.6.16)
+	PgscanDirectNormal         uint64 `vmstat:"pgscan_direct_normal"`
+	PgscanDirectHigh           uint64 `vmstat:"pgscan_direct_high"`
+	PgscanDirectMovable        uint64 `vmstat:"pgscan_direct_movable"`         // (since Linux 2.6.23)
+	PgscanDirectThrottle       uint64 `vmstat:"pgscan_direct_throttle"`        // (since Linux 3.6)
+	ZoneReclaimFailed          uint64 `vmstat:"zone_reclaim_failed"`           // (since linux 2.6.31)
+	Pginodesteal               uint64 `vmstat:"pginodesteal"`                  // (since linux 2.6.0)
+	SlabsScanned               uint64 `vmstat:"slabs_scanned"`                 // (since linux 2.6.5)
+	KswapdInodesteal           uint64 `vmstat:"kswapd_inodesteal"`             // (since linux 2.6.0)
+	KswapdLowWmarkHitQuickly   uint64 `vmstat:"kswapd_low_wmark_hit_quickly"`  // (since 2.6.33)
+	KswapdHighWmarkHitQuickly  uint64 `vmstat:"kswapd_high_wmark_hit_quickly"` // (since 2.6.33)
+	Pageoutrun                 uint64 `vmstat:"pageoutrun"`                    // (since Linux 2.6.0)
+	Allocstall                 uint64 `vmstat:"allocstall"`                    // (since Linux 2.6.0)
+	Pgrotated                  uint64 `vmstat:"pgrotated"`                     // (since Linux 2.6.0)
+	DropPagecache              uint64 `vmstat:"drop_pagecache"`                // (since Linux 3.15)
+	DropSlab                   uint64 `vmstat:"drop_slab"`                     // (since Linux 3.15)
+	NumaPteUpdates             uint64 `vmstat:"numa_pte_updates"`              // (since Linux 3.8)
+	NumaHugePteUpdates         uint64 `vmstat:"numa_huge_pte_updates"`         // (since Linux 3.13)
+	NumaHintFaults             uint64 `vmstat:"numa_hint_faults"`              // (since Linux 3.8)
+	NumaHintFaultsLocal        uint64 `vmstat:"numa_hint_faults_local"`        // (since Linux 3.8)
+	NumaPagesMigrated          uint64 `vmstat:"numa_pages_migrated"`           // (since Linux 3.8)
+	PgmigrateSuccess           uint64 `vmstat:"pgmigrate_success"`             // (since Linux 3.8)
+	PgmigrateFail              uint64 `vmstat:"pgmigrate_fail"`                // (since Linux 3.8)
+	CompactMigrateScanned      uint64 `vmstat:"compact_migrate_scanned"`       // (since Linux 3.8)
+	CompactFreeScanned         uint64 `vmstat:"compact_free_scanned"`          // (since Linux 3.8)
+	CompactIsolated            uint64 `vmstat:"compact_isolated"`              // (since Linux 3.8)
+	CompactStall               uint64 `vmstat:"compact_stall"`                 // (since Linux 2.6.35) See the kernel source file Documentation/admin-guide/mm/transhuge.rst.
+	CompactFail                uint64 `vmstat:"compact_fail"`                  // (since Linux 2.6.35) See the kernel source file Documentation/admin-guide/mm/transhuge.rst.
+	CompactSuccess             uint64 `vmstat:"compact_success"`               // (since Linux 2.6.35) See the kernel source file Documentation/admin-guide/mm/transhuge.rst.
+	HtlbBuddyAllocSuccess      uint64 `vmstat:"htlb_buddy_alloc_success"`      // (since Linux 2.6.26)
+	HtlbBuddyAllocFail         uint64 `vmstat:"htlb_buddy_alloc_fail"`         // (since Linux 2.6.26)
+	UnevictablePgsCulled       uint64 `vmstat:"unevictable_pgs_culled"`        // (since Linux 2.6.28)
+	UnevictablePgsScanned      uint64 `vmstat:"unevictable_pgs_scanned"`       // (since Linux 2.6.28)
+	UnevictablePgsRescued      uint64 `vmstat:"unevictable_pgs_rescued"`       // (since Linux 2.6.28)
+	UnevictablePgsMlocked      uint64 `vmstat:"unevictable_pgs_mlocked"`       // (since Linux 2.6.28)
+	UnevictablePgsMunlocked    uint64 `vmstat:"unevictable_pgs_munlocked"`     // (since Linux 2.6.28)
+	UnevictablePgsCleared      uint64 `vmstat:"unevictable_pgs_cleared"`       // (since Linux 2.6.28)
+	UnevictablePgsStranded     uint64 `vmstat:"unevictable_pgs_stranded"`      // (since Linux 2.6.28)
+	ThpFaultAlloc              uint64 `vmstat:"thp_fault_alloc"`               // (since Linux 2.6.39) See the kernel source file Documentation/admin-guide/mm/transhuge.rst.
+	ThpFaultFallback           uint64 `vmstat:"thp_fault_fallback"`            // (since Linux 2.6.39) See the kernel source file Documentation/admin-guide/mm/transhuge.rst.
+	ThpCollapseAlloc           uint64 `vmstat:"thp_collapse_alloc"`            // (since Linux 2.6.39) See the kernel source file Documentation/admin-guide/mm/transhuge.rst.
+	ThpCollapseAllocFailed     uint64 `vmstat:"thp_collapse_alloc_failed"`     // (since Linux 2.6.39) See the kernel source file Documentation/admin-guide/mm/transhuge.rst.
+	ThpSplit                   uint64 `vmstat:"thp_split"`                     // (since Linux 2.6.39) See the kernel source file Documentation/admin-guide/mm/transhuge.rst.
+	ThpZeroPageAlloc           uint64 `vmstat:"thp_zero_page_alloc"`           // (since Linux 3.8) See the kernel source file Documentation/admin-guide/mm/transhuge.rst.
+	ThpZeroPageAllocFailed     uint64 `vmstat:"thp_zero_page_alloc_failed"`    // (since Linux 3.8) See the kernel source file Documentation/admin-guide/mm/transhuge.rst.
+	BalloonInflate             uint64 `vmstat:"balloon_inflate"`               // (since Linux 3.18)
+	BalloonDeflate             uint64 `vmstat:"balloon_deflate"`               // (since Linux 3.18)
+	BalloonMigrate             uint64 `vmstat:"balloon_migrate"`               // (since Linux 3.18)
+	NrTlbRemoteFlush           uint64 `vmstat:"nr_tlb_remote_flush"`           // (since Linux 3.12)
+	NrTlbRemoteFlushReceived   uint64 `vmstat:"nr_tlb_remote_flush_received"`  // (since Linux 3.12)
+	NrTlbLocalFlushAll         uint64 `vmstat:"nr_tlb_local_flush_all"`        // (since Linux 3.12)
+	NrTlbLocalFlushOne         uint64 `vmstat:"nr_tlb_local_flush_one"`        // (since Linux 3.12)
+	VmacacheFindCalls          uint64 `vmstat:"vmacache_find_calls"`           // (since Linux 3.16)
+	VmacacheFindHits           uint64 `vmstat:"vmacache_find_hits"`            // (since Linux 3.16)
+	VmacacheFullFlushes        uint64 `vmstat:"vmacache_full_flushes"`         // (since Linux 3.19)
+	// the following fields are not documented in `man 5 proc` as of 4.15
+	NrZoneInactiveAnon          uint64 `vmstat:"nr_zone_inactive_anon"`
+	NrZoneActiveAnon            uint64 `vmstat:"nr_zone_active_anon"`
+	NrZoneInactiveFile          uint64 `vmstat:"nr_zone_inactive_file"`
+	NrZoneActiveFile            uint64 `vmstat:"nr_zone_active_file"`
+	NrZoneUnevictable           uint64 `vmstat:"nr_zone_unevictable"`
+	NrZoneWritePending          uint64 `vmstat:"nr_zone_write_pending"`
+	NrZspages                   uint64 `vmstat:"nr_zspages"`
+	NrShmemHugepages            uint64 `vmstat:"nr_shmem_hugepages"`
+	NrShmemPmdmapped            uint64 `vmstat:"nr_shmem_pmdmapped"`
+	AllocstallDma               uint64 `vmstat:"allocstall_dma"`
+	AllocstallDma32             uint64 `vmstat:"allocstall_dma32"`
+	AllocstallNormal            uint64 `vmstat:"allocstall_normal"`
+	AllocstallMovable           uint64 `vmstat:"allocstall_movable"`
+	PgskipDma                   uint64 `vmstat:"pgskip_dma"`
+	PgskipDma32                 uint64 `vmstat:"pgskip_dma32"`
+	PgskipNormal                uint64 `vmstat:"pgskip_normal"`
+	PgskipMovable               uint64 `vmstat:"pgskip_movable"`
+	Pglazyfree                  uint64 `vmstat:"pglazyfree"`
+	Pglazyfreed                 uint64 `vmstat:"pglazyfreed"`
+	Pgrefill                    uint64 `vmstat:"pgrefill"`
+	PgstealKswapd               uint64 `vmstat:"pgsteal_kswapd"`
+	PgstealDirect               uint64 `vmstat:"pgsteal_direct"`
+	PgscanKswapd                uint64 `vmstat:"pgscan_kswapd"`
+	PgscanDirect                uint64 `vmstat:"pgscan_direct"`
+	OomKill                     uint64 `vmstat:"oom_kill"`
+	CompactDaemonWake           uint64 `vmstat:"compact_daemon_wake"`
+	CompactDaemonMigrateScanned uint64 `vmstat:"compact_daemon_migrate_scanned"`
+	CompactDaemonFreeScanned    uint64 `vmstat:"compact_daemon_free_scanned"`
+	ThpFileAlloc                uint64 `vmstat:"thp_file_alloc"`
+	ThpFileMapped               uint64 `vmstat:"thp_file_mapped"`
+	ThpSplitPage                uint64 `vmstat:"thp_split_page"`
+	ThpSplitPageFailed          uint64 `vmstat:"thp_split_page_failed"`
+	ThpDeferredSplitPage        uint64 `vmstat:"thp_deferred_split_page"`
+	ThpSplitPmd                 uint64 `vmstat:"thp_split_pmd"`
+	ThpSplitPud                 uint64 `vmstat:"thp_split_pud"`
+	ThpSwpout                   uint64 `vmstat:"thp_swpout"`
+	ThpSwpoutFallback           uint64 `vmstat:"thp_swpout_fallback"`
+	SwapRa                      uint64 `vmstat:"swap_ra"`
+	SwapRaHit                   uint64 `vmstat:"swap_ra_hit"`
 }
