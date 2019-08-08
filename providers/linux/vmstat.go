@@ -26,7 +26,6 @@ import (
 
 // parseVMStat parses the contents of /proc/vmstat
 func parseVMStat(content []byte) (*types.VMStatInfo, error) {
-
 	vmStat := &types.VMStatInfo{}
 	refVal := reflect.ValueOf(vmStat).Elem()
 
@@ -52,7 +51,7 @@ func parseVMStat(content []byte) (*types.VMStatInfo, error) {
 		})
 
 		// This protects us from fields in /proc/vmstat that we don't have added in our struct
-		//This is just a way to make sure we actually found a field in the above `FieldByNameFunc`
+		// This is just a way to make sure we actually found a field in the above `FieldByNameFunc`
 		if fieldToSet.CanSet() {
 			fieldToSet.SetUint(val)
 		}

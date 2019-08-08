@@ -79,7 +79,6 @@ func (h *host) VMStat() (*types.VMStatInfo, error) {
 	}
 
 	return parseVMStat(content)
-
 }
 
 func (h *host) CPUTime() (types.CPUTimes, error) {
