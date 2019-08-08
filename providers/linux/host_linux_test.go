@@ -21,9 +21,10 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/go-sysinfo/internal/registry"
 	"github.com/elastic/go-sysinfo/types"
-	"github.com/stretchr/testify/assert"
 )
 
 var _ registry.HostProvider = linuxSystem{}
