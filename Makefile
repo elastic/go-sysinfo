@@ -26,4 +26,4 @@ $(GOPATH)/bin/gofumpt:
 
 $(GOPATH)/bin/goimports:
 	@echo "goimports missing, installing"
-	GO111MODULE=off go get golang.org/x/tools/cmd/goimports
+	GO111MODULE=off go get -u golang.org/x/tools/cmd/goimports
