@@ -19,7 +19,7 @@ package types
 
 import "time"
 
-// Host is the interface type for gathering host data
+// Host is the main wrapper for returning Host stats
 type Host interface {
 	CPUTimer
 	Info() HostInfo
@@ -59,7 +59,8 @@ type OSInfo struct {
 	Codename string `json:"codename,omitempty"` // OS codename (e.g. jessie).
 }
 
-// LoadAverage is the interface type that returns load info on the host
+// LoadAverage is the interface that wraps the LoadAverage method.
+// LoadAverage returns load info on the host
 type LoadAverage interface {
 	LoadAverage() LoadAverageInfo
 }

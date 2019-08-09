@@ -19,7 +19,7 @@ package types
 
 import "time"
 
-// Process is the interface type for returning information on a process
+// Process is the main wrapper for gathering information on a process
 type Process interface {
 	CPUTimer
 	Info() (ProcessInfo, error)
@@ -72,22 +72,26 @@ type UserInfo struct {
 	SGID string `json:"sgid"`
 }
 
-// Environment is the interface type that returns the environment variables for a process
+// Environment is the interface that wraps the Environment method.
+// Evironment returns variables for a process
 type Environment interface {
 	Environment() (map[string]string, error)
 }
 
-// OpenHandleEnumerator lists the open file handles.
+// OpenHandleEnumerator is the interface that wraps the OpenHandles method.
+// OpenHandles lists the open file handles.
 type OpenHandleEnumerator interface {
 	OpenHandles() ([]string, error)
 }
 
-// OpenHandleCounter is the interface type returns the number the open file handles.
+// OpenHandleCounter is the interface that wraps the OpenHandleCount method.
+// OpenHandleCount returns the number of open file handles.
 type OpenHandleCounter interface {
 	OpenHandleCount() (int, error)
 }
 
-// CPUTimer is the interface type for returning CPU time info
+// CPUTimer is the interface that wraps the CPUTime method.
+// CPUTime returns CPU time info
 type CPUTimer interface {
 	// CPUTime returns a CPUTimes structure for
 	// the host or some process.
@@ -138,12 +142,14 @@ type CapabilityInfo struct {
 	Ambient     []string `json:"ambient"`
 }
 
-// Capabilities is the interface type for returning capabilities for a process
+// Capabilities is the interface that wraps the Capabilities method.
+// Capabilities returns capabilities for a process
 type Capabilities interface {
 	Capabilities() (*CapabilityInfo, error)
 }
 
-// Seccomp is the interface type for returning Seccomp info
+// Seccomp is the interface that wraps the Seccomp method.
+// Seccomp returns seccomp info on Linux
 type Seccomp interface {
 	Seccomp() (*SeccompInfo, error)
 }
