@@ -19,7 +19,7 @@ package types
 
 import "time"
 
-// Host is the main wrapper for returning Host stats
+// Host is the interface that wraps methods for returning Host stats
 type Host interface {
 	CPUTimer
 	Info() HostInfo

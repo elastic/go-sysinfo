@@ -73,7 +73,7 @@ type UserInfo struct {
 }
 
 // Environment is the interface that wraps the Environment method.
-// Evironment returns variables for a process
+// Environment returns variables for a process
 type Environment interface {
 	Environment() (map[string]string, error)
 }
