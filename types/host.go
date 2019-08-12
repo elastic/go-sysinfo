@@ -19,12 +19,14 @@ package types
 
 import "time"
 
+// Host is the interface that wraps methods for returning Host stats
 type Host interface {
 	CPUTimer
 	Info() HostInfo
 	Memory() (*HostMemoryInfo, error)
 }
 
+// HostInfo contains basic host information
 type HostInfo struct {
 	Architecture      string    `json:"architecture"`            // Hardware architecture (e.g. x86_64, arm, ppc, mips).
 	BootTime          time.Time `json:"boot_time"`               // Host boot time.
@@ -39,10 +41,12 @@ type HostInfo struct {
 	UniqueID          string    `json:"id,omitempty"`            // Unique ID of the host (optional).
 }
 
+// Uptime returns the system uptime
 func (host HostInfo) Uptime() time.Duration {
 	return time.Since(host.BootTime)
 }
 
+// OSInfo contains basic OS information
 type OSInfo struct {
 	Family   string `json:"family"`             // OS Family (e.g. redhat, debian, freebsd, windows).
 	Platform string `json:"platform"`           // OS platform (e.g. centos, ubuntu, windows).
@@ -55,10 +59,13 @@ type OSInfo struct {
 	Codename string `json:"codename,omitempty"` // OS codename (e.g. jessie).
 }
 
+// LoadAverage is the interface that wraps the LoadAverage method.
+// LoadAverage returns load info on the host
 type LoadAverage interface {
 	LoadAverage() LoadAverageInfo
 }
 
+// LoadAverageInfo contains load statistics
 type LoadAverageInfo struct {
 	One     float64 `json:"one_min"`
 	Five    float64 `json:"five_min"`
