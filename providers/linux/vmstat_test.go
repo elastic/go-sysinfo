@@ -164,7 +164,6 @@ func TestVmStatParse(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	// Check a few values
 	assert.Equal(t, uint64(8348560), data.SlabsScanned)
 	assert.Equal(t, uint64(0), data.SwapRa)

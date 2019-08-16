@@ -29,6 +29,14 @@ import (
 func parseVMStat(content []byte) (*types.VMStatInfo, error) {
 	vmStat := &types.VMStatInfo{}
 	refVal := reflect.ValueOf(vmStat).Elem()
+	tagMap := make(map[string]*reflect.Value)
+
+	//iterate over the struct and make a map of tags->values
+	for index := 0; index < refVal.NumField(); index++ {
+		tag := refVal.Type().Field(index).Tag.Get("json")
+		val := refVal.Field(index)
+		tagMap[tag] = &val
+	}
 
 	err := parseKeyValue(content, " ", func(key, value []byte) error {
 		// turn our []byte value into an int
@@ -37,26 +45,16 @@ func parseVMStat(content []byte) (*types.VMStatInfo, error) {
 			return errors.Wrapf(err, "failed to parse %v value of %v", string(key), string(value))
 		}
 
-		// Search The struct object to see if we have a field with a tag that matches the raw key coming off the file input
-		// This is the best way I've found to "search" for a a struct field based on a struct tag value.
-		// In this case, the /proc/vmstat keys are struct tags.
-		fieldToSet := refVal.FieldByNameFunc(func(name string) bool {
-			testField, exists := reflect.TypeOf(vmStat).Elem().FieldByName(name)
-			if !exists {
-				return false
-			}
-			if testField.Tag.Get("vmstat") == string(key) {
-				return true
-			}
-			return false
-		})
+		sval, ok := tagMap[string(key)]
+		if !ok {
+			return nil
+		}
 
-		// This protects us from fields in /proc/vmstat that we don't have added in our struct
-		// This is just a way to make sure we actually found a field in the above `FieldByNameFunc`
-		if fieldToSet.CanSet() {
-			fieldToSet.SetUint(val)
+		if sval.CanSet() {
+			sval.SetUint(val)
 		}
 		return nil
+
 	})
 
 	return vmStat, err
