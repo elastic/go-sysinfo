@@ -25,18 +25,27 @@ import (
 	"github.com/elastic/go-sysinfo/types"
 )
 
+// vmstatTagToFieldIndex contains a mapping of json struct tags to struct field indices.
+var vmstatTagToFieldIndex = make(map[string]int)
+
+func init() {
+	var vmstat types.VMStatInfo
+	val := reflect.ValueOf(vmstat)
+	typ := reflect.TypeOf(vmstat)
+
+	for i := 0; i < val.NumField(); i++ {
+		field := typ.Field(i)
+		if tag := field.Tag.Get("json"); tag != "" {
+			vmstatTagToFieldIndex[tag] = i
+		}
+	}
+}
+
 // parseVMStat parses the contents of /proc/vmstat
 func parseVMStat(content []byte) (*types.VMStatInfo, error) {
-	vmStat := &types.VMStatInfo{}
-	refVal := reflect.ValueOf(vmStat).Elem()
-	tagMap := make(map[string]*reflect.Value)
 
-	//iterate over the struct and make a map of tags->values
-	for index := 0; index < refVal.NumField(); index++ {
-		tag := refVal.Type().Field(index).Tag.Get("json")
-		val := refVal.Field(index)
-		tagMap[tag] = &val
-	}
+	var vmStat types.VMStatInfo
+	refValues := reflect.ValueOf(&vmStat).Elem()
 
 	err := parseKeyValue(content, " ", func(key, value []byte) error {
 		// turn our []byte value into an int
@@ -45,10 +54,12 @@ func parseVMStat(content []byte) (*types.VMStatInfo, error) {
 			return errors.Wrapf(err, "failed to parse %v value of %v", string(key), string(value))
 		}
 
-		sval, ok := tagMap[string(key)]
+		idx, ok := vmstatTagToFieldIndex[string(key)]
 		if !ok {
 			return nil
 		}
+
+		sval := refValues.Field(idx)
 
 		if sval.CanSet() {
 			sval.SetUint(val)
@@ -57,5 +68,5 @@ func parseVMStat(content []byte) (*types.VMStatInfo, error) {
 
 	})
 
-	return vmStat, err
+	return &vmStat, err
 }
