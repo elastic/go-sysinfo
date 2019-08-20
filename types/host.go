@@ -31,7 +31,7 @@ type VMStat interface {
 	VMStat() (*VMStatInfo, error)
 }
 
-// HostInfo contains basic host information
+// HostInfo contains basic host information.
 type HostInfo struct {
 	Architecture      string    `json:"architecture"`            // Hardware architecture (e.g. x86_64, arm, ppc, mips).
 	BootTime          time.Time `json:"boot_time"`               // Host boot time.
