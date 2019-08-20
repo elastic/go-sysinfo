@@ -41,7 +41,7 @@ func init() {
 	}
 }
 
-// parseVMStat parses the contents of /proc/vmstat
+// parseVMStat parses the contents of /proc/vmstat.
 func parseVMStat(content []byte) (*types.VMStatInfo, error) {
 	var vmStat types.VMStatInfo
 	refValues := reflect.ValueOf(&vmStat).Elem()
@@ -64,7 +64,6 @@ func parseVMStat(content []byte) (*types.VMStatInfo, error) {
 			sval.SetUint(val)
 		}
 		return nil
-
 	})
 
 	return &vmStat, err

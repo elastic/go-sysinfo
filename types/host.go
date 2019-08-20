@@ -26,7 +26,7 @@ type Host interface {
 	Memory() (*HostMemoryInfo, error)
 }
 
-// VMStat is the interface wrapper for platforms that support /proc/vmstat
+// VMStat is the interface wrapper for platforms that support /proc/vmstat.
 type VMStat interface {
 	VMStat() (*VMStatInfo, error)
 }
@@ -89,7 +89,7 @@ type HostMemoryInfo struct {
 	Metrics      map[string]uint64 `json:"raw,omitempty"`       // Other memory related metrics.
 }
 
-// VMStatInfo contains parsed info from /proc/vmstat
+// VMStatInfo contains parsed info from /proc/vmstat.
 // This procfs file has expanded much over the years
 // with different kernel versions. If we don't have a field in vmstat,
 // the field in the struct will just be blank. The comments represent kernel versions.

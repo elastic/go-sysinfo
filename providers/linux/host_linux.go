@@ -71,7 +71,7 @@ func (h *host) Memory() (*types.HostMemoryInfo, error) {
 	return parseMemInfo(content)
 }
 
-// VMStat reports data from /proc/vmstat on linux
+// VMStat reports data from /proc/vmstat on linux.
 func (h *host) VMStat() (*types.VMStatInfo, error) {
 	content, err := ioutil.ReadFile(h.procFS.path("vmstat"))
 	if err != nil {
