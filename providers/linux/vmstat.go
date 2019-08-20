@@ -43,7 +43,6 @@ func init() {
 
 // parseVMStat parses the contents of /proc/vmstat
 func parseVMStat(content []byte) (*types.VMStatInfo, error) {
-
 	var vmStat types.VMStatInfo
 	refValues := reflect.ValueOf(&vmStat).Elem()
 
