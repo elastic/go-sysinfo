@@ -24,6 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/go-sysinfo/internal/registry"
+	"github.com/elastic/go-sysinfo/types"
 )
 
 var _ registry.HostProvider = linuxSystem{}
@@ -52,4 +53,21 @@ func TestHostMemoryInfo(t *testing.T) {
 	assert.EqualValues(t, 4139057152, m.Total)
 	assert.NotContains(t, m.Metrics, "MemTotal")
 	assert.Contains(t, m.Metrics, "Slab")
+}
+
+func TestHostVMStat(t *testing.T) {
+	host, err := newLinuxSystem("testdata/ubuntu1710").Host()
+	if err != nil {
+		t.Fatal(err)
+	}
+	s, err := host.(types.VMStat).VMStat()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	data, err := json.MarshalIndent(s, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(string(data))
 }

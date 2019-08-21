@@ -290,5 +290,4 @@ func TestProcesses(t *testing.T) {
 			info.PID, info.Name, info.Exe, info.Args, info.PPID, info.CWD,
 			info.StartTime)
 	}
-
 }
