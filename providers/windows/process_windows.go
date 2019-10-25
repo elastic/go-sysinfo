@@ -306,7 +306,7 @@ func (p *process) User() (types.UserInfo, error) {
 
 	sid := tokenUser.User.Sid.String()
 	if sid == "" {
-		return types.UserInfo{}, errors.Wrap(err, "failed to look up user SID")
+		return types.UserInfo{}, errors.New("failed to look up user SID")
 	}
 
 	tokenGroup, err := accessToken.GetTokenPrimaryGroup()
@@ -315,7 +315,7 @@ func (p *process) User() (types.UserInfo, error) {
 	}
 	gsid := tokenGroup.PrimaryGroup.String()
 	if gsid == "" {
-		return types.UserInfo{}, errors.Wrap(err, "failed to look up primary group SID")
+		return types.UserInfo{}, errors.New("failed to look up primary group SID")
 	}
 
 	return types.UserInfo{
