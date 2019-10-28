@@ -157,4 +157,21 @@ func TestOperatingSystem(t *testing.T) {
 		}, *os)
 		t.Logf("%#v", os)
 	})
+	t.Run("fedora30", func(t *testing.T) {
+		os, err := getOSInfo("testdata/fedora30")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Family:   "redhat",
+			Platform: "fedora",
+			Name:     "Fedora",
+			Version:  "30 (Container Image)",
+			Major:    30,
+			Minor:    0,
+			Patch:    0,
+			Codename: "Thirty",
+		}, *os)
+		t.Logf("%#v", os)
+	})
 }
