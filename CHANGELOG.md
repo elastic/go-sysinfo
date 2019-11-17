@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added detection of systemd cgroups to the `IsContainerized` check. [#71](https://github.com/elastic/go-sysinfo/pull/71)
+
 ### Changed
 
 ### Deprecated

@@ -78,36 +78,57 @@ const lxcCgroup = `9:hugetlb:/lxc/81438f4655cd771c425607dcf7654f4dc03c073c0123ed
 2:cpu:/lxc/81438f4655cd771c425607dcf7654f4dc03c073c0123edc45fcfad28132e8c60
 1:cpuset:/lxc/81438f4655cd771c425607dcf7654f4dc03c073c0123edc45fcfad28132e8c60`
 
+const systemdCgroup = `12:hugetlb:/kubepods.slice/kubepods-podc1281d63_01ab_11ea_ba0a_3cfdfe55a1c0.slice/e2b68f8a6e227921b236c686a243e8ff50f561f493d401da7ac3f8cae28f08b1
+11:perf_event:/kubepods.slice/kubepods-podc1281d63_01ab_11ea_ba0a_3cfdfe55a1c0.slice/e2b68f8a6e227921b236c686a243e8ff50f561f493d401da7ac3f8cae28f08b1
+10:pids:/kubepods.slice/kubepods-podc1281d63_01ab_11ea_ba0a_3cfdfe55a1c0.slice/e2b68f8a6e227921b236c686a243e8ff50f561f493d401da7ac3f8cae28f08b1
+9:cpu,cpuacct:/kubepods.slice/kubepods-podc1281d63_01ab_11ea_ba0a_3cfdfe55a1c0.slice/e2b68f8a6e227921b236c686a243e8ff50f561f493d401da7ac3f8cae28f08b1
+8:cpuset:/kubepods.slice/kubepods-podc1281d63_01ab_11ea_ba0a_3cfdfe55a1c0.slice/e2b68f8a6e227921b236c686a243e8ff50f561f493d401da7ac3f8cae28f08b1
+7:memory:/kubepods.slice/kubepods-podc1281d63_01ab_11ea_ba0a_3cfdfe55a1c0.slice/e2b68f8a6e227921b236c686a243e8ff50f561f493d401da7ac3f8cae28f08b1
+6:freezer:/kubepods.slice/kubepods-podc1281d63_01ab_11ea_ba0a_3cfdfe55a1c0.slice/e2b68f8a6e227921b236c686a243e8ff50f561f493d401da7ac3f8cae28f08b1
+5:rdma:/
+4:net_cls,net_prio:/kubepods.slice/kubepods-podc1281d63_01ab_11ea_ba0a_3cfdfe55a1c0.slice/e2b68f8a6e227921b236c686a243e8ff50f561f493d401da7ac3f8cae28f08b1
+3:devices:/kubepods.slice/kubepods-podc1281d63_01ab_11ea_ba0a_3cfdfe55a1c0.slice/e2b68f8a6e227921b236c686a243e8ff50f561f493d401da7ac3f8cae28f08b1
+2:blkio:/kubepods.slice/kubepods-podc1281d63_01ab_11ea_ba0a_3cfdfe55a1c0.slice/e2b68f8a6e227921b236c686a243e8ff50f561f493d401da7ac3f8cae28f08b1
+1:name=systemd:/kubepods.slice/kubepods-podc1281d63_01ab_11ea_ba0a_3cfdfe55a1c0.slice/e2b68f8a6e227921b236c686a243e8ff50f561f493d401da7ac3f8cae28f08b1`
+
 const emptyCgroup = ``
 
 func TestIsContainerized(t *testing.T) {
-	containerized, err := isContainerizedCgroup([]byte(nonContainerizedCgroup))
-	if err != nil {
-		t.Fatal(err)
+	tests := []struct {
+		cgroupStr     string
+		containerized bool
+	}{
+		{
+			cgroupStr:     nonContainerizedCgroup,
+			containerized: false,
+		},
+		{
+			cgroupStr:     containerCgroup,
+			containerized: true,
+		},
+		{
+			cgroupStr:     containerHostPIDNamespaceCgroup,
+			containerized: false,
+		},
+		{
+			cgroupStr:     lxcCgroup,
+			containerized: true,
+		},
+		{
+			cgroupStr:     systemdCgroup,
+			containerized: true,
+		},
+		{
+			cgroupStr:     emptyCgroup,
+			containerized: false,
+		},
 	}
-	assert.False(t, containerized)
 
-	containerized, err = isContainerizedCgroup([]byte(containerCgroup))
-	if err != nil {
-		t.Fatal(err)
+	for _, test := range tests {
+		containerized, err := isContainerizedCgroup([]byte(test.cgroupStr))
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, test.containerized, containerized)
 	}
-	assert.True(t, containerized)
-
-	containerized, err = isContainerizedCgroup([]byte(containerHostPIDNamespaceCgroup))
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.False(t, containerized)
-
-	containerized, err = isContainerizedCgroup([]byte(lxcCgroup))
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.True(t, containerized)
-
-	containerized, err = isContainerizedCgroup([]byte(emptyCgroup))
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.False(t, containerized)
 }
