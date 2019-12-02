@@ -71,3 +71,20 @@ func TestHostVMStat(t *testing.T) {
 	}
 	t.Log(string(data))
 }
+
+func TestHostNetworkCounters(t *testing.T) {
+	host, err := newLinuxSystem("testdata/fedora30").Host()
+	if err != nil {
+		t.Fatal(err)
+	}
+	s, err := host.(types.NetworkCounters).NetworkCounters()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	data, err := json.MarshalIndent(s, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(string(data))
+}
