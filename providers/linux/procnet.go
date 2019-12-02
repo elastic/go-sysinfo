@@ -37,7 +37,6 @@ func fillStruct(str interface{}, data map[string]map[string]int64) {
 		if tag := field.Tag.Get("netstat"); tag != "" {
 			if values, ok := data[tag]; ok {
 				val.Field(i).Set(reflect.ValueOf(values))
-
 			}
 		}
 	}
