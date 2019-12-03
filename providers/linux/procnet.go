@@ -67,10 +67,13 @@ func parseEntry(line1, line2 string) (map[string]int64, error) {
 func readAndParseNetFile(body string) (map[string]map[string]int64, error) {
 	fileMetrics := make(map[string]map[string]int64)
 	bodySplit := strings.Split(strings.TrimSpace(body), "\n")
+	// There should be an even number of lines. If not, something is wrong.
+	if len(bodySplit)%2 != 0 {
+		return nil, fmt.Errorf("badly parsed body: %s", body)
+	}
 	// in the network counters, data is divided into two-line sections: a line of keys, and a line of values
 	// With each line
 	for index := 0; index < len(bodySplit); index += 2 {
-
 		keysSplit := strings.Split(bodySplit[index], ":")
 		valuesSplit := strings.Split(bodySplit[index+1], ":")
 		if len(keysSplit) != 2 || len(valuesSplit) != 2 {
