@@ -18,8 +18,9 @@
 package linux
 
 import (
-	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/go-sysinfo/types"
 )
@@ -43,5 +44,7 @@ UdpLite: 0 0 0 0 0 0 0 0`
 	}
 	testOut := types.SNMP{}
 	fillStruct(&testOut, mapStr)
-	fmt.Printf("Struct: %#v\n", testOut)
+
+	assert.NotEmpty(t, testOut.IP)
+	assert.Equal(t, int64(16755), testOut.UDP["InDatagrams"])
 }
