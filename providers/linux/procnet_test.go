@@ -38,7 +38,7 @@ Udp: InDatagrams NoPorts InErrors OutDatagrams RcvbufErrors SndbufErrors InCsumE
 Udp: 16755 33 0 16829 0 0 0 0
 UdpLite: InDatagrams NoPorts InErrors OutDatagrams RcvbufErrors SndbufErrors InCsumErrors IgnoredMulti
 UdpLite: 0 0 0 0 0 0 0 0`
-	mapStr, err := readAndParseNetFile(file)
+	mapStr, err := parseNetFile(file)
 	if err != nil {
 		t.Fatalf("error: %s", err)
 	}

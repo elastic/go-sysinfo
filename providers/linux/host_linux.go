@@ -83,14 +83,13 @@ func (h *host) VMStat() (*types.VMStatInfo, error) {
 
 // NetworkCounters reports data from /proc/net on linux
 func (h *host) NetworkCounters() (*types.NetworkCountersInfo, error) {
-
 	snmpRaw, err := ioutil.ReadFile(h.procFS.path("net/snmp"))
 	if err != nil {
 		return nil, err
 	}
 	snmp, err := getNetSnmpStats(snmpRaw)
 	if err != nil {
-		return &types.NetworkCountersInfo{}, err
+		return nil, err
 	}
 
 	netstatRaw, err := ioutil.ReadFile(h.procFS.path("net/netstat"))
@@ -99,7 +98,7 @@ func (h *host) NetworkCounters() (*types.NetworkCountersInfo, error) {
 	}
 	netstat, err := getNetstatStats(netstatRaw)
 	if err != nil {
-		return &types.NetworkCountersInfo{}, err
+		return nil, err
 	}
 
 	return &types.NetworkCountersInfo{SNMP: snmp, Netstat: netstat}, nil

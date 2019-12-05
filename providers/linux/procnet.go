@@ -49,22 +49,22 @@ func parseEntry(line1, line2 string) (map[string]int64, error) {
 	valueArr := strings.Split(strings.TrimSpace(line2), " ")
 
 	if len(keyArr) != len(valueArr) {
-		return nil, errors.New("Key and value lines are mismatched")
+		return nil, errors.New("key and value lines are mismatched")
 	}
 
-	counters := make(map[string]int64)
+	counters := make(map[string]int64, len(valueArr))
 	for iter, value := range valueArr {
 		parsed, err := strconv.ParseInt(value, 10, 64)
 		if err != nil {
-			return nil, errors.Wrapf(err, "Error parsing string to int in line: %#v", valueArr)
+			return nil, errors.Wrapf(err, "error parsing string to int in line: %#v", valueArr)
 		}
 		counters[keyArr[iter]] = parsed
 	}
 	return counters, nil
 }
 
-// readAndParseNetFile parses an entire file, and returns a 2D map, representing how files are sorted by protocol
-func readAndParseNetFile(body string) (map[string]map[string]int64, error) {
+// parseNetFile parses an entire file, and returns a 2D map, representing how files are sorted by protocol
+func parseNetFile(body string) (map[string]map[string]int64, error) {
 	fileMetrics := make(map[string]map[string]int64)
 	bodySplit := strings.Split(strings.TrimSpace(body), "\n")
 	// There should be an even number of lines. If not, something is wrong.
@@ -81,7 +81,7 @@ func readAndParseNetFile(body string) (map[string]map[string]int64, error) {
 		}
 		valMap, err := parseEntry(keysSplit[1], valuesSplit[1])
 		if err != nil {
-			return nil, errors.Wrap(err, "Error parsing lines")
+			return nil, errors.Wrap(err, "error parsing lines")
 		}
 		fileMetrics[valuesSplit[0]] = valMap
 	}
@@ -90,7 +90,7 @@ func readAndParseNetFile(body string) (map[string]map[string]int64, error) {
 
 // getNetSnmpStats pulls snmp stats from /proc/net
 func getNetSnmpStats(raw []byte) (types.SNMP, error) {
-	snmpData, err := readAndParseNetFile(string(raw))
+	snmpData, err := parseNetFile(string(raw))
 	if err != nil {
 		return types.SNMP{}, errors.Wrap(err, "error parsing SNMP")
 	}
@@ -102,7 +102,7 @@ func getNetSnmpStats(raw []byte) (types.SNMP, error) {
 
 // getNetstatStats pulls netstat stats from /proc/net
 func getNetstatStats(raw []byte) (types.Netstat, error) {
-	netstatData, err := readAndParseNetFile(string(raw))
+	netstatData, err := parseNetFile(string(raw))
 	if err != nil {
 		return types.Netstat{}, errors.Wrap(err, "error parsing netstat")
 	}
