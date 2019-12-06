@@ -37,7 +37,7 @@ type SNMP struct {
 	ICMP    map[string]int64 `json:"icmp" netstat:"Icmp"`
 	ICMPMsg map[string]int64 `json:"icmp_msg" netstat:"IcmpMsg"`
 	TCP     map[string]int64 `json:"tcp" netstat:"Tcp"`
-	UDP     map[string]int64 `json:"Udp" netstat:"Udp"`
+	UDP     map[string]int64 `json:"udp" netstat:"Udp"`
 	UDPLite map[string]int64 `json:"udp_lite" netstat:"UdpLite"`
 }
 
