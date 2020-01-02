@@ -17,7 +17,7 @@
 
 package windows
 
-import "github.com/pkg/errors"
+import "fmt"
 
 // stringer wraps the `String()` functions used to return SID strings in golang.org/x/sys
 // These can return an error or no error, depending on the release.
@@ -28,9 +28,8 @@ func stringer(strFunc interface{}) (string, error) {
 		return sig.String(), nil
 	case errString:
 		return sig.String()
-
 	default:
-		return "", errors.New("unknown function signature in String()")
+		return "", fmt.Errorf("unknown function signature %#v", sig)
 	}
 }
 
