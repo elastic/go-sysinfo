@@ -26,7 +26,7 @@ import (
 // stringer wraps the `String()` functions used to return SID strings in golang.org/x/sys
 // These can return an error or no error, depending on the release.
 func sidToString(strFunc *syswin.SID) (string, error) {
-	switch sig := strFunc.(type) {
+	switch sig := (interface{})(strFunc).(type) {
 	case fmt.Stringer:
 		return sig.String(), nil
 	case errString:
