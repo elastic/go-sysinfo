@@ -17,25 +17,25 @@
 
 package windows
 
-import "fmt"
+import (
+	"fmt"
+
+	syswin "golang.org/x/sys/windows"
+)
 
 // stringer wraps the `String()` functions used to return SID strings in golang.org/x/sys
 // These can return an error or no error, depending on the release.
-func stringer(strFunc interface{}) (string, error) {
-
+func sidToString(strFunc *syswin.SID) (string, error) {
 	switch sig := strFunc.(type) {
-	case newString:
+	case fmt.Stringer:
 		return sig.String(), nil
 	case errString:
 		return sig.String()
 	default:
-		return "", fmt.Errorf("unknown function signature %#v", sig)
+		return "", fmt.Errorf("missing or unexpected String() function signature for %#v", sig)
 	}
 }
 
-type newString interface {
-	String() string
-}
 type errString interface {
 	String() (string, error)
 }
