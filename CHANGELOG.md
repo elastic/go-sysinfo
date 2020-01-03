@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- create a sidToString function to deal with API changes in various versions of golang.org/x/sys/windows [#74](https://github.com/elastic/go-sysinfo/pull/74)
+
 ## [1.2.0] - 2019-12-09
 
 ### Added
