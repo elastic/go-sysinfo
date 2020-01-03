@@ -23,7 +23,7 @@ import (
 	syswin "golang.org/x/sys/windows"
 )
 
-// stringer wraps the `String()` functions used to return SID strings in golang.org/x/sys
+// sidToString wraps the `String()` functions used to return SID strings in golang.org/x/sys
 // These can return an error or no error, depending on the release.
 func sidToString(strFunc *syswin.SID) (string, error) {
 	switch sig := (interface{})(strFunc).(type) {
