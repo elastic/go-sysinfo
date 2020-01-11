@@ -46,5 +46,6 @@ UdpLite: 0 0 0 0 0 0 0 0`
 	fillStruct(&testOut, mapStr)
 
 	assert.NotEmpty(t, testOut.IP)
-	assert.Equal(t, int64(16755), testOut.UDP["InDatagrams"])
+	assert.Equal(t, uint64(16755), testOut.UDP["InDatagrams"])
+	assert.Equal(t, uint64(0xffffffffffffffff), testOut.TCP["MaxConn"])
 }
