@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added detection of containerized cgroup in Kubernetes [#80](https://github.com/elastic/go-sysinfo/pull/80)
+- Add AIX support [#77](https://github.com/elastic/go-sysinfo/pull/77)
 
 ### Changed
 
