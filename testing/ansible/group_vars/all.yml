@@ -1,4 +1,0 @@
----
-
-project_dir: '{{ ansible_user_dir }}/go/src/github.com/elastic/go-sysinfo'
-

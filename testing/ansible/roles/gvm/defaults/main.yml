@@ -1,5 +1,0 @@
----
-
-gvm_version: 0.0.5
-gvm_unix_path: /usr/local/bin/gvm
-gvm_windows_path: 'c:\windows\system32\gvm.exe'
