@@ -1,4 +1,0 @@
----
-
-# architecture suffix used to download gvm release archive
-gvm_arch: windows-amd64

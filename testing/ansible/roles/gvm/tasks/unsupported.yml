@@ -1,5 +1,0 @@
----
-
-- fail:
-    msg: 'ERROR: {{ ansible_system }} systems are not supported by this role!'
-  when: skip_unsupported | bool == false
