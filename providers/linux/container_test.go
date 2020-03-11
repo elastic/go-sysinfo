@@ -78,20 +78,33 @@ const lxcCgroup = `9:hugetlb:/lxc/81438f4655cd771c425607dcf7654f4dc03c073c0123ed
 2:cpu:/lxc/81438f4655cd771c425607dcf7654f4dc03c073c0123edc45fcfad28132e8c60
 1:cpuset:/lxc/81438f4655cd771c425607dcf7654f4dc03c073c0123edc45fcfad28132e8c60`
 
-const systemdCgroup = `12:hugetlb:/kubepods.slice/kubepods-podc1281d63_01ab_11ea_ba0a_3cfdfe55a1c0.slice/e2b68f8a6e227921b236c686a243e8ff50f561f493d401da7ac3f8cae28f08b1
-11:perf_event:/kubepods.slice/kubepods-podc1281d63_01ab_11ea_ba0a_3cfdfe55a1c0.slice/e2b68f8a6e227921b236c686a243e8ff50f561f493d401da7ac3f8cae28f08b1
-10:pids:/kubepods.slice/kubepods-podc1281d63_01ab_11ea_ba0a_3cfdfe55a1c0.slice/e2b68f8a6e227921b236c686a243e8ff50f561f493d401da7ac3f8cae28f08b1
-9:cpu,cpuacct:/kubepods.slice/kubepods-podc1281d63_01ab_11ea_ba0a_3cfdfe55a1c0.slice/e2b68f8a6e227921b236c686a243e8ff50f561f493d401da7ac3f8cae28f08b1
-8:cpuset:/kubepods.slice/kubepods-podc1281d63_01ab_11ea_ba0a_3cfdfe55a1c0.slice/e2b68f8a6e227921b236c686a243e8ff50f561f493d401da7ac3f8cae28f08b1
-7:memory:/kubepods.slice/kubepods-podc1281d63_01ab_11ea_ba0a_3cfdfe55a1c0.slice/e2b68f8a6e227921b236c686a243e8ff50f561f493d401da7ac3f8cae28f08b1
-6:freezer:/kubepods.slice/kubepods-podc1281d63_01ab_11ea_ba0a_3cfdfe55a1c0.slice/e2b68f8a6e227921b236c686a243e8ff50f561f493d401da7ac3f8cae28f08b1
+const systemdCgroup = `12:hugetlb:/service.slice/podc1281d63_01ab_11ea_ba0a_3cfdfe55a1c0.slice/e2b68f8a6e227921b236c686a243e8ff50f561f493d401da7ac3f8cae28f08b1
+11:perf_event:/service.slice/podc1281d63_01ab_11ea_ba0a_3cfdfe55a1c0.slice/e2b68f8a6e227921b236c686a243e8ff50f561f493d401da7ac3f8cae28f08b1
+10:pids:/service.slice/podc1281d63_01ab_11ea_ba0a_3cfdfe55a1c0.slice/e2b68f8a6e227921b236c686a243e8ff50f561f493d401da7ac3f8cae28f08b1
+9:cpu,cpuacct:/service.slice/podc1281d63_01ab_11ea_ba0a_3cfdfe55a1c0.slice/e2b68f8a6e227921b236c686a243e8ff50f561f493d401da7ac3f8cae28f08b1
+8:cpuset:/service.slice/podc1281d63_01ab_11ea_ba0a_3cfdfe55a1c0.slice/e2b68f8a6e227921b236c686a243e8ff50f561f493d401da7ac3f8cae28f08b1
+7:memory:/service.slice/podc1281d63_01ab_11ea_ba0a_3cfdfe55a1c0.slice/e2b68f8a6e227921b236c686a243e8ff50f561f493d401da7ac3f8cae28f08b1
+6:freezer:/service.slice/podc1281d63_01ab_11ea_ba0a_3cfdfe55a1c0.slice/e2b68f8a6e227921b236c686a243e8ff50f561f493d401da7ac3f8cae28f08b1
 5:rdma:/
-4:net_cls,net_prio:/kubepods.slice/kubepods-podc1281d63_01ab_11ea_ba0a_3cfdfe55a1c0.slice/e2b68f8a6e227921b236c686a243e8ff50f561f493d401da7ac3f8cae28f08b1
-3:devices:/kubepods.slice/kubepods-podc1281d63_01ab_11ea_ba0a_3cfdfe55a1c0.slice/e2b68f8a6e227921b236c686a243e8ff50f561f493d401da7ac3f8cae28f08b1
-2:blkio:/kubepods.slice/kubepods-podc1281d63_01ab_11ea_ba0a_3cfdfe55a1c0.slice/e2b68f8a6e227921b236c686a243e8ff50f561f493d401da7ac3f8cae28f08b1
-1:name=systemd:/kubepods.slice/kubepods-podc1281d63_01ab_11ea_ba0a_3cfdfe55a1c0.slice/e2b68f8a6e227921b236c686a243e8ff50f561f493d401da7ac3f8cae28f08b1`
+4:net_cls,net_prio:/service.slice/podc1281d63_01ab_11ea_ba0a_3cfdfe55a1c0.slice/e2b68f8a6e227921b236c686a243e8ff50f561f493d401da7ac3f8cae28f08b1
+3:devices:/service.slice/podc1281d63_01ab_11ea_ba0a_3cfdfe55a1c0.slice/e2b68f8a6e227921b236c686a243e8ff50f561f493d401da7ac3f8cae28f08b1
+2:blkio:/service.slice/podc1281d63_01ab_11ea_ba0a_3cfdfe55a1c0.slice/e2b68f8a6e227921b236c686a243e8ff50f561f493d401da7ac3f8cae28f08b1
+1:name=systemd:/service.slice/podc1281d63_01ab_11ea_ba0a_3cfdfe55a1c0.slice/e2b68f8a6e227921b236c686a243e8ff50f561f493d401da7ac3f8cae28f08b1`
 
 const emptyCgroup = ``
+
+const kubernetesCgroup = `11:perf_event:/kubepods/burstable/podb83789a8-5f9d-11ea-bae1-0a0084deb344/9f99515d52142271cfeebef269bf4b7609b9b69b62008d6a5d316f561ccf061d
+10:freezer:/kubepods/burstable/podb83789a8-5f9d-11ea-bae1-0a0084deb344/9f99515d52142271cfeebef269bf4b7609b9b69b62008d6a5d316f561ccf061d
+9:hugetlb:/kubepods/burstable/podb83789a8-5f9d-11ea-bae1-0a0084deb344/9f99515d52142271cfeebef269bf4b7609b9b69b62008d6a5d316f561ccf061d
+8:devices:/kubepods/burstable/podb83789a8-5f9d-11ea-bae1-0a0084deb344/9f99515d52142271cfeebef269bf4b7609b9b69b62008d6a5d316f561ccf061d
+7:blkio:/kubepods/burstable/podb83789a8-5f9d-11ea-bae1-0a0084deb344/9f99515d52142271cfeebef269bf4b7609b9b69b62008d6a5d316f561ccf061d
+6:cpuset:/kubepods/burstable/podb83789a8-5f9d-11ea-bae1-0a0084deb344/9f99515d52142271cfeebef269bf4b7609b9b69b62008d6a5d316f561ccf061d
+5:cpu,cpuacct:/kubepods/burstable/podb83789a8-5f9d-11ea-bae1-0a0084deb344/9f99515d52142271cfeebef269bf4b7609b9b69b62008d6a5d316f561ccf061d
+4:pids:/kubepods/burstable/podb83789a8-5f9d-11ea-bae1-0a0084deb344/9f99515d52142271cfeebef269bf4b7609b9b69b62008d6a5d316f561ccf061d
+3:memory:/kubepods/burstable/podb83789a8-5f9d-11ea-bae1-0a0084deb344/9f99515d52142271cfeebef269bf4b7609b9b69b62008d6a5d316f561ccf061d
+2:net_cls,net_prio:/kubepods/burstable/podb83789a8-5f9d-11ea-bae1-0a0084deb344/9f99515d52142271cfeebef269bf4b7609b9b69b62008d6a5d316f561ccf061d
+1:name=systemd:/kubepods/burstable/podb83789a8-5f9d-11ea-bae1-0a0084deb344/9f99515d52142271cfeebef269bf4b7609b9b69b62008d6a5d316f561ccf061d
+`
 
 func TestIsContainerized(t *testing.T) {
 	tests := []struct {
@@ -121,6 +134,10 @@ func TestIsContainerized(t *testing.T) {
 		{
 			cgroupStr:     emptyCgroup,
 			containerized: false,
+		},
+		{
+			cgroupStr:     kubernetesCgroup,
+			containerized: true,
 		},
 	}
 
