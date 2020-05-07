@@ -64,6 +64,12 @@ var expectedProcessFeatures = map[string]*ProcessFeatures{
 		OpenHandleEnumerator: false,
 		OpenHandleCounter:    true,
 	},
+	"freebsd": &ProcessFeatures{
+		ProcessInfo:          true,
+		Environment:          true,
+		OpenHandleEnumerator: true,
+		OpenHandleCounter:    true,
+	},
 }
 
 func TestProcessFeaturesMatrix(t *testing.T) {
@@ -123,7 +129,18 @@ func TestSelf(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.EqualValues(t, wd, info.CWD)
+
+	wdStat, err := os.Stat(wd)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cwdStat, err := os.Stat(info.CWD)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.EqualValues(t, os.SameFile(wdStat, cwdStat), true)
 
 	exe, err := os.Executable()
 	if err != nil {
