@@ -64,6 +64,12 @@ var expectedProcessFeatures = map[string]*ProcessFeatures{
 		OpenHandleEnumerator: false,
 		OpenHandleCounter:    true,
 	},
+	"aix": &ProcessFeatures{
+		ProcessInfo:          true,
+		Environment:          true,
+		OpenHandleEnumerator: false,
+		OpenHandleCounter:    false,
+	},
 }
 
 func TestProcessFeaturesMatrix(t *testing.T) {
