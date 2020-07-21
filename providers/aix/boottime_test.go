@@ -32,5 +32,4 @@ func TestBootTime(t *testing.T) {
 	}
 
 	assert.EqualValues(t, bt.Unix(), 1585726535)
-
 }

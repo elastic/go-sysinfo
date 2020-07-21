@@ -46,7 +46,7 @@ import (
 )
 
 // Processes returns a list of all actives processes.
-func (s aixSystem) Processes() ([]types.Process, error) {
+func (aixSystem) Processes() ([]types.Process, error) {
 	// Retrieve processes using /proc instead of calling
 	// getprocs which will also retrieve kernel threads.
 	files, err := ioutil.ReadDir("/proc")
@@ -62,7 +62,6 @@ func (s aixSystem) Processes() ([]types.Process, error) {
 		if _, err := os.Stat("/proc/" + f.Name() + "/as"); err == nil {
 			pid, _ := strconv.Atoi(f.Name())
 			processes = append(processes, &process{pid: pid})
-
 		}
 	}
 
@@ -70,7 +69,7 @@ func (s aixSystem) Processes() ([]types.Process, error) {
 }
 
 // Process returns the process designed by PID.
-func (s aixSystem) Process(pid int) (types.Process, error) {
+func (aixSystem) Process(pid int) (types.Process, error) {
 	p := process{pid: pid}
 	return &p, nil
 }
