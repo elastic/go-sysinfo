@@ -49,7 +49,7 @@ func init() {
 type aixSystem struct{}
 
 // Host returns a new AIX host.
-func (s aixSystem) Host() (types.Host, error) {
+func (aixSystem) Host() (types.Host, error) {
 	return newHost()
 }
 
@@ -68,7 +68,7 @@ func (h *host) Info() types.HostInfo {
 }
 
 // Info returns the current CPU usage of the host.
-func (h *host) CPUTime() (types.CPUTimes, error) {
+func (*host) CPUTime() (types.CPUTimes, error) {
 	clock := uint64(C.sysconf(C._SC_CLK_TCK))
 	tick2nsec := func(val uint64) uint64 {
 		return val * 1e9 / clock
@@ -89,7 +89,7 @@ func (h *host) CPUTime() (types.CPUTimes, error) {
 }
 
 // Memory returns the current memory usage of the host.
-func (h *host) Memory() (*types.HostMemoryInfo, error) {
+func (*host) Memory() (*types.HostMemoryInfo, error) {
 	var mem types.HostMemoryInfo
 
 	pagesize := uint64(os.Getpagesize())
@@ -198,7 +198,7 @@ func (r *reader) os(h *host) {
 	h.info.OS = v
 }
 
-func (r *reader) time(h *host) {
+func (*reader) time(h *host) {
 	h.info.Timezone, h.info.TimezoneOffsetSec = time.Now().Zone()
 }
 
