@@ -55,13 +55,7 @@ pipeline {
                 unstash 'source'
                 withGoEnv(version: "${GO_VERSION}"){
                   dir("${BASE_DIR}"){
-                    sh(label: 'go-licenser', script: 'GO111MODULE=off go get -u github.com/elastic/go-licenser')
-                    sh(label: 'test', script: '''
-go mod verify
-go-licenser -d
-go run .ci/scripts/check_format.go
-go run .ci/scripts/check_lint.go
-go test -v ./...''')
+                    sh(label: "go test for ${GO_VERSION} in ${PLATFORM}", script: '.ci/scripts/test.sh')
                   }
                 }
               }
