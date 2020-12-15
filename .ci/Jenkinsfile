@@ -51,7 +51,8 @@ pipeline {
             agent { label "${PLATFORM}" }
             steps {
               withGithubNotify(context: "Test-${GO_VERSION}-${PLATFORM}") {
-                cleanup()
+                deleteDir()
+                unstash 'source'
                 withGoEnv(version: "${GO_VERSION}"){
                   dir("${BASE_DIR}"){
                     sh(label: 'go-licenser', script: 'GO111MODULE=off go get -u github.com/elastic/go-licenser')
@@ -75,11 +76,4 @@ go test -v ./...''')
       notifyBuildResult(prComment: true)
     }
   }
-}
-
-def cleanup(){
-  dir("${BASE_DIR}"){
-    deleteDir()
-  }
-  unstash 'source'
 }
