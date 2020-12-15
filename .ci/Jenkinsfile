@@ -60,6 +60,11 @@ pipeline {
                 }
               }
             }
+            post {
+              always {
+                junit(allowEmptyResults: true, keepLongStdio: true, testResults: "${BASE_DIR}/build/*.xml")
+              }
+            }
           }
         }
       }
