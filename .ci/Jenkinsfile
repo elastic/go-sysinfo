@@ -35,7 +35,6 @@ pipeline {
     stage('Test') {
       failFast false
       matrix {
-        options { skipDefaultCheckout() }
         axes {
           axis {
             name 'GO_VERSION'
@@ -43,11 +42,12 @@ pipeline {
           }
           axis {
             name 'PLATFORM'
-            values 'ubuntu-18 && immutable', 'macosx' // TODO: support windows, 'windows-2019 && immutable'
+            values 'ubuntu-18 && immutable', 'macosx', 'windows-2019 && immutable'
           }
         }
         stages {
           stage('Test') {
+            options { skipDefaultCheckout() }
             agent { label "${PLATFORM}" }
             steps {
               withGithubNotify(context: "Test-${GO_VERSION}-${PLATFORM}") {
@@ -55,7 +55,12 @@ pipeline {
                 unstash 'source'
                 withGoEnv(version: "${GO_VERSION}"){
                   dir("${BASE_DIR}"){
-                    sh(label: "go test for ${GO_VERSION} in ${PLATFORM}", script: '.ci/scripts/test.sh')
+                    whenTrue(isUnix()) {
+                      sh(label: "go test for ${GO_VERSION} in ${PLATFORM}", script: '.ci/scripts/test.sh')
+                    }
+                    whenFalse(isUnix()) {
+                      bat(label: "go test for ${GO_VERSION} in ${PLATFORM}", script: '.ci/scripts/test.bat')
+                    }
                   }
                 }
               }
