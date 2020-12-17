@@ -1,6 +1,6 @@
 # go-sysinfo
 
-[![Build Status](http://img.shields.io/travis/elastic/go-sysinfo.svg?style=flat-square)][travis]
+[![Build Status](https://beats-ci.elastic.co/job/Library/job/go-sysinfo-mbp/job/master/badge/icon)](https://beats-ci.elastic.co/job/Library/job/go-sysinfo-mbp/job/master/)
 [![Go Documentation](http://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)][godocs]
 
 [travis]: http://travis-ci.org/elastic/go-sysinfo
