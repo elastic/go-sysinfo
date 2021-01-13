@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added os.type field to host info. [#87](https://github.com/elastic/go-sysinfo/pull/87)
+
 ### Changed
 
 ### Deprecated
