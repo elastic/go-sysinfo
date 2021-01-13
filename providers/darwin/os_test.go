@@ -47,6 +47,7 @@ func TestOperatingSystem(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	assert.Equal(t, "macos", osInfo.Type)
 	assert.Equal(t, "darwin", osInfo.Family)
 	assert.Equal(t, "darwin", osInfo.Platform)
 	assert.Equal(t, "Mac OS X", osInfo.Name)

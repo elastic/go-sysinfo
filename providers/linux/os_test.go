@@ -34,6 +34,7 @@ func TestOperatingSystem(t *testing.T) {
 			t.Fatal(err)
 		}
 		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
 			Family:   "redhat",
 			Platform: "amzn",
 			Name:     "Amazon Linux AMI",
@@ -50,6 +51,7 @@ func TestOperatingSystem(t *testing.T) {
 			t.Fatal(err)
 		}
 		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
 			Family:   "redhat",
 			Platform: "centos",
 			Name:     "CentOS",
@@ -66,6 +68,7 @@ func TestOperatingSystem(t *testing.T) {
 			t.Fatal(err)
 		}
 		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
 			Family:   "redhat",
 			Platform: "centos",
 			Name:     "CentOS Linux",
@@ -83,6 +86,7 @@ func TestOperatingSystem(t *testing.T) {
 			t.Fatal(err)
 		}
 		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
 			Family:   "debian",
 			Platform: "debian",
 			Name:     "Debian GNU/Linux",
@@ -98,6 +102,7 @@ func TestOperatingSystem(t *testing.T) {
 			t.Fatal(err)
 		}
 		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
 			Family:   "debian",
 			Platform: "raspbian",
 			Name:     "Raspbian GNU/Linux",
@@ -113,6 +118,7 @@ func TestOperatingSystem(t *testing.T) {
 			t.Fatal(err)
 		}
 		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
 			Family:   "redhat",
 			Platform: "rhel",
 			Name:     "Red Hat Enterprise Linux Server",
@@ -129,6 +135,7 @@ func TestOperatingSystem(t *testing.T) {
 			t.Fatal(err)
 		}
 		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
 			Family:   "debian",
 			Platform: "ubuntu",
 			Name:     "Ubuntu",
@@ -146,6 +153,7 @@ func TestOperatingSystem(t *testing.T) {
 			t.Fatal(err)
 		}
 		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
 			Family:   "debian",
 			Platform: "ubuntu",
 			Name:     "Ubuntu",
@@ -163,6 +171,7 @@ func TestOperatingSystem(t *testing.T) {
 			t.Fatal(err)
 		}
 		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
 			Family:   "redhat",
 			Platform: "fedora",
 			Name:     "Fedora",

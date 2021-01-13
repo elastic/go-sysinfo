@@ -81,6 +81,7 @@ func (host HostInfo) Uptime() time.Duration {
 
 // OSInfo contains basic OS information
 type OSInfo struct {
+	Type     string `json:"type"`               // OS Type (one of linux, macos, unix, windows).
 	Family   string `json:"family"`             // OS Family (e.g. redhat, debian, freebsd, windows).
 	Platform string `json:"platform"`           // OS platform (e.g. centos, ubuntu, windows).
 	Name     string `json:"name"`               // OS Name (e.g. Mac OS X, CentOS).
