@@ -145,6 +145,7 @@ func parseOSRelease(content []byte) (*types.OSInfo, error) {
 
 func makeOSInfo(osRelease map[string]string) (*types.OSInfo, error) {
 	os := &types.OSInfo{
+		Type:     "linux",
 		Platform: osRelease["ID"],
 		Name:     osRelease["NAME"],
 		Version:  osRelease["VERSION"],
@@ -238,7 +239,10 @@ func parseDistribRelease(platform string, content []byte) (*types.OSInfo, error)
 	var (
 		line = string(bytes.TrimSpace(content))
 		keys = distribReleaseRegexp.SubexpNames()
-		os   = &types.OSInfo{Platform: platform}
+		os   = &types.OSInfo{
+			Type:     "linux",
+			Platform: platform,
+		}
 	)
 
 	for i, m := range distribReleaseRegexp.FindStringSubmatch(line) {

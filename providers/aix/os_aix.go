@@ -46,6 +46,7 @@ func getOSInfo() (*types.OSInfo, error) {
 	build := strings.SplitN(string(procVersion), "\n", 4)[2]
 
 	return &types.OSInfo{
+		Type:     "unix",
 		Family:   "aix",
 		Platform: "aix",
 		Name:     "aix",
