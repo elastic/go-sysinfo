@@ -9,8 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added os.type field to host info. [#87](https://github.com/elastic/go-sysinfo/pull/87)
-
 ### Changed
 
 ### Deprecated
@@ -18,6 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 ### Fixed
+
+## [1.5.0] - 2021-01-14
+
+### Added
+
+- Added os.type field to host info. [#87](https://github.com/elastic/go-sysinfo/pull/87)
 
 ## [1.4.0] - 2020-07-21
 
@@ -90,7 +94,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Changed the host containerized check to reduce false positives. [#42](https://github.com/elastic/go-sysinfo/pull/42) [#43](https://github.com/elastic/go-sysinfo/pull/43)
 
-[Unreleased]: https://github.com/elastic/go-sysinfo/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/elastic/go-sysinfo/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/elastic/go-sysinfo/releases/tag/v1.5.0
 [1.4.0]: https://github.com/elastic/go-sysinfo/releases/tag/v1.4.0
 [1.3.0]: https://github.com/elastic/go-sysinfo/releases/tag/v1.3.0
 [1.2.1]: https://github.com/elastic/go-sysinfo/releases/tag/v1.2.1
