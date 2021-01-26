@@ -37,7 +37,7 @@ import (
 	"github.com/elastic/go-sysinfo/types"
 )
 
-//go:generate sh -c "go tool cgo -godefs defs_darwin.go > ztypes_darwin_amd64.go"
+//go:generate sh -c "go tool cgo -godefs defs_darwin.go > ztypes_darwin.go"
 
 func (s darwinSystem) Processes() ([]types.Process, error) {
 	n, err := C.proc_listallpids(nil, 0)
