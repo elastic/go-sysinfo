@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Add Apple ARM support [#91](https://github.com/elastic/go-sysinfo/pull/91)
+
 ### Added
 
 ### Changed
