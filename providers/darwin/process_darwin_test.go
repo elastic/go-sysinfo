@@ -15,21 +15,32 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build darwin,amd64,cgo
+// +build amd64,cgo arm64,cgo
 
 package darwin
 
 import (
-	"github.com/pkg/errors"
+	"os"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/go-sysinfo/internal/registry"
 )
 
-const hwMemsizeMIB = "hw.memsize"
+var _ registry.HostProvider = darwinSystem{}
+var _ registry.ProcessProvider = darwinSystem{}
 
-func MemTotal() (uint64, error) {
-	var size uint64
-	if err := sysctlByName(hwMemsizeMIB, &size); err != nil {
-		return 0, errors.Wrap(err, "failed to get mem total")
+func TestKernProcInfo(t *testing.T) {
+	var p process
+	if err := kern_procargs(os.Getpid(), &p); err != nil {
+		t.Fatal(err)
 	}
 
-	return size, nil
+	exe, err := os.Executable()
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, exe, p.exe)
+	assert.Equal(t, os.Args, p.args)
 }

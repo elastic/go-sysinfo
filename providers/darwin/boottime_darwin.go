@@ -15,21 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build amd64,cgo arm64,cgo
+
 package darwin
 
 import (
 	"syscall"
+	"time"
 
 	"github.com/pkg/errors"
 )
 
-const kernelReleaseMIB = "kern.osrelease"
+const kernBoottimeMIB = "kern.boottime"
 
-func KernelVersion() (string, error) {
-	version, err := syscall.Sysctl(kernelReleaseMIB)
-	if err != nil {
-		return "", errors.Wrap(err, "failed to get kernel version")
+func BootTime() (time.Time, error) {
+	var tv syscall.Timeval
+	if err := sysctlByName(kernBoottimeMIB, &tv); err != nil {
+		return time.Time{}, errors.Wrap(err, "failed to get host uptime")
 	}
 
-	return version, nil
+	bootTime := time.Unix(int64(tv.Sec), int64(tv.Usec)*int64(time.Microsecond))
+	return bootTime, nil
 }

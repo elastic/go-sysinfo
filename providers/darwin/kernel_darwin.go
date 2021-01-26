@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build amd64,cgo arm64,cgo
+
 package darwin
 
 import (
@@ -23,13 +25,13 @@ import (
 	"github.com/pkg/errors"
 )
 
-const hardwareMIB = "hw.machine"
+const kernelReleaseMIB = "kern.osrelease"
 
-func Architecture() (string, error) {
-	arch, err := syscall.Sysctl(hardwareMIB)
+func KernelVersion() (string, error) {
+	version, err := syscall.Sysctl(kernelReleaseMIB)
 	if err != nil {
-		return "", errors.Wrap(err, "failed to get architecture")
+		return "", errors.Wrap(err, "failed to get kernel version")
 	}
 
-	return arch, nil
+	return version, nil
 }
