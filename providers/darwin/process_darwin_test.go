@@ -15,21 +15,32 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build amd64,cgo arm64,cgo
+
 package darwin
 
 import (
-	"syscall"
+	"os"
+	"testing"
 
-	"github.com/pkg/errors"
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/go-sysinfo/internal/registry"
 )
 
-const hardwareMIB = "hw.machine"
+var _ registry.HostProvider = darwinSystem{}
+var _ registry.ProcessProvider = darwinSystem{}
 
-func Architecture() (string, error) {
-	arch, err := syscall.Sysctl(hardwareMIB)
-	if err != nil {
-		return "", errors.Wrap(err, "failed to get architecture")
+func TestKernProcInfo(t *testing.T) {
+	var p process
+	if err := kern_procargs(os.Getpid(), &p); err != nil {
+		t.Fatal(err)
 	}
 
-	return arch, nil
+	exe, err := os.Executable()
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, exe, p.exe)
+	assert.Equal(t, os.Args, p.args)
 }
