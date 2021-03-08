@@ -52,7 +52,7 @@ pipeline {
               values '1.12.17'
             }
             axis {
-              name 'ARCHITECTURE'
+              name 'PLATFORM'
               values 'macosx&&arm64'
             }
           }
@@ -62,7 +62,7 @@ pipeline {
               values '1.16'
             }
             axis {
-              name 'ARCHITECTURE'
+              name 'PLATFORM'
               notValues 'macosx&&arm64'
             }
           }
