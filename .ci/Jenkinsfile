@@ -38,11 +38,33 @@ pipeline {
         axes {
           axis {
             name 'GO_VERSION'
-            values '1.12.17'
+            values '1.12.17', '1.16'
           }
           axis {
             name 'PLATFORM'
-            values 'ubuntu-18 && immutable', 'macosx', 'windows-2019 && immutable'
+            values 'ubuntu-18 && immutable', 'macosx&&x86_64', 'macosx&&arm64', 'windows-2019 && immutable'
+          }
+        }
+        excludes {
+          exclude {
+            axis {
+              name 'GO_VERSION'
+              values '1.12.17'
+            }
+            axis {
+              name 'PLATFORM'
+              values 'macosx&&arm64'
+            }
+          }
+          exclude {
+            axis {
+              name 'GO_VERSION'
+              values '1.16'
+            }
+            axis {
+              name 'PLATFORM'
+              notValues 'macosx&&arm64'
+            }
           }
         }
         stages {
