@@ -25,8 +25,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var _ registry.HostProvider = linuxSystem{}
-var _ registry.ProcessProvider = linuxSystem{}
+var (
+	_ registry.HostProvider    = linuxSystem{}
+	_ registry.ProcessProvider = linuxSystem{}
+)
 
 func TestProcessNetstat(t *testing.T) {
 	proc, err := newLinuxSystem("").Self()
