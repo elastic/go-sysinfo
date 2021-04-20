@@ -21,5 +21,7 @@ import (
 	"github.com/elastic/go-sysinfo/internal/registry"
 )
 
-var _ registry.HostProvider = windowsSystem{}
-var _ registry.ProcessProvider = windowsSystem{}
+var (
+	_ registry.HostProvider    = windowsSystem{}
+	_ registry.ProcessProvider = windowsSystem{}
+)

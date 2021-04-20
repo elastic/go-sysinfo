@@ -187,7 +187,6 @@ func (p *process) Info() (types.ProcessInfo, error) {
 	p.info.CWD = strings.TrimSuffix(cwd, "/")
 
 	return *p.info, nil
-
 }
 
 // Environment returns the environment of a process.
@@ -243,7 +242,6 @@ func (p *process) User() (types.UserInfo, error) {
 		EGID: strconv.Itoa(int(prcred.Egid)),
 		SGID: strconv.Itoa(int(prcred.Sgid)),
 	}, nil
-
 }
 
 // Memory returns the current memory usage of a process.

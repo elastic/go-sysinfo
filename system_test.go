@@ -45,13 +45,13 @@ type ProcessFeatures struct {
 }
 
 var expectedProcessFeatures = map[string]*ProcessFeatures{
-	"darwin": &ProcessFeatures{
+	"darwin": {
 		ProcessInfo:          true,
 		Environment:          true,
 		OpenHandleEnumerator: false,
 		OpenHandleCounter:    false,
 	},
-	"linux": &ProcessFeatures{
+	"linux": {
 		ProcessInfo:          true,
 		Environment:          true,
 		OpenHandleEnumerator: true,
@@ -59,12 +59,12 @@ var expectedProcessFeatures = map[string]*ProcessFeatures{
 		Seccomp:              true,
 		Capabilities:         true,
 	},
-	"windows": &ProcessFeatures{
+	"windows": {
 		ProcessInfo:          true,
 		OpenHandleEnumerator: false,
 		OpenHandleCounter:    true,
 	},
-	"aix": &ProcessFeatures{
+	"aix": {
 		ProcessInfo:          true,
 		Environment:          true,
 		OpenHandleEnumerator: false,

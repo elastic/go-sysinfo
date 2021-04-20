@@ -61,17 +61,21 @@ type pstatus struct {
 	X_pad           [8]uint64
 	Lwp             lwpstatus
 }
+
 type prTimestruc64 struct {
 	Sec    int64
 	Nsec   int32
 	X__pad uint32
 }
+
 type prSigset struct {
 	Set [4]uint64
 }
+
 type fltset struct {
 	Set [4]uint64
 }
+
 type lwpstatus struct {
 	Lwpid    uint64
 	Flags    uint32
@@ -98,6 +102,7 @@ type lwpstatus struct {
 	Fpreg    prfpregset
 	Family   pfamily
 }
+
 type prSiginfo64 struct {
 	Signo   int32
 	Errno   int32
@@ -112,18 +117,21 @@ type prSiginfo64 struct {
 	Value   [8]byte
 	X__pad  [4]uint32
 }
+
 type prStack64 struct {
 	Sp     uint64
 	Size   uint64
 	Flags  int32
 	X__pad [5]int32
 }
+
 type prSigaction64 struct {
 	Union  [8]byte
 	Mask   prSigset
 	Flags  int32
 	X__pad [5]int32
 }
+
 type prgregset struct {
 	X__iar    uint64
 	X__msr    uint64
@@ -136,9 +144,11 @@ type prgregset struct {
 	X__gpr    [32]uint64
 	X__pad1   [8]uint64
 }
+
 type prfpregset struct {
 	X__fpr [32]float64
 }
+
 type pfamily struct {
 	Extoff  uint64
 	Extsize uint64
