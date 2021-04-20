@@ -44,12 +44,10 @@ func TestProcessNetstat(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.NotEmpty(t, stats.Netstat.IPExt, "IPExt")
-	assert.NotEmpty(t, stats.Netstat.TCPExt, "TCPExt")
+
 	assert.NotEmpty(t, stats.SNMP.ICMP, "ICMP")
-	assert.NotEmpty(t, stats.SNMP.ICMPMsg, "ICMPMsg")
 	assert.NotEmpty(t, stats.SNMP.IP, "IP")
 	assert.NotEmpty(t, stats.SNMP.TCP, "TCP")
 	assert.NotEmpty(t, stats.SNMP.UDP, "UDP")
-	assert.NotEmpty(t, stats.SNMP.UDPLite, "UDPLite")
+
 }
