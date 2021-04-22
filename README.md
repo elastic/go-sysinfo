@@ -51,3 +51,4 @@ that are implemented.
 | `OpenHandleCounter`    |        | x     |         |           |
 | `Seccomp`              |        | x     |         |           |
 | `Capabilities`         |        | x     |         |           |
+| `NetworkCounters`      |        | x     |         |           |

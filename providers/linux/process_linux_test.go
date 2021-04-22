@@ -18,8 +18,35 @@
 package linux
 
 import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/go-sysinfo/internal/registry"
+	"github.com/elastic/go-sysinfo/types"
 )
 
-var _ registry.HostProvider = linuxSystem{}
-var _ registry.ProcessProvider = linuxSystem{}
+var (
+	_ registry.HostProvider    = linuxSystem{}
+	_ registry.ProcessProvider = linuxSystem{}
+)
+
+func TestProcessNetstat(t *testing.T) {
+	proc, err := newLinuxSystem("").Self()
+	if err != nil {
+		t.Fatal(err)
+	}
+	procNetwork, ok := proc.(types.NetworkCounters)
+	if !ok {
+		t.Fatalf("error, cannot cast to types.NetworkCounters")
+	}
+	stats, err := procNetwork.NetworkCounters()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.NotEmpty(t, stats.SNMP.ICMP, "ICMP")
+	assert.NotEmpty(t, stats.SNMP.IP, "IP")
+	assert.NotEmpty(t, stats.SNMP.TCP, "TCP")
+	assert.NotEmpty(t, stats.SNMP.UDP, "UDP")
+}

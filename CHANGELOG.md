@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add per-process network stats [#96](https://github.com/elastic/go-sysinfo/pull/96)
+
 ### Changed
 
 ### Deprecated

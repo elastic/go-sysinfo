@@ -21,6 +21,7 @@ package aix
 #include <sys/utsname.h>
 */
 import "C"
+
 import (
 	"github.com/pkg/errors"
 )

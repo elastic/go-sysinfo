@@ -74,5 +74,4 @@ func bootTime(filename string) (time.Time, error) {
 	}
 
 	return time.Time{}, errors.Wrap(err, "failed to get host uptime: no utmp record")
-
 }

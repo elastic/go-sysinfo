@@ -28,14 +28,16 @@ import "C"
 
 type prcred C.prcred_t
 
-type pstatus C.pstatus_t
-type prTimestruc64 C.pr_timestruc64_t
-type prSigset C.pr_sigset_t
-type fltset C.fltset_t
-type lwpstatus C.lwpstatus_t
-type prSiginfo64 C.pr_siginfo64_t
-type prStack64 C.pr_stack64_t
-type prSigaction64 C.struct_pr_sigaction64
-type prgregset C.prgregset_t
-type prfpregset C.prfpregset_t
-type pfamily C.pfamily_t
+type (
+	pstatus       C.pstatus_t
+	prTimestruc64 C.pr_timestruc64_t
+	prSigset      C.pr_sigset_t
+	fltset        C.fltset_t
+	lwpstatus     C.lwpstatus_t
+	prSiginfo64   C.pr_siginfo64_t
+	prStack64     C.pr_stack64_t
+	prSigaction64 C.struct_pr_sigaction64
+	prgregset     C.prgregset_t
+	prfpregset    C.prfpregset_t
+	pfamily       C.pfamily_t
+)
