@@ -49,5 +49,4 @@ func TestProcessNetstat(t *testing.T) {
 	assert.NotEmpty(t, stats.SNMP.IP, "IP")
 	assert.NotEmpty(t, stats.SNMP.TCP, "TCP")
 	assert.NotEmpty(t, stats.SNMP.UDP, "UDP")
-
 }
