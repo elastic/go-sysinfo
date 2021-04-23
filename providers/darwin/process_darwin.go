@@ -254,14 +254,17 @@ func kern_procargs(pid int, p *process) error {
 	env := make(map[string]string, len(lines))
 	for _, l := range lines {
 		if len(l) == 0 {
-			break
+			continue
 		}
 		parts := bytes.SplitN(l, []byte{'='}, 2)
-		if len(parts) != 2 {
-			return errors.New("failed to parse")
+		if len(parts) == 0 {
+			continue
 		}
 		key := string(parts[0])
-		value := string(parts[1])
+		var value string
+		if len(parts) > 1 {
+			value = string(parts[1])
+		}
 		env[key] = value
 	}
 	p.env = env
