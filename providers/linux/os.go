@@ -206,7 +206,7 @@ func findDistribRelease(baseDir string) (*types.OSInfo, error) {
 		}
 
 		info, err := os.Lstat(path)
-		if err != nil || info.Size() == 0 {
+		if err != nil || info.Size() == 0 || info.IsDir() {
 			continue
 		}
 
