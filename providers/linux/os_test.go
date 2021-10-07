@@ -80,6 +80,24 @@ func TestOperatingSystem(t *testing.T) {
 		}, *os)
 		t.Logf("%#v", os)
 	})
+	t.Run("centos7.8", func(t *testing.T) {
+		os, err := getOSInfo("testdata/centos7.8")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
+			Family:   "redhat",
+			Platform: "centos",
+			Name:     "CentOS Linux",
+			Version:  "7 (Core)",
+			Major:    7,
+			Minor:    8,
+			Patch:    2003,
+			Codename: "Core",
+		}, *os)
+		t.Logf("%#v", os)
+	})
 	t.Run("debian9", func(t *testing.T) {
 		os, err := getOSInfo("testdata/debian9")
 		if err != nil {
