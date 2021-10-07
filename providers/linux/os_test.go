@@ -201,4 +201,22 @@ func TestOperatingSystem(t *testing.T) {
 		}, *os)
 		t.Logf("%#v", os)
 	})
+	t.Run("dir_release", func(t *testing.T) {
+		os, err := getOSInfo("testdata/dir_release")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
+			Family:   "redhat",
+			Platform: "centos",
+			Name:     "CentOS Linux",
+			Version:  "7 (Core)",
+			Major:    7,
+			Minor:    4,
+			Patch:    1708,
+			Codename: "Core",
+		}, *os)
+		t.Logf("%#v", os)
+	})
 }
