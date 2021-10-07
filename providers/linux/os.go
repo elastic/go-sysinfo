@@ -214,7 +214,7 @@ func findDistribRelease(baseDir string) (*types.OSInfo, error) {
 
 		osInfo, err := getDistribRelease(path)
 		if err != nil {
-			errs = append(errs, errors.Wrapf(err,"in %s", path))
+			errs = append(errs, errors.Wrapf(err, "in %s", path))
 			continue
 		}
 		return osInfo, err
