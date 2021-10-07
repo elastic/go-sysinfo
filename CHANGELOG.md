@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed getting OS info when an unsupported file or directory is found matching /etc/\*-release [#102](https://github.com/elastic/go-sysinfo/pull/102)
+
 ## [1.7.0] - 2021-02-22
 
 ### Added
