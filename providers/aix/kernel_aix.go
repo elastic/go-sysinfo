@@ -49,10 +49,10 @@ func getKernelVersion() (int, int, error) {
 }
 
 // KernelVersion returns the version of AIX kernel
-func KernelVersion() (string, error) {
+func KernelVersion() (int, int, string, error) {
 	major, minor, err := getKernelVersion()
 	if err != nil {
 		return "", err
 	}
-	return strconv.Itoa(major) + "." + strconv.Itoa(minor), nil
+	return major, minor, strconv.Itoa(major) + "." + strconv.Itoa(minor), nil
 }

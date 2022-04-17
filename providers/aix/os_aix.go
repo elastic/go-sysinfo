@@ -17,9 +17,9 @@
 
 package aix
 
+import "C"
 import (
 	"io/ioutil"
-	"strconv"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -33,7 +33,7 @@ func OperatingSystem() (*types.OSInfo, error) {
 }
 
 func getOSInfo() (*types.OSInfo, error) {
-	major, minor, err := getKernelVersion()
+	major, minor, osVersion, err := KernelVersion()
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func getOSInfo() (*types.OSInfo, error) {
 		Family:   "aix",
 		Platform: "aix",
 		Name:     "aix",
-		Version:  strconv.Itoa(major) + "." + strconv.Itoa(minor),
+		Version:  osVersion,
 		Major:    major,
 		Minor:    minor,
 		Patch:    0, // No patch version
