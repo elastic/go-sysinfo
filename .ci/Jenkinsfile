@@ -42,7 +42,7 @@ pipeline {
           }
           axis {
             name 'PLATFORM'
-            values 'ubuntu-18 && immutable', 'macosx&&arm64', 'windows-2019 && immutable', 'orka && darwin && x86_64', 'orka && darwin && arm64'
+            values 'ubuntu-18 && immutable', 'windows-2019 && immutable', 'orka && darwin && x86_64', 'orka && darwin && arm64'
           }
         }
         excludes {
