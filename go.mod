@@ -1,5 +1,7 @@
 module github.com/elastic/go-sysinfo
 
+go 1.17
+
 require (
 	github.com/elastic/go-windows v1.0.0
 	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901
@@ -10,4 +12,7 @@ require (
 	howett.net/plist v0.0.0-20181124034731-591f970eefbb
 )
 
-go 1.13
+require (
+	github.com/davecgh/go-spew v1.1.0 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
+)
