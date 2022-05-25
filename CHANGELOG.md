@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Updated module to require Go 1.17.
+- Updated module to require Go 1.17. [#111](https://github.com/elastic/go-sysinfo/pull/111)
 
 ### Deprecated
 
