@@ -40,9 +40,7 @@ func main() {
 	log.SetFlags(0)
 	flag.Parse()
 
-	goGet := exec.Command("go", "get", "-u", "golang.org/x/lint/golint")
-	goGet.Env = os.Environ()
-	goGet.Env = append(goGet.Env, "GO111MODULE=off")
+	goGet := exec.Command("go", "install", "golang.org/x/lint/golint@latest")
 	out, err := goGet.Output()
 	if err != nil {
 		log.Fatalf("failed to %v: %v", strings.Join(goGet.Args, " "), err)

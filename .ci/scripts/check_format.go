@@ -41,9 +41,7 @@ func main() {
 		paths = flag.Args()
 	}
 
-	goGet := exec.Command("go", "get", "-u", "golang.org/x/tools/cmd/goimports")
-	goGet.Env = os.Environ()
-	goGet.Env = append(goGet.Env, "GO111MODULE=off")
+	goGet := exec.Command("go", "install", "golang.org/x/tools/cmd/goimports@latest")
 	out, err := goGet.Output()
 	if err != nil {
 		log.Fatalf("failed to %v: %v", strings.Join(goGet.Args, " "), err)
