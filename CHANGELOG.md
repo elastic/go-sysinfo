@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Updated module to require Go 1.17. [#111](https://github.com/elastic/go-sysinfo/pull/111)
+- The boot time value for Windows is now rounded to the nearest second to provide a more stable value. [#53](https://github.com/elastic/go-sysinfo/issues/53) [#114](https://github.com/elastic/go-sysinfo/pull/114)
 
 ### Deprecated
 
