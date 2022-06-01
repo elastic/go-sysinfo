@@ -1,6 +1,4 @@
-SET GO111MODULE=off
-go get -u github.com/elastic/go-licenser
-SET GO111MODULE=on
+go install github.com/elastic/go-licenser@latest
 
 go mod verify
 go-licenser -d
@@ -11,5 +9,5 @@ mkdir -p build
 SET OUT_FILE=build\output-report.out
 go test "./..." -v > %OUT_FILE% | type %OUT_FILE%
 
-go get -v -u github.com/jstemmer/go-junit-report
+go install github.com/jstemmer/go-junit-report@latest
 go-junit-report > build\junit-%GO_VERSION%.xml < %OUT_FILE%

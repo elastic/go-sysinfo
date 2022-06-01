@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build (amd64 && cgo) || (arm64 && cgo)
 // +build amd64,cgo arm64,cgo
 
 package darwin
@@ -28,8 +29,10 @@ import (
 	"github.com/elastic/go-sysinfo/internal/registry"
 )
 
-var _ registry.HostProvider = darwinSystem{}
-var _ registry.ProcessProvider = darwinSystem{}
+var (
+	_ registry.HostProvider    = darwinSystem{}
+	_ registry.ProcessProvider = darwinSystem{}
+)
 
 func TestKernProcInfo(t *testing.T) {
 	var p process

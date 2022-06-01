@@ -46,7 +46,6 @@ func getKernelVersion() (int, int, error) {
 		return 0, 0, errors.Wrap(err, "parsing kernel release")
 	}
 	return version, release, nil
-
 }
 
 // KernelVersion returns the version of AIX kernel

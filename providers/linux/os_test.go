@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !windows
 // +build !windows
 
 package linux
@@ -76,6 +77,24 @@ func TestOperatingSystem(t *testing.T) {
 			Major:    7,
 			Minor:    4,
 			Patch:    1708,
+			Codename: "Core",
+		}, *os)
+		t.Logf("%#v", os)
+	})
+	t.Run("centos7.8", func(t *testing.T) {
+		os, err := getOSInfo("testdata/centos7.8")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
+			Family:   "redhat",
+			Platform: "centos",
+			Name:     "CentOS Linux",
+			Version:  "7 (Core)",
+			Major:    7,
+			Minor:    8,
+			Patch:    2003,
 			Codename: "Core",
 		}, *os)
 		t.Logf("%#v", os)
@@ -180,6 +199,24 @@ func TestOperatingSystem(t *testing.T) {
 			Minor:    0,
 			Patch:    0,
 			Codename: "Thirty",
+		}, *os)
+		t.Logf("%#v", os)
+	})
+	t.Run("dir_release", func(t *testing.T) {
+		os, err := getOSInfo("testdata/dir_release")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
+			Family:   "redhat",
+			Platform: "centos",
+			Name:     "CentOS Linux",
+			Version:  "7 (Core)",
+			Major:    7,
+			Minor:    4,
+			Patch:    1708,
+			Codename: "Core",
 		}, *os)
 		t.Logf("%#v", os)
 	})

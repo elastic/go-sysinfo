@@ -1,6 +1,6 @@
 # go-sysinfo
 
-[![Build Status](https://beats-ci.elastic.co/job/Library/job/go-sysinfo-mbp/job/master/badge/icon)](https://beats-ci.elastic.co/job/Library/job/go-sysinfo-mbp/job/master/)
+[![Build Status](https://beats-ci.elastic.co/job/Library/job/go-sysinfo-mbp/job/main/badge/icon)](https://beats-ci.elastic.co/job/Library/job/go-sysinfo-mbp/job/main/)
 [![Go Documentation](http://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)][godocs]
 
 [travis]: http://travis-ci.org/elastic/go-sysinfo
@@ -51,3 +51,4 @@ that are implemented.
 | `OpenHandleCounter`    |        | x     |         |           |
 | `Seccomp`              |        | x     |         |           |
 | `Capabilities`         |        | x     |         |           |
+| `NetworkCounters`      |        | x     |         |           |

@@ -17,7 +17,7 @@ imports: $(GOPATH)/bin/goimports
 
 $(GOPATH)/bin/go-licenser:
 	@echo "go-licenser missing, installing"
-	GO111MODULE=off go get -u github.com/elastic/go-licenser
+	go install github.com/elastic/go-licenser@latest
 
 $(GOPATH)/bin/gofumpt:
 	@echo "gofumpt missing, installing"
@@ -26,4 +26,4 @@ $(GOPATH)/bin/gofumpt:
 
 $(GOPATH)/bin/goimports:
 	@echo "goimports missing, installing"
-	GO111MODULE=off go get -u golang.org/x/tools/cmd/goimports
+	go install golang.org/x/tools/cmd/goimports@latest

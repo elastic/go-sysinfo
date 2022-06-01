@@ -11,11 +11,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Updated module to require Go 1.17. [#111](https://github.com/elastic/go-sysinfo/pull/111)
+
 ### Deprecated
 
 ### Removed
 
 ### Fixed
+
+## [1.7.1] - 2021-10-11
+
+### Fixed
+
+- Fixed getting OS info when an unsupported file or directory is found matching /etc/\*-release [#102](https://github.com/elastic/go-sysinfo/pull/102)
+
+## [1.7.0] - 2021-02-22
+
+### Added
+
+- Add per-process network stats [#96](https://github.com/elastic/go-sysinfo/pull/96)
 
 ## [1.6.0] - 2021-02-09
 
@@ -100,7 +114,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Changed the host containerized check to reduce false positives. [#42](https://github.com/elastic/go-sysinfo/pull/42) [#43](https://github.com/elastic/go-sysinfo/pull/43)
 
-[Unreleased]: https://github.com/elastic/go-sysinfo/compare/v1.6.0...HEAD
+[Unreleased]: https://github.com/elastic/go-sysinfo/compare/v1.7.1...HEAD
+[1.7.1]: https://github.com/elastic/go-sysinfo/releases/tag/v1.7.1
+[1.7.0]: https://github.com/elastic/go-sysinfo/releases/tag/v1.7.0
 [1.6.0]: https://github.com/elastic/go-sysinfo/releases/tag/v1.6.0
 [1.5.0]: https://github.com/elastic/go-sysinfo/releases/tag/v1.5.0
 [1.4.0]: https://github.com/elastic/go-sysinfo/releases/tag/v1.4.0
