@@ -22,9 +22,11 @@ package darwin
 
 import (
 	"os"
+	"os/exec"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/go-sysinfo/internal/registry"
 )
@@ -46,4 +48,49 @@ func TestKernProcInfo(t *testing.T) {
 	}
 	assert.Equal(t, exe, p.exe)
 	assert.Equal(t, os.Args, p.args)
+}
+
+const (
+	noValueEnvVar    = "_GO_SYSINFO_NO_VALUE"
+	emptyValueEnvVar = "_GO_SYSINFO_EMPTY_VALUE"
+	fooValueEnvVar   = "_GO_SYSINFO_FOO_VALUE"
+)
+
+func TestProcessEnvironment(t *testing.T) {
+	cmd := exec.Command("go", "test", "-v", "-run", "^TestProcessEnvironmentInternal$")
+	cmd.Env = os.Environ()
+	cmd.Env = append(cmd.Env,
+		// Activate the test case.
+		"GO_SYSINFO_ENV_TESTING=1",
+		// Set specific values that the test asserts.
+		noValueEnvVar,
+		emptyValueEnvVar+"=",
+		fooValueEnvVar+"=FOO",
+	)
+
+	out, err := cmd.CombinedOutput()
+	require.NoError(t, err, "TestProcessEnvironmentInternal failed:\n"+string(out))
+}
+
+func TestProcessEnvironmentInternal(t *testing.T) {
+	// This test case is executes in its own process space with a specific
+	// environment set by TestProcessEnvironment.
+	if os.Getenv("GO_SYSINFO_ENV_TESTING") != "1" {
+		t.Skip()
+	}
+
+	var p process
+	if err := kern_procargs(os.Getpid(), &p); err != nil {
+		t.Fatal(err)
+	}
+
+	value, exists := p.env[noValueEnvVar]
+	assert.True(t, exists, "Missing "+noValueEnvVar)
+	assert.Equal(t, "", value)
+
+	value, exists = p.env[emptyValueEnvVar]
+	assert.True(t, exists, "Missing "+emptyValueEnvVar)
+	assert.Equal(t, "", value)
+
+	assert.Equal(t, "FOO", p.env[fooValueEnvVar])
 }

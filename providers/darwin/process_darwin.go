@@ -257,12 +257,13 @@ func kern_procargs(pid int, p *process) error {
 		if len(l) == 0 {
 			break
 		}
+
 		parts := bytes.SplitN(l, []byte{'='}, 2)
-		if len(parts) != 2 {
-			return errors.New("failed to parse")
-		}
 		key := string(parts[0])
-		value := string(parts[1])
+		var value string
+		if len(parts) == 2 {
+			value = string(parts[1])
+		}
 		env[key] = value
 	}
 	p.env = env
