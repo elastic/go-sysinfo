@@ -58,8 +58,6 @@ const (
 
 func TestProcessEnvironment(t *testing.T) {
 	cmd := exec.Command("go", "test", "-v", "-run", "^TestProcessEnvironmentInternal$")
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
 	cmd.Env = os.Environ()
 	cmd.Env = append(cmd.Env,
 		// Activate the test case.
@@ -70,7 +68,8 @@ func TestProcessEnvironment(t *testing.T) {
 		fooValueEnvVar+"=FOO",
 	)
 
-	require.NoError(t, cmd.Run(), "TestProcessEnvironmentInternal failed.")
+	out, err := cmd.CombinedOutput()
+	require.NoError(t, err, "TestProcessEnvironmentInternal failed:\n"+string(out))
 }
 
 func TestProcessEnvironmentInternal(t *testing.T) {
