@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Added the Oracle Linux ("ol") platform to "redhat" OS family. [#54](https://github.com/elastic/go-sysinfo/issues/54) [#115](https://github.com/elastic/go-sysinfo/pull/115)
 - Updated module to require Go 1.17. [#111](https://github.com/elastic/go-sysinfo/pull/111)
 
 ### Deprecated
