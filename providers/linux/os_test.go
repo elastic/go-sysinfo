@@ -148,6 +148,24 @@ func TestOperatingSystem(t *testing.T) {
 		}, *os)
 		t.Logf("%#v", os)
 	})
+	t.Run("redhat9", func(t *testing.T) {
+		// Data from 'docker pull redhat/ubi9:9.0.0-1468'.
+		os, err := getOSInfo("testdata/redhat9")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
+			Family:   "redhat",
+			Platform: "rhel",
+			Name:     "Red Hat Enterprise Linux",
+			Version:  "9.0 (Plow)",
+			Major:    9,
+			Minor:    0,
+			Codename: "Plow",
+		}, *os)
+		t.Logf("%#v", os)
+	})
 	t.Run("oraclelinux7", func(t *testing.T) {
 		os, err := getOSInfo("testdata/oraclelinux7")
 		if err != nil {
@@ -197,6 +215,23 @@ func TestOperatingSystem(t *testing.T) {
 			Minor:    10,
 			Patch:    0,
 			Codename: "artful",
+		}, *os)
+		t.Logf("%#v", os)
+	})
+	t.Run("ubuntu2204", func(t *testing.T) {
+		os, err := getOSInfo("testdata/ubuntu2204")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
+			Family:   "debian",
+			Platform: "ubuntu",
+			Name:     "Ubuntu",
+			Version:  "22.04 LTS (Jammy Jellyfish)",
+			Major:    22,
+			Minor:    4,
+			Codename: "jammy",
 		}, *os)
 		t.Logf("%#v", os)
 	})
