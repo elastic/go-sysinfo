@@ -202,6 +202,23 @@ func TestOperatingSystem(t *testing.T) {
 		}, *os)
 		t.Logf("%#v", os)
 	})
+	t.Run("ubuntu2204", func(t *testing.T) {
+		os, err := getOSInfo("testdata/ubuntu2204")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
+			Family:   "debian",
+			Platform: "ubuntu",
+			Name:     "Ubuntu",
+			Version:  "22.04 LTS (Jammy Jellyfish)",
+			Major:    22,
+			Minor:    4,
+			Codename: "jammy",
+		}, *os)
+		t.Logf("%#v", os)
+	})
 	t.Run("fedora30", func(t *testing.T) {
 		os, err := getOSInfo("testdata/fedora30")
 		if err != nil {
