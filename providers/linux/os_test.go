@@ -166,6 +166,22 @@ func TestOperatingSystem(t *testing.T) {
 		}, *os)
 		t.Logf("%#v", os)
 	})
+	t.Run("oraclelinux7", func(t *testing.T) {
+		os, err := getOSInfo("testdata/oraclelinux7")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
+			Family:   "redhat",
+			Platform: "ol",
+			Name:     "Oracle Linux Server",
+			Version:  "7.9",
+			Major:    7,
+			Minor:    9,
+		}, *os)
+		t.Logf("%#v", os)
+	})
 	t.Run("ubuntu1404", func(t *testing.T) {
 		os, err := getOSInfo("testdata/ubuntu1404")
 		if err != nil {
