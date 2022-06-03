@@ -15,6 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build aix && ppc64 && cgo
+// +build aix,ppc64,cgo
+
 package aix
 
 import (
