@@ -131,6 +131,22 @@ func TestOperatingSystem(t *testing.T) {
 		}, *os)
 		t.Logf("%#v", os)
 	})
+	t.Run("linuxmint20", func(t *testing.T) {
+		os, err := getOSInfo("testdata/linuxmint20")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
+			Family:   "debian",
+			Platform: "linuxmint",
+			Name:     "Linux Mint",
+			Version:  "20 (Ulyana)",
+			Major:    20,
+			Codename: "ulyana",
+		}, *os)
+		t.Logf("%#v", os)
+	})
 	t.Run("redhat7", func(t *testing.T) {
 		os, err := getOSInfo("testdata/redhat7")
 		if err != nil {

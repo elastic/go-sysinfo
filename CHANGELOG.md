@@ -9,9 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added the Oracle Linux ("ol") platform to the "redhat" OS family. [#54](https://github.com/elastic/go-sysinfo/issues/54) [#115](https://github.com/elastic/go-sysinfo/pull/115)
+- Added the Linux Mint ("linuxmint") platform to the "debian" OS family. [#52](https://github.com/elastic/go-sysinfo/issues/52)
+
 ### Changed
 
-- Added the Oracle Linux ("ol") platform to "redhat" OS family. [#54](https://github.com/elastic/go-sysinfo/issues/54) [#115](https://github.com/elastic/go-sysinfo/pull/115)
 - Updated module to require Go 1.17. [#111](https://github.com/elastic/go-sysinfo/pull/111)
 - The boot time value for Windows is now rounded to the nearest second to provide a more stable value. [#53](https://github.com/elastic/go-sysinfo/issues/53) [#114](https://github.com/elastic/go-sysinfo/pull/114)
 
