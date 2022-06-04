@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix handling of environment variables without values on macOS. [#94](https://github.com/elastic/go-sysinfo/pull/94)
+- Fix build tags on AIX provider such that CGO is required. [#106](https://github.com/elastic/go-sysinfo/issues/106)
 
 ## [1.7.1] - 2021-10-11
 
