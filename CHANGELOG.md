@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+## [1.8.0]
+
+### Added
+
 - Added the Oracle Linux ("ol") platform to the "redhat" OS family. [#54](https://github.com/elastic/go-sysinfo/issues/54) [#115](https://github.com/elastic/go-sysinfo/pull/115)
 - Added the Linux Mint ("linuxmint") platform to the "debian" OS family. [#52](https://github.com/elastic/go-sysinfo/issues/52)
 
@@ -16,10 +28,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Updated module to require Go 1.17. [#111](https://github.com/elastic/go-sysinfo/pull/111)
 - The boot time value for Windows is now rounded to the nearest second to provide a more stable value. [#53](https://github.com/elastic/go-sysinfo/issues/53) [#114](https://github.com/elastic/go-sysinfo/pull/114)
-
-### Deprecated
-
-### Removed
 
 ### Fixed
 
@@ -121,7 +129,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Changed the host containerized check to reduce false positives. [#42](https://github.com/elastic/go-sysinfo/pull/42) [#43](https://github.com/elastic/go-sysinfo/pull/43)
 
-[Unreleased]: https://github.com/elastic/go-sysinfo/compare/v1.7.1...HEAD
+[Unreleased]: https://github.com/elastic/go-sysinfo/compare/v1.8.0...HEAD
+[1.8.0]: https://github.com/elastic/go-sysinfo/releases/tag/v1.8.0
 [1.7.1]: https://github.com/elastic/go-sysinfo/releases/tag/v1.7.1
 [1.7.0]: https://github.com/elastic/go-sysinfo/releases/tag/v1.7.0
 [1.6.0]: https://github.com/elastic/go-sysinfo/releases/tag/v1.6.0
