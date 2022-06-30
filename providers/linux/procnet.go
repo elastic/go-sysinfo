@@ -25,7 +25,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/go-sysinfo/types"
+	"github.com/redanthrax/go-sysinfo/types"
 )
 
 // fillStruct is some reflection work that can dynamically fill one of our tagged `netstat` structs with netstat data

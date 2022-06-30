@@ -22,7 +22,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	windows "github.com/elastic/go-windows"
+	windows "github.com/redanthrax/go-windows"
 )
 
 func BootTime() (time.Time, error) {

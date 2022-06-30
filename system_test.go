@@ -32,7 +32,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/go-sysinfo/types"
+	"github.com/redanthrax/go-sysinfo/types"
 )
 
 type ProcessFeatures struct {
@@ -69,6 +69,12 @@ var expectedProcessFeatures = map[string]*ProcessFeatures{
 		Environment:          true,
 		OpenHandleEnumerator: false,
 		OpenHandleCounter:    false,
+	},
+	"freebsd": {
+		ProcessInfo:          true,
+		Environment:          true,
+		OpenHandleEnumerator: true,
+		OpenHandleCounter:    true,
 	},
 }
 
@@ -129,7 +135,18 @@ func TestSelf(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.EqualValues(t, wd, info.CWD)
+
+	wdStat, err := os.Stat(wd)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cwdStat, err := os.Stat(info.CWD)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.EqualValues(t, os.SameFile(wdStat, cwdStat), true)
 
 	exe, err := os.Executable()
 	if err != nil {

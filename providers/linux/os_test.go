@@ -25,7 +25,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/go-sysinfo/types"
+	"github.com/redanthrax/go-sysinfo/types"
 )
 
 func TestOperatingSystem(t *testing.T) {

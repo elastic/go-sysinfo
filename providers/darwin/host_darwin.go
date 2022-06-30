@@ -27,9 +27,9 @@ import (
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/go-sysinfo/internal/registry"
-	"github.com/elastic/go-sysinfo/providers/shared"
-	"github.com/elastic/go-sysinfo/types"
+	"github.com/redanthrax/go-sysinfo/internal/registry"
+	"github.com/redanthrax/go-sysinfo/providers/shared"
+	"github.com/redanthrax/go-sysinfo/types"
 )
 
 func init() {

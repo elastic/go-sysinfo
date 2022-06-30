@@ -3,7 +3,7 @@
 [![Build Status](https://beats-ci.elastic.co/job/Library/job/go-sysinfo-mbp/job/main/badge/icon)](https://beats-ci.elastic.co/job/Library/job/go-sysinfo-mbp/job/main/)
 [![Go Documentation](http://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)][godocs]
 
-[godocs]: http://godoc.org/github.com/elastic/go-sysinfo
+[godocs]: http://godoc.org/github.com/redanthrax/go-sysinfo
 
 go-sysinfo is a library for collecting system information. This includes
 information about the host machine and processes running on the host.

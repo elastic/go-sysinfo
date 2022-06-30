@@ -15,17 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package windows
+package freebsd
 
 import (
-	windows "github.com/redanthrax/go-windows"
+	"syscall"
+	"time"
+
+	"github.com/pkg/errors"
 )
 
-func Architecture() (string, error) {
-	systemInfo, err := windows.GetNativeSystemInfo()
-	if err != nil {
-		return "", err
+const kernBoottimeMIB = "kern.boottime"
+
+func BootTime() (time.Time, error) {
+	var tv syscall.Timeval
+	if err := sysctlByName(kernBoottimeMIB, &tv); err != nil {
+		return time.Time{}, errors.Wrap(err, "failed to get host uptime")
 	}
 
-	return systemInfo.ProcessorArchitecture.String(), nil
+	bootTime := time.Unix(int64(tv.Sec), int64(tv.Usec)*int64(time.Microsecond))
+	return bootTime, nil
 }

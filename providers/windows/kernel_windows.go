@@ -18,7 +18,7 @@
 package windows
 
 import (
-	windows "github.com/elastic/go-windows"
+	windows "github.com/redanthrax/go-windows"
 )
 
 const windowsKernelExe = `C:\Windows\System32\ntoskrnl.exe`

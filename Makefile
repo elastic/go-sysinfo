@@ -13,11 +13,11 @@ fmt: $(GOPATH)/bin/gofumpt
 
 .PHONY: imports
 imports: $(GOPATH)/bin/goimports
-	goimports -l -local github.com/elastic/go-sysinfo ./
+	goimports -l -local github.com/redanthrax/go-sysinfo ./
 
 $(GOPATH)/bin/go-licenser:
 	@echo "go-licenser missing, installing"
-	go install github.com/elastic/go-licenser@latest
+	go install github.com/redanthrax/go-licenser@latest
 
 $(GOPATH)/bin/gofumpt:
 	@echo "gofumpt missing, installing"

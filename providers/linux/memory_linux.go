@@ -20,7 +20,7 @@ package linux
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/go-sysinfo/types"
+	"github.com/redanthrax/go-sysinfo/types"
 )
 
 func parseMemInfo(content []byte) (*types.HostMemoryInfo, error) {

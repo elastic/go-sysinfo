@@ -35,7 +35,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/go-sysinfo/types"
+	"github.com/redanthrax/go-sysinfo/types"
 )
 
 //go:generate sh -c "go tool cgo -godefs defs_darwin.go > ztypes_darwin.go"

@@ -28,7 +28,7 @@ import (
 	"strings"
 )
 
-const localPkgs = "github.com/elastic/go-sysinfo"
+const localPkgs = "github.com/redanthrax/go-sysinfo"
 
 var defaultPaths = []string{"."}
 

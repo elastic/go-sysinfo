@@ -15,17 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package windows
-
-import (
-	windows "github.com/redanthrax/go-windows"
-)
-
-func Architecture() (string, error) {
-	systemInfo, err := windows.GetNativeSystemInfo()
-	if err != nil {
-		return "", err
-	}
-
-	return systemInfo.ProcessorArchitecture.String(), nil
-}
+// Package freebsd implements the HostProvider and ProcessProvider interfaces
+// for providing information about FreeBSD
+package freebsd

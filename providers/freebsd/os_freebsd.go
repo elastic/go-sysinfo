@@ -15,48 +15,56 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build aix && ppc64 && cgo
-// +build aix,ppc64,cgo
-
-package aix
+package freebsd
 
 import (
-	"io/ioutil"
 	"strconv"
 	"strings"
-
-	"github.com/pkg/errors"
+	"syscall"
 
 	"github.com/redanthrax/go-sysinfo/types"
 )
 
-// OperatingSystem returns information of the host operating system
+const ostypeMIB = "kern.ostype"
+const osreleaseMIB = "kern.osrelease"
+const osrevisionMIB = "kern.osrevision"
+
 func OperatingSystem() (*types.OSInfo, error) {
-	return getOSInfo()
+	return getOSInfo("")
 }
 
-func getOSInfo() (*types.OSInfo, error) {
-	major, minor, err := getKernelVersion()
-	if err != nil {
-		return nil, err
+func getOSInfo(baseDir string) (*types.OSInfo, error) {
+	info := &types.OSInfo{
+		Family:   "freebsd",
+		Platform: "freebsd",
 	}
 
-	// Retrieve build version from "/proc/version".
-	procVersion, err := ioutil.ReadFile("/proc/version")
+	ostype, err := syscall.Sysctl(ostypeMIB)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get OS info: cannot open /proc/version")
+		return info, err
 	}
-	build := strings.SplitN(string(procVersion), "\n", 4)[2]
+	info.Name = ostype
 
-	return &types.OSInfo{
-		Type:     "unix",
-		Family:   "aix",
-		Platform: "aix",
-		Name:     "aix",
-		Version:  strconv.Itoa(major) + "." + strconv.Itoa(minor),
-		Major:    major,
-		Minor:    minor,
-		Patch:    0, // No patch version
-		Build:    build,
-	}, nil
+	osrelease, err := syscall.Sysctl(osreleaseMIB)
+	if err != nil {
+		return info, err
+	}
+	info.Version = osrelease
+
+	elems := strings.Split(osrelease, "-")
+	majorminor := strings.Split(elems[0], ".")
+
+	if len(majorminor) > 0 {
+		info.Major, _ = strconv.Atoi(majorminor[0])
+	}
+
+	if len(majorminor) > 1 {
+		info.Minor, _ = strconv.Atoi(majorminor[1])
+	}
+
+	if len(elems) > 2 {
+		info.Patch, _ = strconv.Atoi(strings.TrimPrefix(elems[2], "p"))
+	}
+
+	return info, nil
 }

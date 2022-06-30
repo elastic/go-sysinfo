@@ -15,44 +15,46 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build aix && ppc64 && cgo
-// +build aix,ppc64,cgo
+// +build,freebsd,cgo
 
-package aix
+package freebsd
 
-/*
-#cgo LDFLAGS: -L/usr/lib -lperfstat
-
-#include <libperfstat.h>
-#include <procinfo.h>
-#include <sys/proc.h>
-
-*/
+// #cgo LDFLAGS: -lkvm
+//#include <kvm.h>
+//#include <sys/vmmeter.h>
 import "C"
 
 import (
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
+	"github.com/prometheus/procfs"
 
 	"github.com/redanthrax/go-sysinfo/internal/registry"
 	"github.com/redanthrax/go-sysinfo/providers/shared"
 	"github.com/redanthrax/go-sysinfo/types"
 )
 
-//go:generate sh -c "go tool cgo -godefs defs_aix.go | sed 's/*byte/uint64/g' > ztypes_aix_ppc64.go"
-// As cgo will return some psinfo's fields with *byte, binary.Read will refuse this type.
-
 func init() {
-	registry.Register(aixSystem{})
+	registry.Register(newFreeBSDSystem(""))
 }
 
-type aixSystem struct{}
+type freebsdSystem struct {
+	procFS procFS
+}
 
-// Host returns a new AIX host.
-func (aixSystem) Host() (types.Host, error) {
+func newFreeBSDSystem(hostFS string) freebsdSystem {
+	mountPoint := filepath.Join(hostFS, procfs.DefaultMountPoint)
+	fs, _ := procfs.NewFS(mountPoint)
+	return freebsdSystem{
+		procFS: procFS{FS: fs, mountPoint: mountPoint},
+	}
+}
+
+func (s freebsdSystem) Host() (types.Host, error) {
 	return newHost()
 }
 
@@ -60,61 +62,23 @@ type host struct {
 	info types.HostInfo
 }
 
-// Architecture returns the architecture of the host
-func Architecture() (string, error) {
-	return "ppc", nil
-}
-
-// Info returns the host details.
 func (h *host) Info() types.HostInfo {
 	return h.info
 }
 
-// Info returns the current CPU usage of the host.
-func (*host) CPUTime() (types.CPUTimes, error) {
-	clock := uint64(C.sysconf(C._SC_CLK_TCK))
-	tick2nsec := func(val uint64) uint64 {
-		return val * 1e9 / clock
-	}
+func (h *host) CPUTime() (types.CPUTimes, error) {
+	cpu := types.CPUTimes{}
+	r := &reader{}
+	r.cpuTime(&cpu)
 
-	cpudata := C.perfstat_cpu_total_t{}
-
-	if _, err := C.perfstat_cpu_total(nil, &cpudata, C.sizeof_perfstat_cpu_total_t, 1); err != nil {
-		return types.CPUTimes{}, errors.Wrap(err, "error while callin perfstat_cpu_total")
-	}
-
-	return types.CPUTimes{
-		User:   time.Duration(tick2nsec(uint64(cpudata.user))),
-		System: time.Duration(tick2nsec(uint64(cpudata.sys))),
-		Idle:   time.Duration(tick2nsec(uint64(cpudata.idle))),
-		IOWait: time.Duration(tick2nsec(uint64(cpudata.wait))),
-	}, nil
+	return cpu, nil
 }
 
-// Memory returns the current memory usage of the host.
-func (*host) Memory() (*types.HostMemoryInfo, error) {
-	var mem types.HostMemoryInfo
-
-	pagesize := uint64(os.Getpagesize())
-
-	meminfo := C.perfstat_memory_total_t{}
-	_, err := C.perfstat_memory_total(nil, &meminfo, C.sizeof_perfstat_memory_total_t, 1)
-	if err != nil {
-		return nil, errors.Wrap(err, "perfstat_memory_total failed")
-	}
-
-	mem.Total = uint64(meminfo.real_total) * pagesize
-	mem.Free = uint64(meminfo.real_free) * pagesize
-	mem.Used = uint64(meminfo.real_inuse) * pagesize
-
-	// There is no real equivalent to memory available in AIX.
-	mem.Available = mem.Free
-
-	mem.VirtualTotal = uint64(meminfo.virt_total) * pagesize
-	mem.VirtualFree = mem.Free + uint64(meminfo.pgsp_free)*pagesize
-	mem.VirtualUsed = mem.VirtualTotal - mem.VirtualFree
-
-	return &mem, nil
+func (h *host) Memory() (*types.HostMemoryInfo, error) {
+	m := &types.HostMemoryInfo{}
+	r := &reader{}
+	r.memInfo(m)
+	return m, r.Err()
 }
 
 func newHost() (*host, error) {
@@ -152,6 +116,68 @@ func (r *reader) Err() error {
 	return nil
 }
 
+func (r *reader) cpuTime(cpu *types.CPUTimes) {
+	cptime, err := Cptime()
+
+	if r.addErr(err) {
+		return
+	}
+
+	cpu.User = time.Duration(cptime["User"])
+	cpu.System = time.Duration(cptime["System"])
+	cpu.Idle = time.Duration(cptime["Idle"])
+	cpu.Nice = time.Duration(cptime["Nice"])
+	cpu.IRQ = time.Duration(cptime["IRQ"])
+}
+
+func (r *reader) memInfo(m *types.HostMemoryInfo) {
+	pageSize, err := PageSize()
+
+	if r.addErr(err) {
+		return
+	}
+
+	totalMemory, err := TotalMemory()
+	if r.addErr(err) {
+		return
+	}
+
+	m.Total = totalMemory
+
+	vm, err := VmTotal()
+	if r.addErr(err) {
+		return
+	}
+
+	m.Free = uint64(vm.Free) * uint64(pageSize)
+	m.Used = m.Total - m.Free
+
+	numFreeBuffers, err := NumFreeBuffers()
+	if r.addErr(err) {
+		return
+	}
+
+	m.Available = m.Free + (uint64(numFreeBuffers) * uint64(pageSize))
+
+	swap, err := KvmGetSwapInfo()
+	if r.addErr(err) {
+		return
+	}
+
+	swapMaxPages, err := SwapMaxPages()
+	if r.addErr(err) {
+		return
+	}
+
+	if swap.Total > swapMaxPages {
+		swap.Total = swapMaxPages
+	}
+
+	m.VirtualTotal = uint64(swap.Total) * uint64(pageSize)
+	m.VirtualUsed = uint64(swap.Used) * uint64(pageSize)
+	m.VirtualFree = m.VirtualTotal - m.VirtualUsed
+}
+
 func (r *reader) architecture(h *host) {
 	v, err := Architecture()
 	if r.addErr(err) {
@@ -165,6 +191,7 @@ func (r *reader) bootTime(h *host) {
 	if r.addErr(err) {
 		return
 	}
+
 	h.info.BootTime = v
 }
 
@@ -201,7 +228,7 @@ func (r *reader) os(h *host) {
 	h.info.OS = v
 }
 
-func (*reader) time(h *host) {
+func (r *reader) time(h *host) {
 	h.info.Timezone, h.info.TimezoneOffsetSec = time.Now().Zone()
 }
 
@@ -211,4 +238,9 @@ func (r *reader) uniqueID(h *host) {
 		return
 	}
 	h.info.UniqueID = v
+}
+
+type procFS struct {
+	procfs.FS
+	mountPoint string
 }

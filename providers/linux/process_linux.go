@@ -27,7 +27,7 @@ import (
 
 	"github.com/prometheus/procfs"
 
-	"github.com/elastic/go-sysinfo/types"
+	"github.com/redanthrax/go-sysinfo/types"
 )
 
 const userHz = 100

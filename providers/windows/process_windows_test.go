@@ -18,7 +18,7 @@
 package windows
 
 import (
-	"github.com/elastic/go-sysinfo/internal/registry"
+	"github.com/redanthrax/go-sysinfo/internal/registry"
 )
 
 var (

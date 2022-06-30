@@ -15,17 +15,41 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package windows
+// +build,freebsd,cgo
+
+package freebsd
 
 import (
-	windows "github.com/redanthrax/go-windows"
+	"encoding/json"
+	"testing"
+
+	"github.com/redanthrax/go-sysinfo/internal/registry"
+	"github.com/stretchr/testify/assert"
 )
 
-func Architecture() (string, error) {
-	systemInfo, err := windows.GetNativeSystemInfo()
+var _ registry.HostProvider = freebsdSystem{}
+
+func TestHost(t *testing.T) {
+	host, err := freebsdSystem{}.Host()
 	if err != nil {
-		return "", err
+		t.Fatal(err)
 	}
 
-	return systemInfo.ProcessorArchitecture.String(), nil
+	info := host.Info()
+	data, _ := json.MarshalIndent(info, "", "  ")
+	t.Log(string(data))
+}
+
+func TestHostMemoryInfo(t *testing.T) {
+	host, err := newFreeBSDSystem("").Host()
+	if err != nil {
+		t.Fatal(err)
+	}
+	m, err := host.Memory()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.EqualValues(t, 8554647552, int64(m.Total))
+	assert.NotContains(t, m.Metrics, "MemTotal")
 }

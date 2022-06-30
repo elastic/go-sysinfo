@@ -23,8 +23,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/go-sysinfo/internal/registry"
-	"github.com/elastic/go-sysinfo/types"
+	"github.com/redanthrax/go-sysinfo/internal/registry"
+	"github.com/redanthrax/go-sysinfo/types"
 )
 
 var _ registry.HostProvider = linuxSystem{}

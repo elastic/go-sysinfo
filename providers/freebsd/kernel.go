@@ -15,17 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package windows
+package freebsd
 
 import (
-	windows "github.com/redanthrax/go-windows"
+	"syscall"
+
+	"github.com/pkg/errors"
 )
 
-func Architecture() (string, error) {
-	systemInfo, err := windows.GetNativeSystemInfo()
+const kernelReleaseMIB = "kern.osrelease"
+
+func KernelVersion() (string, error) {
+	version, err := syscall.Sysctl(kernelReleaseMIB)
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err, "failed to get kernel version")
 	}
 
-	return systemInfo.ProcessorArchitecture.String(), nil
+	return version, nil
 }

@@ -15,17 +15,32 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package windows
+package freebsd
 
 import (
-	windows "github.com/redanthrax/go-windows"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/redanthrax/go-sysinfo/types"
 )
 
-func Architecture() (string, error) {
-	systemInfo, err := windows.GetNativeSystemInfo()
-	if err != nil {
-		return "", err
-	}
-
-	return systemInfo.ProcessorArchitecture.String(), nil
+func TestOperatingSystem(t *testing.T) {
+	t.Run("freebsd13", func(t *testing.T) {
+		os, err := getOSInfo("")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Type:     "",
+			Family:   "freebsd",
+			Platform: "freebsd",
+			Name:     "FreeBSD",
+			Version:  "13.1-RELEASE",
+			Major:    13,
+			Minor:    1,
+			Patch:    0,
+		}, *os)
+		t.Logf("%#v", os)
+	})
 }

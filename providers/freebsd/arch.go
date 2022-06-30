@@ -15,17 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package windows
+package freebsd
 
 import (
-	windows "github.com/redanthrax/go-windows"
+	"syscall"
+
+	"github.com/pkg/errors"
 )
 
+const hardwareMIB = "hw.machine"
+
 func Architecture() (string, error) {
-	systemInfo, err := windows.GetNativeSystemInfo()
+	arch, err := syscall.Sysctl(hardwareMIB)
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err, "failed to get architecture")
 	}
 
-	return systemInfo.ProcessorArchitecture.String(), nil
+	return arch, nil
 }

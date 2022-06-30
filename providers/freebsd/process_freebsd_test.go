@@ -15,17 +15,35 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package windows
+package freebsd
 
 import (
-	windows "github.com/redanthrax/go-windows"
+	"testing"
+
+	"github.com/redanthrax/go-sysinfo/internal/registry"
+	"github.com/redanthrax/go-sysinfo/types"
+	"github.com/stretchr/testify/assert"
 )
 
-func Architecture() (string, error) {
-	systemInfo, err := windows.GetNativeSystemInfo()
+var _ registry.HostProvider = freebsdSystem{}
+var _ registry.ProcessProvider = freebsdSystem{}
+
+func TestProcessNetstat(t *testing.T) {
+	proc, err := newFreeBSDSystem("").Self()
 	if err != nil {
-		return "", err
+		t.Fatal(err)
+	}
+	procNetwork, ok := proc.(types.NetworkCounters)
+	if !ok {
+		t.Fatalf("error, cannot cast to types.NetworkCounters")
+	}
+	stats, err := procNetwork.NetworkCounters()
+	if err != nil {
+		t.Fatal(err)
 	}
 
-	return systemInfo.ProcessorArchitecture.String(), nil
+	assert.NotEmpty(t, stats.SNMP.ICMP, "ICMP")
+	assert.NotEmpty(t, stats.SNMP.IP, "IP")
+	assert.NotEmpty(t, stats.SNMP.TCP, "TCP")
+	assert.NotEmpty(t, stats.SNMP.UDP, "UDP")
 }

@@ -15,17 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package windows
+package freebsd
 
 import (
-	windows "github.com/redanthrax/go-windows"
+	"syscall"
+
+	"github.com/pkg/errors"
 )
 
-func Architecture() (string, error) {
-	systemInfo, err := windows.GetNativeSystemInfo()
+const kernelHostUUIDMIB = "kern.hostuuid"
+
+func MachineID() (string, error) {
+	uuid, err := syscall.Sysctl(kernelHostUUIDMIB)
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err, "failed to get machine id")
 	}
 
-	return systemInfo.ProcessorArchitecture.String(), nil
+	return uuid, nil
 }

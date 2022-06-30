@@ -15,17 +15,20 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package windows
+// +build ignore
 
-import (
-	windows "github.com/redanthrax/go-windows"
-)
+package freebsd
 
-func Architecture() (string, error) {
-	systemInfo, err := windows.GetNativeSystemInfo()
-	if err != nil {
-		return "", err
-	}
+/*
+#include <sys/types.h>
+#include <sys/vmmeter.h>
+#include <sys/time.h>
+#include <kvm.h>
+*/
+import "C"
 
-	return systemInfo.ProcessorArchitecture.String(), nil
-}
+type vmTotal C.struct_vmtotal
+
+type kvmSwap C.struct_kvm_swap
+
+type clockInfo C.struct_clockinfo

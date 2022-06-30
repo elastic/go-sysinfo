@@ -25,7 +25,7 @@ import (
 	"github.com/pkg/errors"
 	"howett.net/plist"
 
-	"github.com/elastic/go-sysinfo/types"
+	"github.com/redanthrax/go-sysinfo/types"
 )
 
 const (

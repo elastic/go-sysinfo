@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euxo pipefail
 
-go install github.com/elastic/go-licenser@latest
+go install github.com/redanthrax/go-licenser@latest
 
 go mod verify
 go-licenser -d
