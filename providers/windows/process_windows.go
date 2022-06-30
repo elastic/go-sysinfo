@@ -28,7 +28,7 @@ import (
 	"github.com/pkg/errors"
 	syswin "golang.org/x/sys/windows"
 
-	windows "github.com/redanthrax/go-windows"
+	windows "github.com/elastic/go-windows"
 
 	"github.com/redanthrax/go-sysinfo/types"
 )

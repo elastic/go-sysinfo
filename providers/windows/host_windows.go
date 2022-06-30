@@ -23,7 +23,7 @@ import (
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
-	windows "github.com/redanthrax/go-windows"
+	windows "github.com/elastic/go-windows"
 
 	"github.com/redanthrax/go-sysinfo/internal/registry"
 	"github.com/redanthrax/go-sysinfo/providers/shared"
