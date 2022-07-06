@@ -75,10 +75,11 @@ func OperatingSystem() (*types.OSInfo, error) {
 	}
 
 	name = "CurrentBuild"
-	osInfo.Build, _, err = k.GetStringValue(name)
+	currentBuild, _, err := k.GetStringValue(name)
 	if err != nil {
 		return nil, errors.Wrapf(err, `failed to get value of HKLM\%v\%v`, path, name)
 	}
+	osInfo.Build = currentBuild
 
 	// Update Build Revision (optional)
 	name = "UBR"
@@ -89,5 +90,27 @@ func OperatingSystem() (*types.OSInfo, error) {
 		osInfo.Build = fmt.Sprintf("%v.%d", osInfo.Build, updateBuildRevision)
 	}
 
+	fixWindows11Naming(currentBuild, osInfo)
+
 	return osInfo, nil
+}
+
+// fixWindows11Naming adjusts the OS name because the ProductName registry value
+// was not changed in Windows 11 and still contains Windows 10. If the product
+// name contains "Windows 10" and the version is greater than or equal to
+// 10.0.22000 then "Windows 10" is replaced with "Windows 11" in the OS name.
+//
+// https://docs.microsoft.com/en-us/answers/questions/586619/windows-11-build-ver-is-still-10022000194.html
+func fixWindows11Naming(currentBuild string, osInfo *types.OSInfo) {
+	buildNumber, err := strconv.Atoi(currentBuild)
+	if err != nil {
+		return
+	}
+
+	// "Anything above [or equal] 10.0.22000.0 is Win 11. Anything below is Win 10."
+	if osInfo.Major > 10 ||
+		osInfo.Major == 10 && osInfo.Minor > 0 ||
+		osInfo.Major == 10 && osInfo.Minor == 0 && buildNumber >= 22000 {
+		osInfo.Name = strings.Replace(osInfo.Name, "Windows 10", "Windows 11", 1)
+	}
 }
