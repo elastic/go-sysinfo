@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Report OS name as Windows 11 when version is >= 10.0.22000. [#118](https://github.com/elastic/go-sysinfo/issues/118) [#121](https://github.com/elastic/go-sysinfo/pull/121)
+
 ## [1.8.0]
 
 ### Added
