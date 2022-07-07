@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.8.1]
+
+### Fixed
+
 - Report OS name as Windows 11 when version is >= 10.0.22000. [#118](https://github.com/elastic/go-sysinfo/issues/118) [#121](https://github.com/elastic/go-sysinfo/pull/121)
 
 ## [1.8.0]
@@ -131,7 +135,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Changed the host containerized check to reduce false positives. [#42](https://github.com/elastic/go-sysinfo/pull/42) [#43](https://github.com/elastic/go-sysinfo/pull/43)
 
-[Unreleased]: https://github.com/elastic/go-sysinfo/compare/v1.8.0...HEAD
+[Unreleased]: https://github.com/elastic/go-sysinfo/compare/v1.8.1...HEAD
+[1.8.1]: https://github.com/elastic/go-sysinfo/releases/tag/v1.8.1
 [1.8.0]: https://github.com/elastic/go-sysinfo/releases/tag/v1.8.0
 [1.7.1]: https://github.com/elastic/go-sysinfo/releases/tag/v1.7.1
 [1.7.0]: https://github.com/elastic/go-sysinfo/releases/tag/v1.7.0
