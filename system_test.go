@@ -19,6 +19,8 @@ package sysinfo
 
 import (
 	"encoding/json"
+	"errors"
+	"io/fs"
 	"os"
 	osUser "os/user"
 	"runtime"
@@ -28,7 +30,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -287,8 +288,7 @@ func TestProcesses(t *testing.T) {
 	for _, proc := range procs {
 		info, err := proc.Info()
 		if err != nil {
-			cause := errors.Cause(err)
-			if os.IsPermission(cause) || syscall.ESRCH == cause {
+			if errors.Is(err, fs.ErrPermission) || errors.Is(err, syscall.ESRCH) {
 				// The process may no longer exist by the time we try fetching
 				// additional information so ignore ESRCH (no such process).
 				continue

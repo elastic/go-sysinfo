@@ -21,10 +21,9 @@
 package darwin
 
 import (
+	"fmt"
 	"syscall"
 	"time"
-
-	"github.com/pkg/errors"
 )
 
 const kernBoottimeMIB = "kern.boottime"
@@ -32,7 +31,7 @@ const kernBoottimeMIB = "kern.boottime"
 func BootTime() (time.Time, error) {
 	var tv syscall.Timeval
 	if err := sysctlByName(kernBoottimeMIB, &tv); err != nil {
-		return time.Time{}, errors.Wrap(err, "failed to get host uptime")
+		return time.Time{}, fmt.Errorf("failed to get host uptime: %w", err)
 	}
 
 	bootTime := time.Unix(int64(tv.Sec), int64(tv.Usec)*int64(time.Microsecond))
