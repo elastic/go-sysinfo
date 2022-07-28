@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Replace pkg/errors with Go 1.13 native errors #123.
+
 ### Changed
 
 ### Deprecated
