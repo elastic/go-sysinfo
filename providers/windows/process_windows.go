@@ -18,6 +18,8 @@
 package windows
 
 import (
+	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -25,7 +27,6 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/pkg/errors"
 	syswin "golang.org/x/sys/windows"
 
 	windows "github.com/elastic/go-windows"
@@ -41,7 +42,7 @@ var (
 func (s windowsSystem) Processes() (procs []types.Process, err error) {
 	pids, err := windows.EnumProcesses()
 	if err != nil {
-		return nil, errors.Wrap(err, "EnumProcesses")
+		return nil, fmt.Errorf("EnumProcesses: %w", err)
 	}
 	procs = make([]types.Process, 0, len(pids))
 	var proc types.Process
@@ -184,7 +185,7 @@ func getUserProcessParams(handle syscall.Handle, pbi windows.ProcessBasicInforma
 		return params, err
 	}
 	if nRead != uintptr(pebSize) {
-		return params, errors.Errorf("PEB: short read (%d/%d)", nRead, pebSize)
+		return params, fmt.Errorf("PEB: short read (%d/%d)", nRead, pebSize)
 	}
 
 	// Get the RTL_USER_PROCESS_PARAMETERS struct pointer from the PEB
@@ -197,7 +198,7 @@ func getUserProcessParams(handle syscall.Handle, pbi windows.ProcessBasicInforma
 		return params, err
 	}
 	if nRead != uintptr(windows.SizeOfRtlUserProcessParameters) {
-		return params, errors.Errorf("RTL_USER_PROCESS_PARAMETERS: short read (%d/%d)", nRead, windows.SizeOfRtlUserProcessParameters)
+		return params, fmt.Errorf("RTL_USER_PROCESS_PARAMETERS: short read (%d/%d)", nRead, windows.SizeOfRtlUserProcessParameters)
 	}
 
 	params = *(*windows.RtlUserProcessParameters)(unsafe.Pointer(&paramsBuf[0]))
@@ -219,7 +220,7 @@ func readProcessUnicodeString(handle syscall.Handle, s *windows.UnicodeString) (
 		return nil, err
 	}
 	if nRead != uintptr(s.Size) {
-		return nil, errors.Errorf("unicode string: short read: (%d/%d)", nRead, s.Size)
+		return nil, fmt.Errorf("unicode string: short read: (%d/%d)", nRead, s.Size)
 	}
 	return buf, nil
 }
@@ -288,43 +289,41 @@ func (p *process) Info() (types.ProcessInfo, error) {
 func (p *process) User() (types.UserInfo, error) {
 	handle, err := p.open()
 	if err != nil {
-		return types.UserInfo{}, errors.Wrap(err, "OpenProcess failed")
+		return types.UserInfo{}, fmt.Errorf("OpenProcess failed: %w", err)
 	}
 	defer syscall.CloseHandle(handle)
 
 	var accessToken syswin.Token
 	err = syswin.OpenProcessToken(syswin.Handle(handle), syscall.TOKEN_QUERY, &accessToken)
 	if err != nil {
-		return types.UserInfo{}, errors.Wrap(err, "OpenProcessToken failed")
+		return types.UserInfo{}, fmt.Errorf("OpenProcessToken failed: %w", err)
 	}
 	defer accessToken.Close()
 
 	tokenUser, err := accessToken.GetTokenUser()
 	if err != nil {
-		return types.UserInfo{}, errors.Wrap(err, "GetTokenUser failed")
+		return types.UserInfo{}, fmt.Errorf("GetTokenUser failed: %w", err)
 	}
 
 	sid, err := sidToString(tokenUser.User.Sid)
 	if sid == "" || err != nil {
-		const errStr = "failed to look up user SID"
 		if err != nil {
-			return types.UserInfo{}, errors.Wrap(err, errStr)
+			return types.UserInfo{}, fmt.Errorf("failed to look up user SID: %w", err)
 		}
-		return types.UserInfo{}, errors.New(errStr)
+		return types.UserInfo{}, errors.New("failed to look up user SID")
 	}
 
 	tokenGroup, err := accessToken.GetTokenPrimaryGroup()
 	if err != nil {
-		return types.UserInfo{}, errors.Wrap(err, "GetTokenPrimaryGroup failed")
+		return types.UserInfo{}, fmt.Errorf("GetTokenPrimaryGroup failed: %w", err)
 	}
 
 	gsid, err := sidToString(tokenGroup.PrimaryGroup)
 	if gsid == "" || err != nil {
-		const errStr = "failed to look up primary group SID"
 		if err != nil {
-			return types.UserInfo{}, errors.Wrap(err, errStr)
+			return types.UserInfo{}, fmt.Errorf("failed to look up primary group SID: %w", err)
 		}
-		return types.UserInfo{}, errors.New(errStr)
+		return types.UserInfo{}, errors.New("failed to look up primary group SID")
 	}
 
 	return types.UserInfo{

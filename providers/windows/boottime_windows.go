@@ -18,9 +18,8 @@
 package windows
 
 import (
+	"fmt"
 	"time"
-
-	"github.com/pkg/errors"
 
 	windows "github.com/elastic/go-windows"
 )
@@ -28,7 +27,7 @@ import (
 func BootTime() (time.Time, error) {
 	msSinceBoot, err := windows.GetTickCount64()
 	if err != nil {
-		return time.Time{}, errors.Wrap(err, "failed to get boot time")
+		return time.Time{}, fmt.Errorf("failed to get boot time: %w", err)
 	}
 
 	bootTime := time.Now().Add(-1 * time.Duration(msSinceBoot) * time.Millisecond)

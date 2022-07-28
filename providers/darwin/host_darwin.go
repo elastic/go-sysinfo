@@ -21,11 +21,12 @@
 package darwin
 
 import (
+	"errors"
+	"fmt"
 	"os"
 	"time"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/go-sysinfo/internal/registry"
 	"github.com/elastic/go-sysinfo/providers/shared"
@@ -53,7 +54,7 @@ func (h *host) Info() types.HostInfo {
 func (h *host) CPUTime() (types.CPUTimes, error) {
 	cpu, err := getHostCPULoadInfo()
 	if err != nil {
-		return types.CPUTimes{}, errors.Wrap(err, "failed to get host CPU usage")
+		return types.CPUTimes{}, fmt.Errorf("failed to get host CPU usage: %w", err)
 	}
 
 	ticksPerSecond := time.Duration(getClockTicks())
@@ -71,25 +72,25 @@ func (h *host) Memory() (*types.HostMemoryInfo, error) {
 
 	// Total physical memory.
 	if err := sysctlByName("hw.memsize", &mem.Total); err != nil {
-		return nil, errors.Wrap(err, "failed to get total physical memory")
+		return nil, fmt.Errorf("failed to get total physical memory: %w", err)
 	}
 
 	// Page size for computing byte totals.
 	pageSizeBytes, err := getPageSize()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get page size")
+		return nil, fmt.Errorf("failed to get page size: %w", err)
 	}
 
 	// Virtual Memory Statistics
 	vmStat, err := getHostVMInfo64()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get virtual memory statistics")
+		return nil, fmt.Errorf("failed to get virtual memory statistics: %w", err)
 	}
 
 	// Swap
 	swap, err := getSwapUsage()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get swap usage")
+		return nil, fmt.Errorf("failed to get swap usage: %w", err)
 	}
 
 	inactiveBytes := uint64(vmStat.Inactive_count) * pageSizeBytes
@@ -150,7 +151,7 @@ type reader struct {
 
 func (r *reader) addErr(err error) bool {
 	if err != nil {
-		if errors.Cause(err) != types.ErrNotImplemented {
+		if !errors.Is(err, types.ErrNotImplemented) {
 			r.errs = append(r.errs, err)
 		}
 		return true

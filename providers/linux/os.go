@@ -20,6 +20,7 @@ package linux
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -28,7 +29,6 @@ import (
 	"strings"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/go-sysinfo/types"
 )
@@ -103,7 +103,7 @@ func getOSRelease(baseDir string) (*types.OSInfo, error) {
 		return nil, err
 	}
 	if len(osRel) == 0 {
-		return nil, errors.Errorf("%v is empty", osRelease)
+		return nil, fmt.Errorf("%v is empty: %w", osRelease, err)
 	}
 
 	return parseOSRelease(append(lsbRel, osRel...))
@@ -214,12 +214,12 @@ func findDistribRelease(baseDir string) (*types.OSInfo, error) {
 
 		osInfo, err := getDistribRelease(path)
 		if err != nil {
-			errs = append(errs, errors.Wrapf(err, "in %s", path))
+			errs = append(errs, fmt.Errorf("in %s: %w", path, err))
 			continue
 		}
 		return osInfo, err
 	}
-	return nil, errors.Wrap(&multierror.MultiError{Errors: errs}, "no valid /etc/<distrib>-release file found")
+	return nil, fmt.Errorf("no valid /etc/<distrib>-release file found: %w", &multierror.MultiError{Errors: errs})
 }
 
 func getDistribRelease(file string) (*types.OSInfo, error) {
@@ -229,7 +229,7 @@ func getDistribRelease(file string) (*types.OSInfo, error) {
 	}
 	parts := bytes.SplitN(data, []byte("\n"), 2)
 	if len(parts) != 2 {
-		return nil, errors.Errorf("failed to parse %v", file)
+		return nil, fmt.Errorf("failed to parse %v", file)
 	}
 
 	// Use distrib as platform name.

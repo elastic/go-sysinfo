@@ -18,13 +18,14 @@
 package linux
 
 import (
+	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 	"github.com/prometheus/procfs"
 
 	"github.com/elastic/go-sysinfo/internal/registry"
@@ -125,7 +126,7 @@ func (h *host) CPUTime() (types.CPUTimes, error) {
 func newHost(fs procFS) (*host, error) {
 	stat, err := fs.NewStat()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to read proc stat")
+		return nil, fmt.Errorf("failed to read proc stat: %w", err)
 	}
 
 	h := &host{stat: stat, procFS: fs}
@@ -148,7 +149,7 @@ type reader struct {
 
 func (r *reader) addErr(err error) bool {
 	if err != nil {
-		if errors.Cause(err) != types.ErrNotImplemented {
+		if !errors.Is(err, types.ErrNotImplemented) {
 			r.errs = append(r.errs, err)
 		}
 		return true

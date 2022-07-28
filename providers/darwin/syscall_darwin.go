@@ -36,8 +36,6 @@ import (
 	"sync"
 	"syscall"
 	"unsafe"
-
-	"github.com/pkg/errors"
 )
 
 // Single-word zero for use when we need a valid pointer to 0 bytes.
@@ -182,7 +180,7 @@ func getHostCPULoadInfo() (*cpuUsage, error) {
 		&count)
 
 	if status != C.KERN_SUCCESS {
-		return nil, errors.Errorf("host_statistics returned status %d", status)
+		return nil, fmt.Errorf("host_statistics returned status %d", status)
 	}
 
 	return &cpu, nil
@@ -216,7 +214,7 @@ func getPageSize() (uint64, error) {
 		C.host_t(C.mach_host_self()),
 		(*C.vm_size_t)(unsafe.Pointer(&pageSize)))
 	if status != C.KERN_SUCCESS {
-		return 0, errors.Errorf("host_page_size returned status %d", status)
+		return 0, fmt.Errorf("host_page_size returned status %d", status)
 	}
 
 	return uint64(pageSize), nil

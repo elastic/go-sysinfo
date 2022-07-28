@@ -31,11 +31,12 @@ package aix
 import "C"
 
 import (
+	"errors"
+	"fmt"
 	"os"
 	"time"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/go-sysinfo/internal/registry"
 	"github.com/elastic/go-sysinfo/providers/shared"
@@ -80,7 +81,7 @@ func (*host) CPUTime() (types.CPUTimes, error) {
 	cpudata := C.perfstat_cpu_total_t{}
 
 	if _, err := C.perfstat_cpu_total(nil, &cpudata, C.sizeof_perfstat_cpu_total_t, 1); err != nil {
-		return types.CPUTimes{}, errors.Wrap(err, "error while callin perfstat_cpu_total")
+		return types.CPUTimes{}, fmt.Errorf("error while callin perfstat_cpu_total: %w", err)
 	}
 
 	return types.CPUTimes{
@@ -100,7 +101,7 @@ func (*host) Memory() (*types.HostMemoryInfo, error) {
 	meminfo := C.perfstat_memory_total_t{}
 	_, err := C.perfstat_memory_total(nil, &meminfo, C.sizeof_perfstat_memory_total_t, 1)
 	if err != nil {
-		return nil, errors.Wrap(err, "perfstat_memory_total failed")
+		return nil, fmt.Errorf("perfstat_memory_total failed: %w", err)
 	}
 
 	mem.Total = uint64(meminfo.real_total) * pagesize
@@ -137,7 +138,7 @@ type reader struct {
 
 func (r *reader) addErr(err error) bool {
 	if err != nil {
-		if errors.Cause(err) != types.ErrNotImplemented {
+		if !errors.Is(err, types.ErrNotImplemented) {
 			r.errs = append(r.errs, err)
 		}
 		return true
