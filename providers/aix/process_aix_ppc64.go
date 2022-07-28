@@ -33,6 +33,7 @@ import "C"
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -222,7 +223,7 @@ func (p *process) Environment() (map[string]string, error) {
 
 		pair := bytes.SplitN(chop(line), delim, 2)
 		if len(pair) != 2 {
-			return nil, fmt.Errorf("error reading process environment: %w", err)
+			return nil, errors.New("error reading process environment")
 		}
 		p.env[string(pair[0])] = string(pair[1])
 	}
