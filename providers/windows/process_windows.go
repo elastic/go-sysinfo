@@ -128,7 +128,7 @@ func (p *process) init() error {
 	pbi, err := getProcessBasicInformation(handle)
 	if err == nil {
 		ppid = int(pbi.InheritedFromUniqueProcessID)
-		userProcParams, err := getUserProcessParams(handle, pbi)
+		userProcParams, err := getUserProcessParams(syswin.Handle(handle), pbi)
 		if err == nil {
 			if argsW, err := readProcessUnicodeString(handle, &userProcParams.CommandLine); err == nil {
 				args, err = splitCommandline(argsW)
@@ -167,7 +167,7 @@ func getProcessBasicInformation(handle syscall.Handle) (pbi windows.ProcessBasic
 	return pbi, err
 }
 
-func getUserProcessParams(handle syscall.Handle, pbi windows.ProcessBasicInformationStruct) (params windows.RtlUserProcessParameters, err error) {
+func getUserProcessParams(handle syswin.Handle, pbi windows.ProcessBasicInformationStruct) (params windows.RtlUserProcessParameters, err error) {
 	const is32bitProc = unsafe.Sizeof(uintptr(0)) == 4
 
 	// Offset of params field within PEB structure.
@@ -180,7 +180,8 @@ func getUserProcessParams(handle syscall.Handle, pbi windows.ProcessBasicInforma
 	// Read the PEB from the target process memory
 	pebSize := paramsOffset + 8
 	peb := make([]byte, pebSize)
-	nRead, err := windows.ReadProcessMemory(handle, pbi.PebBaseAddress, peb)
+	var nRead uintptr
+	err = syswin.ReadProcessMemory(handle, pbi.PebBaseAddress, &peb[0], uintptr(pebSize), &nRead)
 	if err != nil {
 		return params, err
 	}
@@ -193,7 +194,7 @@ func getUserProcessParams(handle syscall.Handle, pbi windows.ProcessBasicInforma
 
 	// Read the RTL_USER_PROCESS_PARAMETERS from the target process memory
 	paramsBuf := make([]byte, windows.SizeOfRtlUserProcessParameters)
-	nRead, err = windows.ReadProcessMemory(handle, paramsAddr, paramsBuf)
+	err = syswin.ReadProcessMemory(handle, paramsAddr, &paramsBuf[0], uintptr(windows.SizeOfRtlUserProcessParameters), &nRead)
 	if err != nil {
 		return params, err
 	}
