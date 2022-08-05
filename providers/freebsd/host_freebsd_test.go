@@ -21,10 +21,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/elastic/go-sysinfo/internal/registry"
-	"github.com/elastic/go-sysinfo/types"
 )
 
 var _ registry.HostProvider = freebsdSystem{}
@@ -49,26 +46,4 @@ func TestHostMemoryInfo(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-}
-
-func TestHostNetworkCounters(t *testing.T) {
-	host, err := newFreeBSDSystem("").Host()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	s, err := host.(types.NetworkCounters).NetworkCounters()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	assert.NotEmpty(t, s.Netstat.IPExt)
-	assert.NotEmpty(t, s.Netstat.TCPExt)
-	assert.NotEmpty(t, s.SNMP.IP)
-
-	data, err := json.MarshalIndent(s, "", "  ")
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Log(string(data))
 }

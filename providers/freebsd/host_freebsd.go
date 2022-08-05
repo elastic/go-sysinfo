@@ -24,7 +24,6 @@ import "C"
 
 import (
 	"os"
-	"io/ioutil"
 	"path/filepath"
 	"time"
 
@@ -93,30 +92,6 @@ func newHost() (*host, error) {
 	r.time(h)
 	r.uniqueID(h)
 	return h, r.Err()
-}
-
-
-// NetworkCounters reports data from /proc/net on linux
-func (h *host) NetworkCounters() (*types.NetworkCountersInfo, error) {
-	snmpRaw, err := ioutil.ReadFile(h.procFS.path("net/snmp"))
-	if err != nil {
-		return nil, err
-	}
-	snmp, err := getNetSnmpStats(snmpRaw)
-	if err != nil {
-		return nil, err
-	}
-
-	netstatRaw, err := ioutil.ReadFile(h.procFS.path("net/netstat"))
-	if err != nil {
-		return nil, err
-	}
-	netstat, err := getNetstatStats(netstatRaw)
-	if err != nil {
-		return nil, err
-	}
-
-	return &types.NetworkCountersInfo{SNMP: snmp, Netstat: netstat}, nil
 }
 
 type reader struct {
