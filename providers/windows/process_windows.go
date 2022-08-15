@@ -125,7 +125,7 @@ func (p *process) init() error {
 	var args []string
 	var cwd string
 	var ppid int
-	pbi, err := getProcessBasicInformation(handle)
+	pbi, err := getProcessBasicInformation(syswin.Handle(handle))
 	if err == nil {
 		ppid = int(pbi.InheritedFromUniqueProcessID)
 		userProcParams, err := getUserProcessParams(syswin.Handle(handle), pbi)
@@ -159,8 +159,9 @@ func (p *process) init() error {
 	return nil
 }
 
-func getProcessBasicInformation(handle syscall.Handle) (pbi windows.ProcessBasicInformationStruct, err error) {
-	actualSize, err := windows.NtQueryInformationProcess(handle, windows.ProcessBasicInformation, unsafe.Pointer(&pbi), uint32(windows.SizeOfProcessBasicInformationStruct))
+func getProcessBasicInformation(handle syswin.Handle) (pbi windows.ProcessBasicInformationStruct, err error) {
+	var actualSize uint32
+	err = syswin.NtQueryInformationProcess(handle, syswin.ProcessBasicInformation, unsafe.Pointer(&pbi), uint32(windows.SizeOfProcessBasicInformationStruct), &actualSize)
 	if actualSize < uint32(windows.SizeOfProcessBasicInformationStruct) {
 		return pbi, errors.New("bad size for PROCESS_BASIC_INFORMATION")
 	}
