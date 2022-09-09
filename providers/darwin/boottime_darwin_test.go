@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestBoottime(t *testing.T) {
+func TestBootTime(t *testing.T) {
 	bt, err := BootTime()
 	assert.NoError(t, err)
 
