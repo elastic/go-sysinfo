@@ -15,24 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build amd64 || arm64
-// +build amd64 arm64
-
 package darwin
 
 import (
-	"fmt"
+	"testing"
 
-	"golang.org/x/sys/unix"
+	"github.com/stretchr/testify/assert"
 )
 
-const hardwareMIB = "hw.machine"
-
-func Architecture() (string, error) {
-	arch, err := unix.Sysctl(hardwareMIB)
-	if err != nil {
-		return "", fmt.Errorf("failed to get architecture: %w", err)
-	}
-
-	return arch, nil
+func TestArchitecture(t *testing.T) {
+	a, err := Architecture()
+	assert.NoError(t, err)
+	assert.NotEmpty(t, a)
 }
