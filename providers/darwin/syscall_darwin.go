@@ -213,7 +213,7 @@ func getHostVMInfo64() (*vmStatistics64Data, error) {
 func getPageSize() (uint64, error) {
 	i, err := unix.SysctlUint32("vm.pagesize")
 	if err != nil {
-		return 0, fmt.Errorf("host_page_size returned %w", err)
+		return 0, fmt.Errorf("vm.pagesize returned %w", err)
 	}
 
 	return uint64(i), nil
