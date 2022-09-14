@@ -38,27 +38,6 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-func sysctl(name string, value interface{}, args ...int) error {
-	data, err := unix.SysctlRaw(name, args...)
-	if err != nil {
-		return err
-	}
-
-	switch v := value.(type) {
-	case *[]byte:
-		out := make([]byte, len(data))
-		copy(out, data)
-		*v = out
-		return nil
-	default:
-		return binary.Read(bytes.NewReader(data), binary.LittleEndian, v)
-	}
-}
-
-func sysctlByName(name string, out interface{}) error {
-	return sysctl(name, out)
-}
-
 type cpuUsage struct {
 	User   uint32
 	System uint32
@@ -127,8 +106,14 @@ const vmSwapUsageMIB = "vm.swapusage"
 
 func getSwapUsage() (*swapUsage, error) {
 	var swap swapUsage
-	if err := sysctlByName(vmSwapUsageMIB, &swap); err != nil {
+	data, err := unix.SysctlRaw(vmSwapUsageMIB);
+	if err != nil {
 		return nil, err
 	}
+
+	if err := binary.Read(bytes.NewReader(data), binary.LittleEndian, &swap); err != nil {
+		return nil, err
+	}
+
 	return &swap, nil
 }

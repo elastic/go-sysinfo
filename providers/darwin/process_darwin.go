@@ -36,6 +36,7 @@ import (
 	"unsafe"
 
 	"github.com/elastic/go-sysinfo/types"
+	"golang.org/x/sys/unix"
 )
 
 //go:generate sh -c "go tool cgo -godefs defs_darwin.go > ztypes_darwin.go"
@@ -218,8 +219,8 @@ var nullTerminator = []byte{0}
 // callbacks params are optional,
 // up to the caller as to which pieces of data they want
 func kern_procargs(pid int, p *process) error {
-	var data []byte
-	if err := sysctl("kern.procargs2", &data, pid); err != nil {
+	data, err := unix.SysctlRaw("kern.procargs2", pid)
+	if err != nil {
 		return nil
 	}
 	buf := bytes.NewBuffer(data)
