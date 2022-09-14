@@ -106,7 +106,7 @@ const vmSwapUsageMIB = "vm.swapusage"
 
 func getSwapUsage() (*swapUsage, error) {
 	var swap swapUsage
-	data, err := unix.SysctlRaw(vmSwapUsageMIB);
+	data, err := unix.SysctlRaw(vmSwapUsageMIB)
 	if err != nil {
 		return nil, err
 	}
