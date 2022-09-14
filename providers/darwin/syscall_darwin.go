@@ -36,6 +36,8 @@ import (
 	"sync"
 	"syscall"
 	"unsafe"
+
+	"golang.org/x/sys/unix"
 )
 
 // Single-word zero for use when we need a valid pointer to 0 bytes.
@@ -209,15 +211,12 @@ func getHostVMInfo64() (*vmStatistics64Data, error) {
 }
 
 func getPageSize() (uint64, error) {
-	var pageSize vmSize
-	status := C.host_page_size(
-		C.host_t(C.mach_host_self()),
-		(*C.vm_size_t)(unsafe.Pointer(&pageSize)))
-	if status != C.KERN_SUCCESS {
-		return 0, fmt.Errorf("host_page_size returned status %d", status)
+	i, err := unix.SysctlUint32("vm.pagesize")
+	if err != nil {
+		return 0, fmt.Errorf("host_page_size returned %w", err)
 	}
 
-	return uint64(pageSize), nil
+	return uint64(i), nil
 }
 
 // From sysctl.h - xsw_usage.
