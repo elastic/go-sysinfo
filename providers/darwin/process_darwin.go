@@ -35,8 +35,9 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/elastic/go-sysinfo/types"
 	"golang.org/x/sys/unix"
+
+	"github.com/elastic/go-sysinfo/types"
 )
 
 //go:generate sh -c "go tool cgo -godefs defs_darwin.go > ztypes_darwin.go"
