@@ -15,24 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build amd64 || arm64
-// +build amd64 arm64
-
 package darwin
 
 import (
-	"fmt"
+	"testing"
 
-	"golang.org/x/sys/unix"
+	"github.com/stretchr/testify/assert"
 )
 
-const hwMemsizeMIB = "hw.memsize"
-
-func MemTotal() (uint64, error) {
-	size, err := unix.SysctlUint64(hwMemsizeMIB)
-	if err != nil {
-		return 0, fmt.Errorf("failed to get mem total: %w", err)
-	}
-
-	return size, nil
+func TestArchitecture(t *testing.T) {
+	a, err := Architecture()
+	assert.NoError(t, err)
+	assert.NotEmpty(t, a)
 }
