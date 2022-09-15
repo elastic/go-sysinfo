@@ -35,6 +35,8 @@ import (
 	"time"
 	"unsafe"
 
+	"golang.org/x/sys/unix"
+
 	"github.com/elastic/go-sysinfo/types"
 )
 
@@ -218,9 +220,8 @@ var nullTerminator = []byte{0}
 // callbacks params are optional,
 // up to the caller as to which pieces of data they want
 func kern_procargs(pid int, p *process) error {
-	mib := []C.int{C.CTL_KERN, C.KERN_PROCARGS2, C.int(pid)}
-	var data []byte
-	if err := sysctl(mib, &data); err != nil {
+	data, err := unix.SysctlRaw("kern.procargs2", pid)
+	if err != nil {
 		return nil
 	}
 	buf := bytes.NewBuffer(data)

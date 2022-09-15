@@ -71,9 +71,12 @@ func (h *host) Memory() (*types.HostMemoryInfo, error) {
 	var mem types.HostMemoryInfo
 
 	// Total physical memory.
-	if err := sysctlByName("hw.memsize", &mem.Total); err != nil {
+	total, err := MemTotal()
+	if err != nil {
 		return nil, fmt.Errorf("failed to get total physical memory: %w", err)
 	}
+
+	mem.Total = total
 
 	// Page size for computing byte totals.
 	pageSizeBytes, err := getPageSize()
