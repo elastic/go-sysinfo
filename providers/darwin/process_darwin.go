@@ -43,37 +43,21 @@ import (
 //go:generate sh -c "go tool cgo -godefs defs_darwin.go > ztypes_darwin.go"
 
 func (s darwinSystem) Processes() ([]types.Process, error) {
-	n, err := C.proc_listallpids(nil, 0)
+	ps, err := unix.SysctlKinfoProcSlice("kern.proc.all")
 	if err != nil {
-		return nil, fmt.Errorf("error getting process count from proc_listallpids (n = %v): %w", n, err)
-	} else if n <= 0 {
-		return nil, fmt.Errorf("proc_listallpids returned %v", n)
+		return nil, fmt.Errorf("failed to read process table: %w", err)
 	}
 
-	var pid C.int
-	bufsize := n * C.int(unsafe.Sizeof(pid))
-	buf := make([]byte, bufsize)
-	n, err = C.proc_listallpids(unsafe.Pointer(&buf[0]), bufsize)
-	if err != nil {
-		return nil, fmt.Errorf("error getting processes from proc_listallpids (n = %v): %w", n, err)
-	} else if n <= 0 {
-		return nil, fmt.Errorf("proc_listallpids returned %v", n)
-	}
-
-	bbuf := bytes.NewBuffer(buf)
-	processes := make([]types.Process, 0, n)
-	for i := 0; i < int(n); i++ {
-		err = binary.Read(bbuf, binary.LittleEndian, &pid)
-		if err != nil {
-			return nil, fmt.Errorf("error reading binary list of PIDs: %w", err)
-		}
-
+	processes := make([]types.Process, 0, len(ps))
+	for _, kp := range ps {
+		pid := kp.Proc.P_pid
 		if pid == 0 {
 			continue
 		}
 
 		processes = append(processes, &process{pid: int(pid)})
 	}
+
 	return processes, nil
 }
 
