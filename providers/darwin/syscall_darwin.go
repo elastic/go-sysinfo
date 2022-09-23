@@ -15,25 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build (amd64 && cgo) || (arm64 && cgo)
-// +build amd64,cgo arm64,cgo
+//go:build amd64 || arm64
+// +build amd64 arm64
 
 package darwin
-
-/*
-#cgo LDFLAGS:-lproc
-#include <sys/sysctl.h>
-#include <mach/mach_time.h>
-#include <mach/mach_host.h>
-#include <unistd.h>
-*/
-import "C"
 
 import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	"unsafe"
 
 	"golang.org/x/sys/unix"
 )
@@ -43,43 +33,6 @@ type cpuUsage struct {
 	System uint32
 	Idle   uint32
 	Nice   uint32
-}
-
-func getHostCPULoadInfo() (*cpuUsage, error) {
-	var count C.mach_msg_type_number_t = C.HOST_CPU_LOAD_INFO_COUNT
-	var cpu cpuUsage
-	status := C.host_statistics(C.host_t(C.mach_host_self()),
-		C.HOST_CPU_LOAD_INFO,
-		C.host_info_t(unsafe.Pointer(&cpu)),
-		&count)
-
-	if status != C.KERN_SUCCESS {
-		return nil, fmt.Errorf("host_statistics returned status %d", status)
-	}
-
-	return &cpu, nil
-}
-
-// getClockTicks returns the number of click ticks in one jiffie.
-func getClockTicks() int {
-	return int(C.sysconf(C._SC_CLK_TCK))
-}
-
-func getHostVMInfo64() (*vmStatistics64Data, error) {
-	var count C.mach_msg_type_number_t = C.HOST_VM_INFO64_COUNT
-
-	var vmStat vmStatistics64Data
-	status := C.host_statistics64(
-		C.host_t(C.mach_host_self()),
-		C.HOST_VM_INFO64,
-		C.host_info_t(unsafe.Pointer(&vmStat)),
-		&count)
-
-	if status != C.KERN_SUCCESS {
-		return nil, fmt.Errorf("host_statistics64 returned status %d", status)
-	}
-
-	return &vmStat, nil
 }
 
 func getPageSize() (uint64, error) {
