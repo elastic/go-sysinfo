@@ -94,3 +94,26 @@ func TestProcessEnvironmentInternal(t *testing.T) {
 
 	assert.Equal(t, "FOO", p.env[fooValueEnvVar])
 }
+
+func TestProcesses(t *testing.T) {
+	var s darwinSystem
+	ps, err := s.Processes()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	pinfo, err := ps[0].Info()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if pinfo.PID == 0 {
+		t.Fatal("empty pid")
+	}
+
+	if pinfo.Exe == "" {
+		t.Fatal("empty exec")
+	}
+
+	t.Log(ps[0].Info())
+}
