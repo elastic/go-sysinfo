@@ -19,8 +19,12 @@
 
 package darwin
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/elastic/go-sysinfo/types"
+)
 
 func MachineID() (string, error) {
-	return "", fmt.Errorf("machineid without cgo not implemented")
+	return "", fmt.Errorf("machineid requires cgo: %w", types.ErrNotImplemented)
 }

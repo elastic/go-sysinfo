@@ -19,10 +19,14 @@
 
 package darwin
 
-import "errors"
+import (
+	"fmt"
+
+	"github.com/elastic/go-sysinfo/types"
+)
 
 func getHostCPULoadInfo() (*cpuUsage, error) {
-	return nil, errors.New("host cpu load without cgo not implemented")
+	return nil, fmt.Errorf("host cpu load requires cgo: %w", types.ErrNotImplemented)
 }
 
 // getClockTicks returns the number of click ticks in one jiffie.
@@ -31,5 +35,5 @@ func getClockTicks() int {
 }
 
 func getHostVMInfo64() (*vmStatistics64Data, error) {
-	return nil, errors.New("host vm info without cgo not implemented")
+	return nil, fmt.Errorf("host vm info requires cgo: %w", types.ErrNotImplemented)
 }

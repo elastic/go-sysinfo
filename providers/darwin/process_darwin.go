@@ -90,12 +90,12 @@ func (p *process) Info() (types.ProcessInfo, error) {
 	}
 
 	var task procTaskAllInfo
-	if err := getProcTaskAllInfo(p.pid, &task); err != nil {
+	if err := getProcTaskAllInfo(p.pid, &task); err != nil && err != types.ErrNotImplemented {
 		return types.ProcessInfo{}, err
 	}
 
 	var vnode procVnodePathInfo
-	if err := getProcVnodePathInfo(p.pid, &vnode); err != nil {
+	if err := getProcVnodePathInfo(p.pid, &vnode); err != nil && err != types.ErrNotImplemented {
 		return types.ProcessInfo{}, err
 	}
 

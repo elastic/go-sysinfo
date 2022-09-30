@@ -19,10 +19,12 @@
 
 package darwin
 
+import "github.com/elastic/go-sysinfo/types"
+
 func getProcTaskAllInfo(pid int, info *procTaskAllInfo) error {
-	return nil
+	return types.ErrNotImplemented
 }
 
 func getProcVnodePathInfo(pid int, info *procVnodePathInfo) error {
-	return nil
+	return types.ErrNotImplemented
 }
