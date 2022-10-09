@@ -43,6 +43,10 @@ pipeline {
             name 'PLATFORM'
             values 'ubuntu-18 && immutable', 'windows-2019 && immutable', 'orka && darwin && x86_64', 'orka && darwin && arm64'
           }
+          axis {
+            name 'CGO_ENABLED'
+            values '0', '1'
+          }
         }
         excludes {
           exclude {
@@ -68,6 +72,9 @@ pipeline {
         }
         stages {
           stage('Test') {
+	    environment {
+	      CGO_ENABLED = "${env.CGO_ENABLED}"
+            }
             options { skipDefaultCheckout() }
             agent { label "${PLATFORM}" }
             steps {
