@@ -22,8 +22,9 @@ import "time"
 // Process is the main wrapper for gathering information on a process
 type Process interface {
 	CPUTimer
-	// On Darwin (macOS) this method returns partial information
-	// with cgo disabled.
+	// Info returns process info.
+	// It may return partial information if the provider
+	// implementation is unable to collect all of the necessary data.
 	Info() (ProcessInfo, error)
 	Memory() (MemoryInfo, error)
 	User() (UserInfo, error)
@@ -101,8 +102,8 @@ type CPUTimer interface {
 	// The User and System fields are guaranteed
 	// to be populated for all platforms, and
 	// for both hosts and processes.
-	// On Darwin (macOS) this returns types.ErrNotImplemented
-	// with cgo disabled.
+	// This may return types.ErrNotImplemented
+	// if the provider cannot implement collection of this data.
 	CPUTime() (CPUTimes, error)
 }
 
