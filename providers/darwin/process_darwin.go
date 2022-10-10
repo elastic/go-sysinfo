@@ -15,32 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build (amd64 && cgo) || (arm64 && cgo)
-// +build amd64,cgo arm64,cgo
+//go:build amd64 || arm64
+// +build amd64 arm64
 
 package darwin
-
-// #cgo LDFLAGS:-lproc
-// #include <sys/sysctl.h>
-// #include <libproc.h>
-import "C"
 
 import (
 	"bytes"
 	"encoding/binary"
-	"errors"
 	"fmt"
 	"os"
 	"strconv"
 	"time"
-	"unsafe"
 
 	"golang.org/x/sys/unix"
 
 	"github.com/elastic/go-sysinfo/types"
 )
-
-//go:generate sh -c "go tool cgo -godefs defs_darwin.go > ztypes_darwin.go"
 
 func (s darwinSystem) Processes() ([]types.Process, error) {
 	ps, err := unix.SysctlKinfoProcSlice("kern.proc.all")
@@ -99,12 +90,12 @@ func (p *process) Info() (types.ProcessInfo, error) {
 	}
 
 	var task procTaskAllInfo
-	if err := getProcTaskAllInfo(p.pid, &task); err != nil {
+	if err := getProcTaskAllInfo(p.pid, &task); err != nil && err != types.ErrNotImplemented {
 		return types.ProcessInfo{}, err
 	}
 
 	var vnode procVnodePathInfo
-	if err := getProcVnodePathInfo(p.pid, &vnode); err != nil {
+	if err := getProcVnodePathInfo(p.pid, &vnode); err != nil && err != types.ErrNotImplemented {
 		return types.ProcessInfo{}, err
 	}
 
@@ -170,32 +161,6 @@ func (p *process) Memory() (types.MemoryInfo, error) {
 			"page_faults": uint64(task.Ptinfo.Faults),
 		},
 	}, nil
-}
-
-func getProcTaskAllInfo(pid int, info *procTaskAllInfo) error {
-	size := C.int(unsafe.Sizeof(*info))
-	ptr := unsafe.Pointer(info)
-
-	n, err := C.proc_pidinfo(C.int(pid), C.PROC_PIDTASKALLINFO, 0, ptr, size)
-	if err != nil {
-		return err
-	} else if n != size {
-		return errors.New("failed to read process info with proc_pidinfo")
-	}
-
-	return nil
-}
-
-func getProcVnodePathInfo(pid int, info *procVnodePathInfo) error {
-	size := C.int(unsafe.Sizeof(*info))
-	ptr := unsafe.Pointer(info)
-
-	n := C.proc_pidinfo(C.int(pid), C.PROC_PIDVNODEPATHINFO, 0, ptr, size)
-	if n != size {
-		return errors.New("failed to read vnode info with proc_pidinfo")
-	}
-
-	return nil
 }
 
 var nullTerminator = []byte{0}

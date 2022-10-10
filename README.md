@@ -59,8 +59,8 @@ This table lists the OS and architectures for which a "provider" is implemented.
 | GOOS / GOARCH  | Requires CGO | Tested |
 |----------------|--------------|--------|
 | aix/ppc64      | x            |        |
-| darwin/amd64   | x            | x      |
-| darwin/arm64   | x            | x      |
+| darwin/amd64   | optional *   | x      |
+| darwin/arm64   | optional *   | x      |
 | linux/386      |              |        |
 | linux/amd64    |              | x      |
 | linux/arm      |              |        |
@@ -76,3 +76,5 @@ This table lists the OS and architectures for which a "provider" is implemented.
 | windows/amd64  |              | x      |
 | windows/arm64  |              |        |
 | windows/arm    |              |        |
+
+* On darwin (macOS) host information like machineid and process information like memory, cpu, user and starttime require cgo.
