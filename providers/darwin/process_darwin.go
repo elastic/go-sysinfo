@@ -46,7 +46,9 @@ func (s darwinSystem) Processes() ([]types.Process, error) {
 			continue
 		}
 
-		processes = append(processes, &process{pid: int(pid)})
+		processes = append(processes, &process{
+			pid: int(pid),
+		})
 	}
 
 	return processes, nil
@@ -118,18 +120,23 @@ func (p *process) Info() (types.ProcessInfo, error) {
 }
 
 func (p *process) User() (types.UserInfo, error) {
-	var task procTaskAllInfo
-	if err := getProcTaskAllInfo(p.pid, &task); err != nil {
+	kproc, err := unix.SysctlKinfoProc("kern.proc.pid", p.pid)
+	if err != nil {
 		return types.UserInfo{}, err
 	}
 
+	egid := ""
+	if len(kproc.Eproc.Ucred.Groups) > 0 {
+		egid = strconv.Itoa(int(kproc.Eproc.Ucred.Groups[0]))
+	}
+
 	return types.UserInfo{
-		UID:  strconv.Itoa(int(task.Pbsd.Pbi_ruid)),
-		EUID: strconv.Itoa(int(task.Pbsd.Pbi_uid)),
-		SUID: strconv.Itoa(int(task.Pbsd.Pbi_svuid)),
-		GID:  strconv.Itoa(int(task.Pbsd.Pbi_rgid)),
-		EGID: strconv.Itoa(int(task.Pbsd.Pbi_gid)),
-		SGID: strconv.Itoa(int(task.Pbsd.Pbi_svgid)),
+		UID:  strconv.Itoa(int(kproc.Eproc.Pcred.P_ruid)),
+		EUID: strconv.Itoa(int(kproc.Eproc.Ucred.Uid)),
+		SUID: strconv.Itoa(int(kproc.Eproc.Pcred.P_svuid)),
+		GID:  strconv.Itoa(int(kproc.Eproc.Pcred.P_rgid)),
+		SGID: strconv.Itoa(int(kproc.Eproc.Pcred.P_svgid)),
+		EGID: egid,
 	}, nil
 }
 
