@@ -115,7 +115,7 @@ func TestProcesses(t *testing.T) {
 		t.Fatal("empty exec")
 	}
 
-	u, err :=  ps[0].User()
+	u, err := ps[0].User()
 	require.NoError(t, err)
 
 	require.NotEmpty(t, u.UID)
