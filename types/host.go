@@ -24,6 +24,7 @@ import "time"
 // implementation is unable to collect all of the necessary data.
 type Host interface {
 	CPUTimer
+	LoadAverage
 	Info() HostInfo
 	Memory() (*HostMemoryInfo, error)
 }
