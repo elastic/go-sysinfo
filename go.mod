@@ -3,6 +3,7 @@ module github.com/elastic/go-sysinfo
 go 1.17
 
 require (
+	github.com/dustin/go-humanize v1.0.0
 	github.com/elastic/go-windows v1.0.0
 	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901
 	github.com/prometheus/procfs v0.0.0-20190425082905-87a4384529e0

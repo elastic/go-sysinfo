@@ -1,3 +1,4 @@
+*~
 *.iml
 *.swp
 *.o
@@ -11,3 +12,6 @@ testing/ssh_config
 testing/ve
 
 build/
+
+/sysinfo
+/cmd/sysinfo/sysinfo
