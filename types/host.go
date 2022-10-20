@@ -24,6 +24,7 @@ import "time"
 // implementation is unable to collect all of the necessary data.
 type Host interface {
 	CPUTimer
+	LoadAverage
 	Info() HostInfo
 	Memory() (*HostMemoryInfo, error)
 }
@@ -98,7 +99,7 @@ type OSInfo struct {
 // LoadAverage is the interface that wraps the LoadAverage method.
 // LoadAverage returns load info on the host
 type LoadAverage interface {
-	LoadAverage() LoadAverageInfo
+	LoadAverage() (*LoadAverageInfo, error)
 }
 
 // LoadAverageInfo contains load statistics
