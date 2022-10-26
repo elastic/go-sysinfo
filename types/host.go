@@ -25,6 +25,7 @@ import "time"
 type Host interface {
 	CPUTimer
 	Info() HostInfo
+	LoadAverage() (*LoadAverageInfo, error)
 	Memory() (*HostMemoryInfo, error)
 }
 

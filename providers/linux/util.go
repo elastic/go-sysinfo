@@ -109,18 +109,3 @@ func parseBytesOrNumber(data []byte) (uint64, error) {
 
 	return num * multiplier, nil
 }
-
-func parseBytesOrFloat(data []byte) (float64, error) {
-	parts := bytes.Fields(data)
-
-	if len(parts) == 0 {
-		return 0, errors.New("empty value")
-	}
-
-	num, err := strconv.ParseFloat(string(parts[0]), 64)
-	if err != nil {
-		return 0, fmt.Errorf("failed to parse value: %w", err)
-	}
-
-	return num, nil
-}
