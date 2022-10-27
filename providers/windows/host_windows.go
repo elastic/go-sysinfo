@@ -78,6 +78,10 @@ func (h *host) Memory() (*types.HostMemoryInfo, error) {
 	}, nil
 }
 
+func (h *host) LoadAverage() (*types.LoadAverageInfo, error) {
+	return nil, types.ErrNotImplemented
+}
+
 func newHost() (*host, error) {
 	h := &host{}
 	r := &reader{}

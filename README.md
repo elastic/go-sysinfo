@@ -35,6 +35,7 @@ that are implemented.
 | `Info()`         | x      | x     | x       | x   |
 | `Memory()`       | x      | x     | x       | x   |
 | `CPUTimer`       | x      | x     | x       | x   |
+| `LoadAverage()`  | x      | x     |         |     |
 | `VMStat`         |        | x     |         |     |
 | `NetworkCounters`|        | x     |         |     |
 
