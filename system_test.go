@@ -246,11 +246,6 @@ func TestHost(t *testing.T) {
 
 	if v, ok := host.(types.LoadAverage); ok {
 		loadAvg, err := v.LoadAverage()
-		if errors.Is(err, types.ErrNotImplemented) {
-			t.Log("LoadAverage not implemented")
-			return
-		}
-
 		if err != nil {
 			t.Fatal(err)
 		}
