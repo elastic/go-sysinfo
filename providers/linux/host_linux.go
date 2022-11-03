@@ -82,6 +82,20 @@ func (h *host) VMStat() (*types.VMStatInfo, error) {
 	return parseVMStat(content)
 }
 
+// LoadAverage reports data from /proc/loadavg on linux.
+func (h *host) LoadAverage() (*types.LoadAverageInfo, error) {
+	loadAvg, err := h.procFS.LoadAvg()
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.LoadAverageInfo{
+		One:     loadAvg.Load1,
+		Five:    loadAvg.Load5,
+		Fifteen: loadAvg.Load15,
+	}, nil
+}
+
 // NetworkCounters reports data from /proc/net on linux
 func (h *host) NetworkCounters() (*types.NetworkCountersInfo, error) {
 	snmpRaw, err := ioutil.ReadFile(h.procFS.path("net/snmp"))

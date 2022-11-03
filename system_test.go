@@ -241,10 +241,22 @@ func TestHost(t *testing.T) {
 	info := host.Info()
 	assert.NotZero(t, info)
 
+	output := map[string]interface{}{}
+	output["host.info"] = info
+
+	if v, ok := host.(types.LoadAverage); ok {
+		loadAvg, err := v.LoadAverage()
+		if err != nil {
+			t.Fatal(err)
+		}
+		output["host.loadavg"] = loadAvg
+	}
+
 	memory, err := host.Memory()
 	if err != nil {
 		t.Fatal(err)
 	}
+	output["host.memory"] = memory
 
 	cpu, err := host.CPUTime()
 	if errors.Is(err, types.ErrNotImplemented) {
@@ -255,12 +267,9 @@ func TestHost(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	output["host.cpu"] = cpu
 
-	logAsJSON(t, map[string]interface{}{
-		"host.info":   info,
-		"host.memory": memory,
-		"host.cpu":    cpu,
-	})
+	logAsJSON(t, output)
 }
 
 func logAsJSON(t testing.TB, v interface{}) {

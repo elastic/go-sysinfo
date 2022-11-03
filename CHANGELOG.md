@@ -13,7 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Remove custom sysctl implementation and partial cgo requirement 
+- Remove custom sysctl implementation and partial cgo requirement
+- Changes on the `Host` and `LoadAverage` interfaces, now implemented by default on Linux and Darwin platforms. [#140](https://github.com/elastic/go-sysinfo/pull/140)
 
 ### Deprecated
 

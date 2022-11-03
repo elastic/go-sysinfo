@@ -72,6 +72,23 @@ func TestHostVMStat(t *testing.T) {
 	t.Log(string(data))
 }
 
+func TestHostLoadAverage(t *testing.T) {
+	host, err := newLinuxSystem("testdata/ubuntu1710").Host()
+	if err != nil {
+		t.Fatal(err)
+	}
+	s, err := host.(types.LoadAverage).LoadAverage()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	data, err := json.Marshal(s)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(string(data))
+}
+
 func TestHostNetworkCounters(t *testing.T) {
 	host, err := newLinuxSystem("testdata/fedora30").Host()
 	if err != nil {
