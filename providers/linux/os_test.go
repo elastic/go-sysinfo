@@ -200,6 +200,23 @@ func TestOperatingSystem(t *testing.T) {
 		}, *os)
 		t.Logf("%#v", os)
 	})
+	t.Run("openeuler20.03", func(t *testing.T) {
+		os, err := getOSInfo("testdata/openeuler20.03")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
+			Family:   "redhat",
+			Platform: "openEuler",
+			Name:     "openEuler",
+			Version:  "20.03 (LTS-SP3)",
+			Major:    20,
+			Minor:    3,
+			Codename: "LTS-SP3",
+		}, *os)
+		t.Logf("%#v", os)
+	})
 	t.Run("oraclelinux7", func(t *testing.T) {
 		os, err := getOSInfo("testdata/oraclelinux7")
 		if err != nil {
