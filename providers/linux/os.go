@@ -37,7 +37,7 @@ const (
 	osRelease      = "/etc/os-release"
 	lsbRelease     = "/etc/lsb-release"
 	distribRelease = "/etc/*-release"
-	versionGrok    = `(?P<version>(?P<major>[0-9]+)\.?(?P<minor>[0-9]+)?\.?(?P<patch>\w+)?)(?: \((?P<codename>\w+)\))?`
+	versionGrok    = `(?P<version>(?P<major>[0-9]+)\.?(?P<minor>[0-9]+)?\.?(?P<patch>\w+)?)(?: \((?P<codename>[\w ]+)\))?`
 )
 
 var (
@@ -50,7 +50,7 @@ var (
 
 // familyMap contains a mapping of family -> []platforms.
 var familyMap = map[string][]string{
-	"redhat": {"redhat", "fedora", "centos", "scientific", "oraclelinux", "ol", "amzn", "rhel"},
+	"redhat": {"redhat", "fedora", "centos", "scientific", "oraclelinux", "ol", "amzn", "rhel", "almalinux"},
 	"debian": {"debian", "ubuntu", "raspbian", "linuxmint"},
 	"suse":   {"suse", "sles", "opensuse"},
 }

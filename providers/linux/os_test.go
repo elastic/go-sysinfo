@@ -29,6 +29,24 @@ import (
 )
 
 func TestOperatingSystem(t *testing.T) {
+	t.Run("almalinux9", func(t *testing.T) {
+		// Data from 'docker pull almalinux:9'.
+		os, err := getOSInfo("testdata/almalinux9")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
+			Family:   "redhat",
+			Platform: "almalinux",
+			Name:     "AlmaLinux",
+			Version:  "9.1 (Lime Lynx)",
+			Major:    9,
+			Minor:    1,
+			Codename: "Lime Lynx",
+		}, *os)
+		t.Logf("%#v", os)
+	})
 	t.Run("amazon2017.03", func(t *testing.T) {
 		os, err := getOSInfo("testdata/amazon2017.03")
 		if err != nil {
