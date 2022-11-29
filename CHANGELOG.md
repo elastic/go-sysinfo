@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+## [1.9.0]
+
+### Added
+
 - Replace pkg/errors with Go 1.13 native errors. [#123](https://github.com/elastic/go-sysinfo/pull/123)
 - Add OS family mappings for `rocky`, `openEuler`, and `almalinux`. [#143](https://github.com/elastic/go-sysinfo/pull/143)
 
@@ -16,12 +28,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Remove custom sysctl implementation and partial cgo requirement. [#135](https://github.com/elastic/go-sysinfo/pull/135)
 - Changes on the `Host` and `LoadAverage` interfaces, now implemented by default on Linux and Darwin platforms. [#140](https://github.com/elastic/go-sysinfo/pull/140)
-
-### Deprecated
-
-### Removed
-
-### Fixed
 
 ## [1.8.1]
 
