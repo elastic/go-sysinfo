@@ -29,6 +29,24 @@ import (
 )
 
 func TestOperatingSystem(t *testing.T) {
+	t.Run("almalinux9", func(t *testing.T) {
+		// Data from 'docker pull almalinux:9'.
+		os, err := getOSInfo("testdata/almalinux9")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
+			Family:   "redhat",
+			Platform: "almalinux",
+			Name:     "AlmaLinux",
+			Version:  "9.1 (Lime Lynx)",
+			Major:    9,
+			Minor:    1,
+			Codename: "Lime Lynx",
+		}, *os)
+		t.Logf("%#v", os)
+	})
 	t.Run("amazon2017.03", func(t *testing.T) {
 		os, err := getOSInfo("testdata/amazon2017.03")
 		if err != nil {
@@ -179,6 +197,41 @@ func TestOperatingSystem(t *testing.T) {
 			Major:    9,
 			Minor:    0,
 			Codename: "Plow",
+		}, *os)
+		t.Logf("%#v", os)
+	})
+	t.Run("rockylinux9", func(t *testing.T) {
+		// Data from 'docker pull rockylinux:9.0'.
+		os, err := getOSInfo("testdata/rockylinux9")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
+			Family:   "redhat",
+			Platform: "rocky",
+			Name:     "Rocky Linux",
+			Version:  "9.0 (Blue Onyx)",
+			Major:    9,
+			Minor:    0,
+			Codename: "Blue Onyx",
+		}, *os)
+		t.Logf("%#v", os)
+	})
+	t.Run("openeuler20.03", func(t *testing.T) {
+		os, err := getOSInfo("testdata/openeuler20.03")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
+			Family:   "redhat",
+			Platform: "openEuler",
+			Name:     "openEuler",
+			Version:  "20.03 (LTS-SP3)",
+			Major:    20,
+			Minor:    3,
+			Codename: "LTS-SP3",
 		}, *os)
 		t.Logf("%#v", os)
 	})
