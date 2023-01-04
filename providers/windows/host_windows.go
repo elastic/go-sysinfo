@@ -87,6 +87,7 @@ func newHost() (*host, error) {
 	r.architecture(h)
 	r.bootTime(h)
 	r.hostname(h)
+	r.fqdn(h)
 	r.network(h)
 	r.kernelVersion(h)
 	r.os(h)
