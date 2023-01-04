@@ -67,6 +67,7 @@ type HostInfo struct {
 	BootTime          time.Time `json:"boot_time"`               // Host boot time.
 	Containerized     *bool     `json:"containerized,omitempty"` // Is the process containerized.
 	Hostname          string    `json:"name"`                    // Hostname
+	FQDN              string    `json:"fqdn"`                    // FQDN
 	IPs               []string  `json:"ip,omitempty"`            // List of all IPs.
 	KernelVersion     string    `json:"kernel_version"`          // Kernel version.
 	MACs              []string  `json:"mac"`                     // List of MAC addresses.

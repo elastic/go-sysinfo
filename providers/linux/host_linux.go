@@ -18,11 +18,14 @@
 package linux
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/joeshaw/multierror"
@@ -138,7 +141,7 @@ func (h *host) CPUTime() (types.CPUTimes, error) {
 }
 
 func newHost(fs procFS) (*host, error) {
-	stat, err := fs.NewStat()
+	stat, err := fs.Stat()
 	if err != nil {
 		return nil, fmt.Errorf("failed to read proc stat: %w", err)
 	}
@@ -149,11 +152,13 @@ func newHost(fs procFS) (*host, error) {
 	r.bootTime(h)
 	r.containerized(h)
 	r.hostname(h)
+	r.fqdn(h)
 	r.network(h)
 	r.kernelVersion(h)
 	r.os(h)
 	r.time(h)
 	r.uniqueID(h)
+
 	return h, r.Err()
 }
 
@@ -208,6 +213,24 @@ func (r *reader) hostname(h *host) {
 		return
 	}
 	h.info.Hostname = v
+}
+
+func (r *reader) fqdn(h *host) {
+	const cmdPath, args = "/bin/hostname", "-f"
+	cmd := exec.Command(cmdPath, args)
+
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+
+	err := cmd.Run()
+	if err != nil {
+		r.addErr(fmt.Errorf("could not get linux FQDN:'%s %s' failed to run: %q: %w",
+			cmdPath, args, strings.Trim(stderr.String(), "\n"), err))
+		return
+	}
+
+	h.info.FQDN = strings.Trim(stdout.String(), "\n")
 }
 
 func (r *reader) network(h *host) {
