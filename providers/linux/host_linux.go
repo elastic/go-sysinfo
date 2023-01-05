@@ -228,6 +228,9 @@ func (r *reader) fqdn(h *host) {
 }
 
 func fqdnC() (string, error) {
+	// Another option could be reading:
+	// - /proc/sys/kernel/hostname
+	// - /proc/sys/kernel/domainname
 	const buffSize = 64
 	buff := make([]byte, buffSize)
 	size := C.size_t(buffSize)

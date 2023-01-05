@@ -27,10 +27,11 @@ import (
 	"github.com/joeshaw/multierror"
 	stdwindows "golang.org/x/sys/windows"
 
+	"github.com/elastic/go-windows"
+
 	"github.com/elastic/go-sysinfo/internal/registry"
 	"github.com/elastic/go-sysinfo/providers/shared"
 	"github.com/elastic/go-sysinfo/types"
-	"github.com/elastic/go-windows"
 )
 
 func init() {
@@ -142,14 +143,31 @@ func (r *reader) hostname(h *host) {
 }
 
 func (r *reader) fqdn(h *host) {
+	hostname, err := getComputerNameEx(stdwindows.ComputerNamePhysicalDnsHostname)
+	if err != nil {
+		r.addErr(fmt.Errorf("could not get windows hostname to build  FQDN: %s", err))
+	}
+
+	dns, err := getComputerNameEx(stdwindows.ComputerNamePhysicalDnsDomain)
+	if err != nil {
+		r.addErr(fmt.Errorf("could not get windows dns to build FQDN: %s", err))
+	}
+	if dns == "" {
+		dns = "lan"
+	}
+
+	h.info.FQDN = fmt.Sprintf("%s.%s", hostname, dns)
+}
+
+func getComputerNameEx(name uint32) (string, error) {
 	size := uint32(64)
+
 	for {
 		buff := make([]uint16, size)
 		err := stdwindows.GetComputerNameEx(
-			stdwindows.ComputerNamePhysicalDnsFullyQualified, &buff[0], &size)
+			name, &buff[0], &size)
 		if err == nil {
-			h.info.FQDN = syscall.UTF16ToString(buff[:size])
-			return
+			return syscall.UTF16ToString(buff[:size]), nil
 		}
 
 		// ERROR_MORE_DATA means buff is too small and size is set to the
@@ -158,10 +176,9 @@ func (r *reader) fqdn(h *host) {
 		if errors.Is(err, syscall.ERROR_MORE_DATA) {
 			if size <= uint32(len(buff)) {
 				// Safeguard to avoid an infinite loop.
-				r.addErr(fmt.Errorf(
+				return "", fmt.Errorf(
 					"windows.GetComputerNameEx returned ERROR_MORE_DATA, " +
-						"but data size should fit into buffer"))
-				return
+						"but data size should fit into buffer")
 			} else {
 				// Grow the buffer and try again.
 				// Should we limit its growth?
@@ -170,7 +187,7 @@ func (r *reader) fqdn(h *host) {
 			}
 		}
 
-		r.addErr(fmt.Errorf("could not get windows FQDN: could not get windows.ComputerNamePhysicalDnsFullyQualified: %w", err))
+		return "", fmt.Errorf("could not get windows FQDN: could not get windows.ComputerNamePhysicalDnsFullyQualified: %w", err)
 	}
 }
 

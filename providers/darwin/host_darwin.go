@@ -20,11 +20,13 @@
 
 package darwin
 
+import "C"
 import (
 	"errors"
 	"fmt"
 	"os"
 	"time"
+	"unsafe"
 
 	"github.com/joeshaw/multierror"
 
@@ -160,6 +162,7 @@ func newHost() (*host, error) {
 	r.architecture(h)
 	r.bootTime(h)
 	r.hostname(h)
+	r.fqdn(h)
 	r.network(h)
 	r.kernelVersion(h)
 	r.os(h)
@@ -211,6 +214,44 @@ func (r *reader) hostname(h *host) {
 		return
 	}
 	h.info.Hostname = v
+}
+
+func (r *reader) fqdn(h *host) {
+	fqdn, err := fqdnC()
+	if err != nil {
+		r.addErr(fmt.Errorf("could not get linux FQDN: %w", err))
+		return
+	}
+
+	h.info.FQDN = fqdn
+}
+
+func fqdnC() (string, error) {
+	// Another option could be reading:
+	// - /proc/sys/kernel/hostname
+	// - /proc/sys/kernel/domainname
+	const buffSize = 64
+	buff := make([]byte, buffSize)
+	size := C.size_t(buffSize)
+	cString := C.CString(string(buff))
+	defer C.free(unsafe.Pointer(cString))
+
+	_, errno := C.gethostname(cString, size)
+	if errno != nil {
+		return "", fmt.Errorf("syscall gethostname errored: %v", errno)
+	}
+	var hostname string = C.GoString(cString)
+
+	_, errno = C.getdomainname(cString, size)
+	if errno != nil {
+		return "", fmt.Errorf("syscall getdomainname errored: %v", errno)
+	}
+	var domain string = C.GoString(cString)
+	if domain == "" || domain == "(none)" { // mimicking 'hostname -f' behaviour
+		domain = "lan"
+	}
+
+	return fmt.Sprintf("%s.%s", hostname, domain), nil
 }
 
 func (r *reader) network(h *host) {

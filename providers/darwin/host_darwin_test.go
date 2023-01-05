@@ -15,7 +15,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package windows
+//go:build amd64 || arm64
+// +build amd64 arm64
+
+package darwin
 
 import (
 	"encoding/json"
@@ -24,10 +27,10 @@ import (
 	"github.com/elastic/go-sysinfo/internal/registry"
 )
 
-var _ registry.HostProvider = windowsSystem{}
+var _ registry.HostProvider = darwinSystem{}
 
 func TestHost(t *testing.T) {
-	host, err := windowsSystem{}.Host()
+	host, err := darwinSystem{}.Host()
 	if err != nil {
 		t.Fatal(err)
 	}
