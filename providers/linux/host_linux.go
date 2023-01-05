@@ -125,7 +125,7 @@ func (h *host) NetworkCounters() (*types.NetworkCountersInfo, error) {
 }
 
 func (h *host) CPUTime() (types.CPUTimes, error) {
-	stat, err := h.procFS.NewStat()
+	stat, err := h.procFS.Stat()
 	if err != nil {
 		return types.CPUTimes{}, err
 	}
