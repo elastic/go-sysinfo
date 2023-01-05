@@ -17,16 +17,18 @@
 
 package linux
 
+// #include <unistd.h>
+// #include <stdlib.h>
+import "C"
+
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path/filepath"
-	"strings"
 	"time"
+	"unsafe"
 
 	"github.com/joeshaw/multierror"
 	"github.com/prometheus/procfs"
@@ -216,21 +218,38 @@ func (r *reader) hostname(h *host) {
 }
 
 func (r *reader) fqdn(h *host) {
-	const cmdPath, args = "/bin/hostname", "-f"
-	cmd := exec.Command(cmdPath, args)
-
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-
-	err := cmd.Run()
+	fqdn, err := fqdnC()
 	if err != nil {
-		r.addErr(fmt.Errorf("could not get linux FQDN:'%s %s' failed to run: %q: %w",
-			cmdPath, args, strings.Trim(stderr.String(), "\n"), err))
+		r.addErr(fmt.Errorf("could not get linux FQDN: %w", err))
 		return
 	}
 
-	h.info.FQDN = strings.Trim(stdout.String(), "\n")
+	h.info.FQDN = fqdn
+}
+
+func fqdnC() (string, error) {
+	const buffSize = 64
+	buff := make([]byte, buffSize)
+	size := C.size_t(buffSize)
+	cString := C.CString(string(buff))
+	defer C.free(unsafe.Pointer(cString))
+
+	_, errno := C.gethostname(cString, size)
+	if errno != nil {
+		return "", fmt.Errorf("syscall gethostname errored: %v", errno)
+	}
+	var hostname string = C.GoString(cString)
+
+	_, errno = C.getdomainname(cString, size)
+	if errno != nil {
+		return "", fmt.Errorf("syscall getdomainname errored: %v", errno)
+	}
+	var domain string = C.GoString(cString)
+	if domain == "" || domain == "(none)" { // mimicking 'hostname -f' behaviour
+		domain = "lan"
+	}
+
+	return fmt.Sprintf("%s.%s", hostname, domain), nil
 }
 
 func (r *reader) network(h *host) {
