@@ -235,6 +235,35 @@ func TestOperatingSystem(t *testing.T) {
 		}, *os)
 		t.Logf("%#v", os)
 	})
+	t.Run("opensuse-leap15.4", func(t *testing.T) {
+		os, err := getOSInfo("testdata/opensuse-leap15.4")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
+			Family:   "suse",
+			Platform: "opensuse-leap",
+			Name:     "openSUSE Leap",
+			Version:  "15.4",
+			Major:    15,
+			Minor:    4,
+		}, *os)
+		t.Logf("%#v", os)
+	})
+	t.Run("opensuse-tumbleweed", func(t *testing.T) {
+		os, err := getOSInfo("testdata/opensuse-tumbleweed")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
+			Family:   "suse",
+			Platform: "opensuse-tumbleweed",
+			Name:     "openSUSE Tumbleweed",
+		}, *os)
+		t.Logf("%#v", os)
+	})
 	t.Run("oraclelinux7", func(t *testing.T) {
 		os, err := getOSInfo("testdata/oraclelinux7")
 		if err != nil {
