@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build cgo && (amd64 || arm64)
+//go:build cgo
 
 package linux
 
