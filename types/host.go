@@ -63,18 +63,20 @@ type VMStat interface {
 
 // HostInfo contains basic host information.
 type HostInfo struct {
-	Architecture      string    `json:"architecture"`            // Hardware architecture (e.g. x86_64, arm, ppc, mips).
-	BootTime          time.Time `json:"boot_time"`               // Host boot time.
-	Containerized     *bool     `json:"containerized,omitempty"` // Is the process containerized.
-	Hostname          string    `json:"name"`                    // Hostname
-	FQDN              string    `json:"fqdn"`                    // FQDN
-	IPs               []string  `json:"ip,omitempty"`            // List of all IPs.
-	KernelVersion     string    `json:"kernel_version"`          // Kernel version.
-	MACs              []string  `json:"mac"`                     // List of MAC addresses.
-	OS                *OSInfo   `json:"os"`                      // OS information.
-	Timezone          string    `json:"timezone"`                // System timezone.
-	TimezoneOffsetSec int       `json:"timezone_offset_sec"`     // Timezone offset (seconds from UTC).
-	UniqueID          string    `json:"id,omitempty"`            // Unique ID of the host (optional).
+	Architecture  string    `json:"architecture"`            // Hardware architecture (e.g. x86_64, arm, ppc, mips).
+	BootTime      time.Time `json:"boot_time"`               // Host boot time.
+	Containerized *bool     `json:"containerized,omitempty"` // Is the process containerized.
+	Hostname      string    `json:"name"`                    // Hostname
+	// FQDN is the Fully qualified domain name, for linux and darwin it requires CGO.
+	// if CGO is not enabled it'll fallback to os.Hostname(), the same as Hostname.
+	FQDN              string   `json:"fqdn"`
+	IPs               []string `json:"ip,omitempty"`        // List of all IPs.
+	KernelVersion     string   `json:"kernel_version"`      // Kernel version.
+	MACs              []string `json:"mac"`                 // List of MAC addresses.
+	OS                *OSInfo  `json:"os"`                  // OS information.
+	Timezone          string   `json:"timezone"`            // System timezone.
+	TimezoneOffsetSec int      `json:"timezone_offset_sec"` // Timezone offset (seconds from UTC).
+	UniqueID          string   `json:"id,omitempty"`        // Unique ID of the host (optional).
 }
 
 // Uptime returns the system uptime
