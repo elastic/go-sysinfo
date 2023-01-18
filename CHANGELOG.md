@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add OS family mappings for `opensuse-leap` and `opensuse-tumbleweed`. [#146](https://github.com/elastic/go-sysinfo/pull/146)
+
 ### Changed
 
 ### Deprecated
