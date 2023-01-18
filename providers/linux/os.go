@@ -155,6 +155,11 @@ func makeOSInfo(osRelease map[string]string) (*types.OSInfo, error) {
 		Codename: osRelease["VERSION_CODENAME"],
 	}
 
+	if os.Version == "" {
+		// Fallback to VERSION_ID if VERSION is empty.
+		os.Version = osRelease["VERSION_ID"]
+	}
+
 	if os.Codename == "" {
 		// Some OSes uses their own CODENAME keys (e.g UBUNTU_CODENAME) or we
 		// can get the DISTRIB_CODENAME value from the lsb-release data.

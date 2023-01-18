@@ -261,6 +261,8 @@ func TestOperatingSystem(t *testing.T) {
 			Family:   "suse",
 			Platform: "opensuse-tumbleweed",
 			Name:     "openSUSE Tumbleweed",
+			Version:  "20230108",
+			Major:    20230108,
 		}, *os)
 		t.Logf("%#v", os)
 	})
