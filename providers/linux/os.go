@@ -53,7 +53,7 @@ var familyMap = map[string][]string{
 	"redhat": {"redhat", "fedora", "centos", "scientific", "oraclelinux", "ol",
 		"amzn", "rhel", "almalinux", "openeuler", "rocky"},
 	"debian": {"debian", "ubuntu", "raspbian", "linuxmint"},
-	"suse":   {"suse", "sles", "opensuse"},
+	"suse":   {"suse", "sles", "opensuse", "opensuse-leap", "opensuse-tumbleweed"},
 }
 
 var platformToFamilyMap map[string]string
@@ -153,6 +153,11 @@ func makeOSInfo(osRelease map[string]string) (*types.OSInfo, error) {
 		Version:  osRelease["VERSION"],
 		Build:    osRelease["BUILD_ID"],
 		Codename: osRelease["VERSION_CODENAME"],
+	}
+
+	if os.Version == "" {
+		// Fallback to VERSION_ID if VERSION is empty.
+		os.Version = osRelease["VERSION_ID"]
 	}
 
 	if os.Codename == "" {
