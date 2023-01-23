@@ -67,10 +67,13 @@ type HostInfo struct {
 	BootTime      time.Time `json:"boot_time"`               // Host boot time.
 	Containerized *bool     `json:"containerized,omitempty"` // Is the process containerized.
 	Hostname      string    `json:"name"`                    // Hostname
-	Domain        string    `json:"domain"`                  // Domain
-	// FQDN is the Fully qualified domain name, for linux and darwin it requires CGO.
-	// if CGO is not enabled it'll fallback to os.Hostname(), the same as Hostname.
-	// If no domain can be obtained, .lan will be used instead.
+	// Domain requires Cgo for linux and darwin, therefore it'll be empty if Cgo
+	// is disabled.
+	Domain string `json:"domain"` // Domain
+	// FQDN (Fully qualified domain name) depends on Domain and therefore on Cgo
+	// for linux and darwin.
+	// When Cgo is disabled, FQDN is empty. If Domain is empty, but Cgo is enabled,
+	// FQDN will be "hostname.lan".
 	FQDN              string   `json:"fqdn"`
 	IPs               []string `json:"ip,omitempty"`        // List of all IPs.
 	KernelVersion     string   `json:"kernel_version"`      // Kernel version.
