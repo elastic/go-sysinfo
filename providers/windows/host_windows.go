@@ -154,7 +154,7 @@ func (r *reader) domain(h *host) {
 func (r *reader) fqdn(h *host) {
 	hostname, err := os.Hostname()
 
-	dnsDomain, err := getComputerNameEx(stdwindows.ComputerNamePhysicalDnsDomain)
+	dnsDomain, err := domain
 	if err != nil {
 		r.addErr(fmt.Errorf("could not get windows dnsDomain to build FQDN: %s", err))
 	}
