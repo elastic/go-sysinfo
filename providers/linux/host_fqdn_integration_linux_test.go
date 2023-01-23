@@ -75,12 +75,10 @@ func TestHost_FQDN_Domain_NoCgo(t *testing.T) {
 func TestHost_FQDN(t *testing.T) {
 	tcs := []struct {
 		name string
-		want string
 		cf   container.Config
 	}{
 		{
 			name: "debian Cgo with domain",
-			want: "debian.cgo",
 			cf: container.Config{
 				Hostname:     wantHostname,
 				Domainname:   wantDomainCgo,
@@ -95,7 +93,6 @@ func TestHost_FQDN(t *testing.T) {
 		},
 		{
 			name: "debian Cgo no domain",
-			want: "debian.cgo",
 			cf: container.Config{
 				Hostname:     wantHostname,
 				AttachStderr: testing.Verbose(),
@@ -109,7 +106,6 @@ func TestHost_FQDN(t *testing.T) {
 		},
 		{
 			name: "debian no Cgo",
-			want: "debian.nocgo",
 			cf: container.Config{
 				Hostname:     wantHostname,
 				AttachStderr: testing.Verbose(),
