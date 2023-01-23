@@ -52,7 +52,7 @@ func domain() (string, error) {
 	cString := C.CString(string(buff))
 	defer C.free(unsafe.Pointer(cString))
 
-	_, errno = C.getdomainname(cString, C.int(size))
+	_, errno := C.getdomainname(cString, C.int(size))
 	if errno != nil {
 		return "", fmt.Errorf("syscall getdomainname errored: %v", errno)
 	}
