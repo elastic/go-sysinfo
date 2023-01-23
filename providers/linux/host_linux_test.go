@@ -34,7 +34,6 @@ func TestHost(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	info := host.Info()
 	data, _ := json.MarshalIndent(info, "", "  ")
 	t.Log(string(data))

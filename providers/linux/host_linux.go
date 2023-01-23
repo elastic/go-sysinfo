@@ -149,6 +149,7 @@ func newHost(fs procFS) (*host, error) {
 	r.bootTime(h)
 	r.containerized(h)
 	r.hostname(h)
+	r.domain(h)
 	r.fqdn(h)
 	r.network(h)
 	r.kernelVersion(h)
@@ -210,6 +211,14 @@ func (r *reader) hostname(h *host) {
 		return
 	}
 	h.info.Hostname = v
+}
+
+func (r *reader) domain(h *host) {
+	v, err := domain()
+	if r.addErr(err) {
+		return
+	}
+	h.info.Domain = v
 }
 
 func (r *reader) fqdn(h *host) {

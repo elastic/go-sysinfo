@@ -19,6 +19,10 @@
 
 package darwin
 
-import "os"
+func fqdn() (string, error) {
+	return "", nil
+}
 
-func fqdn() (string, error) { return os.Hostname() }
+func domain() (string, error) {
+	return "", nil
+}

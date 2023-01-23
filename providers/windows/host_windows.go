@@ -88,6 +88,7 @@ func newHost() (*host, error) {
 	r.architecture(h)
 	r.bootTime(h)
 	r.hostname(h)
+	r.domain(h)
 	r.fqdn(h)
 	r.network(h)
 	r.kernelVersion(h)
@@ -142,21 +143,35 @@ func (r *reader) hostname(h *host) {
 	h.info.Hostname = v
 }
 
+func (r *reader) domain(h *host) {
+	v, err := domain
+	if r.addErr(err) {
+		return
+	}
+	h.info.Domain = v
+}
+
 func (r *reader) fqdn(h *host) {
-	hostname, err := getComputerNameEx(stdwindows.ComputerNamePhysicalDnsHostname)
+	hostname, err := os.Hostname()
+
+	dnsDomain, err := getComputerNameEx(stdwindows.ComputerNamePhysicalDnsDomain)
 	if err != nil {
-		r.addErr(fmt.Errorf("could not get windows hostname to build  FQDN: %s", err))
+		r.addErr(fmt.Errorf("could not get windows dnsDomain to build FQDN: %s", err))
+	}
+	if dnsDomain == "" {
+		dnsDomain = "lan"
 	}
 
+	h.info.FQDN = fmt.Sprintf("%s.%s", hostname, dnsDomain)
+}
+
+func domain() {
 	dns, err := getComputerNameEx(stdwindows.ComputerNamePhysicalDnsDomain)
 	if err != nil {
-		r.addErr(fmt.Errorf("could not get windows dns to build FQDN: %s", err))
-	}
-	if dns == "" {
-		dns = "lan"
+		return "", fmt.Errorf("could not get windows dns to build FQDN: %s", err)
 	}
 
-	h.info.FQDN = fmt.Sprintf("%s.%s", hostname, dns)
+	return dns, nil
 }
 
 func getComputerNameEx(name uint32) (string, error) {

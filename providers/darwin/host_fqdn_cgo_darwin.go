@@ -24,30 +24,38 @@ package darwin
 import "C"
 import (
 	"fmt"
+	"os"
 	"unsafe"
 )
 
 func fqdn() (string, error) {
+	hostname, err := os.Hostname()
+	if err != nil {
+		return "", err
+	}
+
+	domain, err := domain()
+	if err != nil {
+		return "", err
+	}
+	if domain == "" || domain == "(none)" { // mimicking 'hostname -f' behaviour
+		domain = "lan"
+	}
+
+	return fmt.Sprintf("%s.%s", hostname, domain), nil
+}
+
+func domain() (string, error) {
 	const buffSize = 64
 	buff := make([]byte, buffSize)
 	size := buffSize
 	cString := C.CString(string(buff))
 	defer C.free(unsafe.Pointer(cString))
 
-	_, errno := C.gethostname(cString, C.size_t(size))
-	if errno != nil {
-		return "", fmt.Errorf("syscall gethostname errored: %v", errno)
-	}
-	var hostname string = C.GoString(cString)
-
 	_, errno = C.getdomainname(cString, C.int(size))
 	if errno != nil {
 		return "", fmt.Errorf("syscall getdomainname errored: %v", errno)
 	}
-	var domain string = C.GoString(cString)
-	if domain == "" || domain == "(none)" { // mimicking 'hostname -f' behaviour
-		domain = "lan"
-	}
 
-	return fmt.Sprintf("%s.%s", hostname, domain), nil
+	return C.GoString(cString), nil
 }
