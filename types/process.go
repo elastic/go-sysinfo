@@ -24,7 +24,7 @@ type Process interface {
 	CPUTimer
 	// Info returns process info.
 	// It may return partial information if the provider
-	// implementation is unable to collect all of the necessary data.
+	// implementation is unable to collect all the necessary data.
 	Info() (ProcessInfo, error)
 	Memory() (MemoryInfo, error)
 	User() (UserInfo, error)
