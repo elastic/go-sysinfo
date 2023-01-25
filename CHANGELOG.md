@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- On darwin without CGO `process.Info()` could fail, but would not return the error. [#150](https://github.com/elastic/go-sysinfo/pull/150)
+
 ## [1.9.0]
 
 ### Added

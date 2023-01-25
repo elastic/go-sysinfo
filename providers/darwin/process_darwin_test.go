@@ -21,8 +21,10 @@
 package darwin
 
 import (
+	"errors"
 	"os"
 	"os/exec"
+	"syscall"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -97,33 +99,44 @@ func TestProcessEnvironmentInternal(t *testing.T) {
 
 func TestProcesses(t *testing.T) {
 	var s darwinSystem
-	ps, err := s.Processes()
+	processes, err := s.Processes()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	pinfo, err := ps[0].Info()
-	if err != nil {
-		t.Fatal(err)
+	var count int
+	for _, proc := range processes {
+		processInfo, err := proc.Info()
+		switch {
+		// Ignore processes that no longer exist or that cannot be accessed.
+		case errors.Is(err, syscall.ESRCH),
+			errors.Is(err, syscall.EPERM),
+			errors.Is(err, syscall.EINVAL):
+			continue
+		case err != nil:
+			t.Fatalf("failed to get process info for PID=%d: %v", proc.PID(), err)
+		default:
+			count++
+		}
+
+		if processInfo.PID == 0 {
+			t.Fatalf("empty pid in %#v", processInfo)
+		}
+
+		if processInfo.Exe == "" {
+			t.Fatalf("empty exec in %#v", processInfo)
+		}
+
+		u, err := proc.User()
+		require.NoError(t, err)
+
+		require.NotEmpty(t, u.UID)
+		require.NotEmpty(t, u.EUID)
+		require.NotEmpty(t, u.SUID)
+		require.NotEmpty(t, u.GID)
+		require.NotEmpty(t, u.EGID)
+		require.NotEmpty(t, u.SGID)
 	}
 
-	if pinfo.PID == 0 {
-		t.Fatal("empty pid")
-	}
-
-	if pinfo.Exe == "" {
-		t.Fatal("empty exec")
-	}
-
-	u, err := ps[0].User()
-	require.NoError(t, err)
-
-	require.NotEmpty(t, u.UID)
-	require.NotEmpty(t, u.EUID)
-	require.NotEmpty(t, u.SUID)
-	require.NotEmpty(t, u.GID)
-	require.NotEmpty(t, u.EGID)
-	require.NotEmpty(t, u.SGID)
-
-	t.Log(ps[0].Info())
+	assert.NotZero(t, count, "failed to get process info for any processes")
 }

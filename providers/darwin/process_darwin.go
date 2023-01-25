@@ -23,9 +23,11 @@ package darwin
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
+	"syscall"
 	"time"
 
 	"golang.org/x/sys/unix"
@@ -178,7 +180,12 @@ var nullTerminator = []byte{0}
 func kern_procargs(pid int, p *process) error {
 	data, err := unix.SysctlRaw("kern.procargs2", pid)
 	if err != nil {
-		return nil
+		if errors.Is(err, syscall.EINVAL) {
+			// sysctl returns "invalid argument" for both "no such process"
+			// and "operation not permitted" errors.
+			return fmt.Errorf("no such process or operation not permitted: %w", err)
+		}
+		return err
 	}
 	buf := bytes.NewBuffer(data)
 
