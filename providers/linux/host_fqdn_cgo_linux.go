@@ -34,7 +34,7 @@ func fqdn() (string, error) {
 		return "", err
 	}
 
-	domain, err := domain()
+	domain, err := domainname()
 	if err != nil {
 		return "", err
 	}
@@ -46,7 +46,7 @@ func fqdn() (string, error) {
 	return fmt.Sprintf("%s.%s", hostname, domain), nil
 }
 
-func domain() (string, error) {
+func domainname() (string, error) {
 	const buffSize = 64
 	buff := make([]byte, buffSize)
 	size := C.size_t(buffSize)

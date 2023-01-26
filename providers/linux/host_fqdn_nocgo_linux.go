@@ -23,6 +23,6 @@ func fqdn() (string, error) {
 	return "", nil
 }
 
-func domain() (string, error) {
+func domainname() (string, error) {
 	return "", nil
 }

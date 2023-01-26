@@ -214,7 +214,7 @@ func (r *reader) hostname(h *host) {
 }
 
 func (r *reader) domain(h *host) {
-	v, err := domain()
+	v, err := domainname()
 	if r.addErr(err) {
 		return
 	}
