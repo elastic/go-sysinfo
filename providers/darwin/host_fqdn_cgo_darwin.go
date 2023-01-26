@@ -34,18 +34,19 @@ func fqdn() (string, error) {
 		return "", err
 	}
 
-	domain, err := domain()
+	domain, err := domainname()
 	if err != nil {
 		return "", err
 	}
+
 	if domain == "" || domain == "(none)" { // mimicking 'hostname -f' behaviour
-		domain = "lan"
+		domain = "local"
 	}
 
 	return fmt.Sprintf("%s.%s", hostname, domain), nil
 }
 
-func domain() (string, error) {
+func domainname() (string, error) {
 	const buffSize = 64
 	buff := make([]byte, buffSize)
 	size := buffSize

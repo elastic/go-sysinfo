@@ -216,7 +216,7 @@ func (r *reader) hostname(h *host) {
 }
 
 func (r *reader) domain(h *host) {
-	v, err := domain()
+	v, err := domainname()
 	if r.addErr(err) {
 		return
 	}
@@ -226,7 +226,7 @@ func (r *reader) domain(h *host) {
 func (r *reader) fqdn(h *host) {
 	fqdn, err := fqdn()
 	if err != nil {
-		r.addErr(fmt.Errorf("could not get linux FQDN: %w", err))
+		r.addErr(fmt.Errorf("could not get darwin FQDN: %w", err))
 		return
 	}
 
