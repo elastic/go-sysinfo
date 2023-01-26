@@ -292,14 +292,17 @@ func TestProcesses(t *testing.T) {
 	t.Log("Found", len(procs), "processes.")
 	for _, proc := range procs {
 		info, err := proc.Info()
-		if err != nil {
-			if errors.Is(err, fs.ErrPermission) || errors.Is(err, syscall.ESRCH) {
-				// The process may no longer exist by the time we try fetching
-				// additional information so ignore ESRCH (no such process).
-				continue
-			}
-			t.Fatal(err)
+		switch {
+		// Ignore processes that no longer exist or that cannot be accessed.
+		case errors.Is(err, syscall.ESRCH),
+			errors.Is(err, syscall.EPERM),
+			errors.Is(err, syscall.EINVAL),
+			errors.Is(err, fs.ErrPermission):
+			continue
+		case err != nil:
+			t.Fatalf("failed to get process info for PID=%d: %v", proc.PID(), err)
 		}
+
 		t.Logf("pid=%v name='%s' exe='%s' args=%+v ppid=%d cwd='%s' start_time=%v",
 			info.PID, info.Name, info.Exe, info.Args, info.PPID, info.CWD,
 			info.StartTime)
