@@ -152,23 +152,20 @@ func (r *reader) domain(h *host) {
 }
 
 func (r *reader) fqdn(h *host) {
-	hostname, err := os.Hostname()
-
-	dnsDomain, err := domain()
+	fqdn, err := getComputerNameEx(
+		stdwindows.ComputerNamePhysicalDnsFullyQualified)
 	if err != nil {
-		r.addErr(fmt.Errorf("could not get windows dnsDomain to build FQDN: %s", err))
-	}
-	if dnsDomain == "" {
-		dnsDomain = "lan"
+		r.addErr(fmt.Errorf("could not get windows FQDN: %s", err))
+		return
 	}
 
-	h.info.FQDN = fmt.Sprintf("%s.%s", hostname, dnsDomain)
+	h.info.FQDN = fqdn
 }
 
 func domain() (string, error) {
 	dns, err := getComputerNameEx(stdwindows.ComputerNamePhysicalDnsDomain)
 	if err != nil {
-		return "", fmt.Errorf("could not get windows dns to build FQDN: %s", err)
+		return "", fmt.Errorf("could not get windows dns: %s", err)
 	}
 
 	return dns, nil
