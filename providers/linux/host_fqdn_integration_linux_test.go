@@ -36,6 +36,8 @@ const wantHostname = "debian"
 const wantDomainCgo = "cgo"
 
 func TestHost_FQDN(t *testing.T) {
+	// TODO: read GO_VERSION and set the image accordingly
+	const image = "golang:1.19-bullseye"
 	tcs := []struct {
 		name string
 		cf   container.Config
@@ -48,7 +50,7 @@ func TestHost_FQDN(t *testing.T) {
 				AttachStderr: testing.Verbose(),
 				AttachStdout: testing.Verbose(),
 				WorkingDir:   "/usr/src/elastic/go-sysinfo",
-				Image:        "golang:1.19-bullseye",
+				Image:        image,
 				Cmd: []string{
 					"go", "test", "-v",
 					"-tags", "integration,docker",
@@ -64,7 +66,7 @@ func TestHost_FQDN(t *testing.T) {
 				AttachStderr: testing.Verbose(),
 				AttachStdout: testing.Verbose(),
 				WorkingDir:   "/usr/src/elastic/go-sysinfo",
-				Image:        "golang:1.19-bullseye",
+				Image:        image,
 				Cmd: []string{
 					"go", "test", "-v", "-count", "1",
 					"-tags", "integration,docker",
@@ -81,7 +83,7 @@ func TestHost_FQDN(t *testing.T) {
 				AttachStdout: testing.Verbose(),
 				Env:          []string{"CGO_ENABLED=0"},
 				WorkingDir:   "/usr/src/elastic/go-sysinfo",
-				Image:        "golang:1.19-bullseye",
+				Image:        image,
 				Cmd: []string{
 					"go", "test", "-v",
 					"-tags", "integration,docker",
@@ -119,7 +121,7 @@ func runOnDocker(t *testing.T, cli *client.Client, cf *container.Config) {
 		t.Fatalf("failed to pull image %s: %v", cf.Image, err)
 	}
 	defer reader.Close()
-	io.Copy(os.Stdout, reader)
+	io.Copy(os.Stderr, reader)
 
 	resp, err := cli.ContainerCreate(ctx, cf, &container.HostConfig{
 		AutoRemove: false,
