@@ -9,5 +9,5 @@ mkdir -p build
 SET OUT_FILE=build\output-report.out
 go test "./..." -v > %OUT_FILE% | type %OUT_FILE%
 
-go install github.com/jstemmer/go-junit-report@latest
+go install github.com/jstemmer/go-junit-report/v2@latest
 go-junit-report > build\junit-%GO_VERSION%.xml < %OUT_FILE%
