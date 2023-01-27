@@ -2,6 +2,7 @@
 set -euxo pipefail
 
 go install github.com/elastic/go-licenser@latest
+go install gotest.tools/gotestsum@latest
 
 go mod verify
 go-licenser -d
@@ -34,12 +35,6 @@ CGO_ENABLED=0 GOOS=windows GOARCH=arm64    go build ./...
 fi
 
 # Run the tests
-set +e
 export OUT_FILE="build/test-report.out"
 mkdir -p build
-go test "./..." -v 2>&1 | tee ${OUT_FILE}
-status=$?
-go install github.com/jstemmer/go-junit-report/v2@latest
-go-junit-report > "build/junit-${GO_VERSION}.xml" < ${OUT_FILE}
-
-exit ${status}
+gotestsum --format testname --junitfile "build/junit-${GO_VERSION}.xml" -- ./...
