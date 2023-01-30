@@ -46,6 +46,27 @@ func fqdn() (string, error) {
 	return fmt.Sprintf("%s.%s", hostname, domain), nil
 }
 
+func hostname() (string, error) {
+	const buffSize = 64
+	buff := make([]byte, buffSize)
+	size := C.size_t(buffSize)
+	cString := C.CString(string(buff))
+	defer C.free(unsafe.Pointer(cString))
+
+	_, errno := C.gethostname(cString, size)
+	if errno != nil {
+		return "", fmt.Errorf("cgo call gethostname errored: %v", errno)
+	}
+
+	var name string = C.GoString(cString)
+
+	if name == "(none)" {
+		name = ""
+	}
+
+	return name, nil
+}
+
 func domainname() (string, error) {
 	const buffSize = 64
 	buff := make([]byte, buffSize)

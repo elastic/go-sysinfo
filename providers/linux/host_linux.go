@@ -23,6 +23,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/joeshaw/multierror"
@@ -276,4 +277,59 @@ type procFS struct {
 func (fs *procFS) path(p ...string) string {
 	elem := append([]string{fs.mountPoint}, p...)
 	return filepath.Join(elem...)
+}
+
+// TODO: check k8s: https://kubernetes.io/docs/tasks/network/customize-hosts-file-for-pods/
+
+//	type struct []etchosts {
+//		ip, canonical string
+//		aliases []string
+//	}
+//
+// func findInHosts(hostname, line string) (string, bool) {
+//
+// }
+func parseLine(name, line string) (string, bool) {
+	nline, after, _ := strings.Cut(line, "#")
+	if len(nline) < 1 {
+		fmt.Printf("skip comment or empty: %q\n", line)
+		return "", false
+	}
+
+	if len(after) > 0 {
+		fmt.Printf("ignoring comment: %q\n", after)
+		fmt.Printf("\tfull line: %q\n", line)
+
+	}
+
+	fileds := strings.FieldsFunc(nline, func(r rune) bool {
+		return r == ' ' || r == '\t'
+	})
+
+	if len(fileds) < 2 {
+		fmt.Printf("invalid line: %q\n", line)
+
+		return "", false
+	}
+
+	// fields[0] is the ip address
+	cannonical, aliases := fileds[1], fileds[1:]
+
+	// TODO: confirm: a name should not repeat on different addresses.
+	if len(fileds) == 2 {
+		if fileds[1] == name {
+			return name, true
+		}
+		if hname, _, _ := strings.Cut(cannonical, "."); hname == name {
+			return cannonical, true
+		}
+	}
+
+	for _, h := range aliases {
+		if h == name {
+			return cannonical, true
+		}
+	}
+
+	return "", false
 }
