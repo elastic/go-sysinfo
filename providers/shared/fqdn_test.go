@@ -17,7 +17,9 @@
 
 package shared
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestParseLine(t *testing.T) {
 	tcs := []struct {
