@@ -19,7 +19,6 @@ package linux
 
 import (
 	"encoding/json"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -111,30 +110,63 @@ func TestHostNetworkCounters(t *testing.T) {
 	t.Log(string(data))
 }
 
-const etcHosts = `
-# The following lines are desirable for IPv4 capable hosts
-127.0.0.1       localhost
-
-# 127.0.1.1 is often used for the FQDN of the machine
-127.0.1.1       thishost.mydomain.org  thishost
-192.168.1.10    foo.mydomain.org	#  foo
-192.168.1.13    bar.mydomain.org       bar # comment 1
-146.82.138.7    master.debian.org      master # comment 2
-209.237.226.90  www.opensource.org
-209.237.226.91INVALIDwww.opensource.org
-213.456.178.9 ahost.no.alias
-
-# The following lines are desirable for IPv6 capable hosts
-::1             localhost ip6-localhost ip6-loopback
-ff02::1         ip6-allnodes
-ff02::2         ip6-allrouters
-`
-
 func TestParseLine(t *testing.T) {
-	lines := strings.Split(etcHosts, "\n")
+	tcs := []struct {
+		name     string
+		hostname string
+		line     string
+		want     string
+	}{
+		{
+			name:     "find fqdn - spaces",
+			hostname: "thishost",
+			want:     "thishost.mydomain.org",
+			line:     "127.0.1.1       thishost.mydomain.org  thishost",
+		},
+		{
+			name:     "find fqdn - tabs",
+			hostname: "thishost",
+			want:     "thishost.mydomain.org",
+			line:     "127.0.1.1	thishost.mydomain.org	thishost",
+		},
+		{
+			name:     "find fqdn - tabs and spaces",
+			hostname: "thishost",
+			want:     "thishost.mydomain.org",
+			line:     "127.0.1.1	 thishost.mydomain.org	  thishost",
+		},
+		{
+			name:     "find fqdn - line with comment",
+			hostname: "bar",
+			want:     "bar.mydomain.org",
+			line:     "192.168.1.13    bar.mydomain.org       bar # comment 1",
+		},
+		{
+			name:     "find fqdn - fqdn with hostname but no alias",
+			hostname: "ahostWith",
+			want:     "ahostWith.no.alias",
+			line:     "213.456.178.9 ahostWith.no.alias",
+		},
+		{
+			name:     "ignore invalid line",
+			hostname: "ignore",
+			want:     "",
+			line:     "209.237.226.91INVALIDwww.opensource.org",
+		},
+		{
+			name:     "comment line",
+			hostname: "ignore",
+			want:     "",
+			line:     "# The following lines are desirable for IPv4 capable hosts",
+		},
+	}
 
-	for n, l := range lines {
-		fqdn, ok := parseLine("ahost", l)
-		t.Logf("[%d] fqdn: %s, ok: %t", n, fqdn, ok)
+	for _, tc := range tcs {
+		t.Run(tc.name, func(t *testing.T) {
+			got := findInHostsLine(tc.hostname, tc.line)
+			if got != tc.want {
+				t.Errorf("got %s, want %s", got, tc.want)
+			}
+		})
 	}
 }

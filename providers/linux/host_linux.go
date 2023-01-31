@@ -18,8 +18,10 @@
 package linux
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
+	"io/fs"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -222,13 +224,31 @@ func (r *reader) domain(h *host) {
 	h.info.Domain = v
 }
 
+const etcHosts = "/etc/hosts"
+
 func (r *reader) fqdn(h *host) {
-	fqdn, err := fqdn()
+	f, err := os.Open(etcHosts)
 	if err != nil {
-		r.addErr(fmt.Errorf("could not get linux FQDN: %w", err))
+		r.addErr(fmt.Errorf("could open %q to get FQDN: %w", etcHosts, err))
 		return
 	}
 
+	hname, err := os.Hostname()
+	if err != nil {
+		r.addErr(fmt.Errorf("could get hostname to look for FQDN: %w", err))
+		return
+	}
+
+	fqdn, err := fqdnFromHosts(hname, f)
+	if err != nil {
+		r.addErr(fmt.Errorf("error when looking for FQDN on %s: %w", etcHosts, err))
+		return
+	}
+
+	if fqdn == "" {
+		// FQDN not found on hosts file, fall back to net.Lookup?
+		// add an error?
+	}
 	h.info.FQDN = fqdn
 }
 
@@ -279,37 +299,43 @@ func (fs *procFS) path(p ...string) string {
 	return filepath.Join(elem...)
 }
 
+// fqdnFromHosts looks for the FQDN for hostname on hostFile.
+// If successfully it returns FQDN, nil. If no FQDN for hostname is found
+// it returns "", nil. It returns "", err if any error happens.
+func fqdnFromHosts(hostname string, hostsFile fs.File) (string, error) {
+	s := bufio.NewScanner(hostsFile)
+
+	for s.Scan() {
+		fqdn := findInHostsLine(hostname, s.Text())
+		if fqdn != "" {
+			return fqdn, nil
+		}
+	}
+	if err := s.Err(); err != nil {
+		return "", fmt.Errorf("error reading hosts file lines: %w", err)
+	}
+
+	return "", nil
+}
+
+// findInHostsLine takes a HOSTS(5) line and searches for an alias matching
+// hostname, if found it returns the canonical_hostname. The canonical_hostname
+// should be the FQDN, see HOSTNAME(1).
 // TODO: check k8s: https://kubernetes.io/docs/tasks/network/customize-hosts-file-for-pods/
-
-//	type struct []etchosts {
-//		ip, canonical string
-//		aliases []string
-//	}
-//
-// func findInHosts(hostname, line string) (string, bool) {
-//
-// }
-func parseLine(name, line string) (string, bool) {
-	nline, after, _ := strings.Cut(line, "#")
-	if len(nline) < 1 {
-		fmt.Printf("skip comment or empty: %q\n", line)
-		return "", false
+func findInHostsLine(hostname, hostsEntry string) string {
+	line, _, _ := strings.Cut(hostsEntry, "#")
+	if len(line) < 1 {
+		fmt.Printf("skip comment or empty: %q\n", hostsEntry)
+		return ""
 	}
 
-	if len(after) > 0 {
-		fmt.Printf("ignoring comment: %q\n", after)
-		fmt.Printf("\tfull line: %q\n", line)
-
-	}
-
-	fileds := strings.FieldsFunc(nline, func(r rune) bool {
+	fileds := strings.FieldsFunc(line, func(r rune) bool {
 		return r == ' ' || r == '\t'
 	})
 
 	if len(fileds) < 2 {
-		fmt.Printf("invalid line: %q\n", line)
-
-		return "", false
+		// invalid hostsEntry
+		return ""
 	}
 
 	// fields[0] is the ip address
@@ -317,19 +343,23 @@ func parseLine(name, line string) (string, bool) {
 
 	// TODO: confirm: a name should not repeat on different addresses.
 	if len(fileds) == 2 {
-		if fileds[1] == name {
-			return name, true
+		if fileds[1] == hostname {
+			return cannonical
 		}
-		if hname, _, _ := strings.Cut(cannonical, "."); hname == name {
-			return cannonical, true
+
+		// If hostname was not set as an alias for FQDN, but the fist name
+		// before the dot is the hostname:
+		//   192.168.1.10    foo.mydomain.org	#  foo
+		if hname, _, _ := strings.Cut(cannonical, "."); hname == hostname {
+			return cannonical
 		}
 	}
 
 	for _, h := range aliases {
-		if h == name {
-			return cannonical, true
+		if h == hostname {
+			return cannonical
 		}
 	}
 
-	return "", false
+	return ""
 }
