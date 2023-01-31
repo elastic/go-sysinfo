@@ -48,7 +48,7 @@ func main() {
 	}
 
 	goimports := exec.Command(filepath.Join(build.Default.GOPATH, "bin", "goimports"),
-		append([]string{"-l", "-local", localPkgs}, paths...)...)
+		append([]string{"-d", "-l", "-local", localPkgs}, paths...)...)
 	out, err = goimports.Output()
 	if err != nil {
 		log.Fatalf("failed to %v: %v", strings.Join(goimports.Args, " "), err)
