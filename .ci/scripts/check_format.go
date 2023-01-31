@@ -55,7 +55,7 @@ func main() {
 	}
 	if len(out) > 0 {
 		fmt.Fprintln(os.Stderr, "Run goimports on the code.")
-		fmt.Printf(string(out))
+		fmt.Fprintln(os.Stderr, string(out))
 		os.Exit(1)
 	}
 }
