@@ -23,6 +23,7 @@ import (
 	"bufio"
 	"fmt"
 	"io/fs"
+	"net"
 	"os"
 	"strings"
 )
@@ -30,27 +31,60 @@ import (
 const etcHosts = "/etc/hosts"
 
 func FQDN() (string, error) {
+	hostname, err := os.Hostname()
+	if err != nil {
+		return "", fmt.Errorf("could get hostname to look for FQDN: %w", err)
+	}
+
+	var errs error
+
+	fqdn, err := fqdnFromEtcHosts(hostname)
+	if err != nil {
+		errs = fmt.Errorf("could not get FQDN, all methods failed: %w", err)
+	}
+	if fqdn != "" {
+		return fqdn, nil
+	}
+
+	cname, err := net.LookupCNAME(hostname)
+	if err != nil {
+		errs = fmt.Errorf("%s: %w", errs, err)
+	}
+	if cname != "" {
+		return cname, nil
+	}
+
+	ips, err := net.LookupIP(hostname)
+	if err != nil {
+		errs = fmt.Errorf("%s: %w", errs, err)
+	}
+
+	for _, ip := range ips {
+		names, err := net.LookupAddr(ip.String())
+		if err != nil || len(names) == 0 {
+			continue
+		}
+		return names[0], nil
+	}
+
+	return "", errs
+}
+
+func fqdnFromEtcHosts(hostname string) (string, error) {
 	f, err := os.Open(etcHosts)
 	if err != nil {
 		return "", fmt.Errorf("could open %q to get FQDN: %w", etcHosts, err)
 	}
 
-	hname, err := os.Hostname()
-	if err != nil {
-		return "", fmt.Errorf("could get hostname to look for FQDN: %w", err)
-	}
-
-	fqdn, err := fqdnFromHosts(hname, f)
+	fqdn, err := fqdnFromHosts(hostname, f)
 	if err != nil {
 		return "", fmt.Errorf("error when looking for FQDN on %s: %w", etcHosts, err)
 	}
-
-	if fqdn == "" {
-		// FQDN not found on hosts file, fall back to net.Lookup?
-		// add an error?
+	if fqdn != "" {
+		return fqdn, nil
 	}
 
-	return fqdn, nil
+	return "", fmt.Errorf("no entry for %q on %q", hostname, etcHosts)
 }
 
 // fqdnFromHosts looks for the FQDN for hostname on hostFile.
