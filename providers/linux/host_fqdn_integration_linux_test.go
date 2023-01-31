@@ -32,21 +32,28 @@ import (
 	"github.com/docker/docker/pkg/stdcopy"
 )
 
-const wantHostname = "debian"
-const wantDomainCgo = "cgo"
+const wantHostname = "hostname"
+const wantDomain = "some.domain"
+const wantFQDN = wantHostname + "." + wantDomain
 
 func TestHost_FQDN(t *testing.T) {
-	// TODO: read GO_VERSION and set the image accordingly
-	const image = "golang:1.19-bullseye"
+	const envKey = "GO_VERSION"
+	goversion, ok := os.LookupEnv(envKey)
+	if !ok {
+		t.Fatalf("environment variable %s not set, please set a Go version",
+			envKey)
+	}
+	image := "golang:" + goversion
+
 	tcs := []struct {
 		name string
 		cf   container.Config
 	}{
 		{
-			name: "debian Cgo with domain",
+			name: "TestHost_FQDN_set_hostname+domainname",
 			cf: container.Config{
 				Hostname:     wantHostname,
-				Domainname:   wantDomainCgo,
+				Domainname:   wantDomain,
 				AttachStderr: testing.Verbose(),
 				AttachStdout: testing.Verbose(),
 				WorkingDir:   "/usr/src/elastic/go-sysinfo",
@@ -54,15 +61,30 @@ func TestHost_FQDN(t *testing.T) {
 				Cmd: []string{
 					"go", "test", "-v",
 					"-tags", "integration,docker",
-					"-run", "^TestHost_FQDN_Domain_Cgo",
+					"-run", "^TestHost_FQDN_set$",
 					"./providers/linux"},
 				Tty: false,
 			},
 		},
 		{
-			name: "debian Cgo no domain",
+			name: "TestHost_FQDN_set_hostname_only",
 			cf: container.Config{
-				Hostname:     wantHostname,
+				Hostname:     wantFQDN,
+				AttachStderr: testing.Verbose(),
+				AttachStdout: testing.Verbose(),
+				WorkingDir:   "/usr/src/elastic/go-sysinfo",
+				Image:        image,
+				Cmd: []string{
+					"go", "test", "-v",
+					"-tags", "integration,docker",
+					"-run", "^TestHost_FQDN_set$",
+					"./providers/linux"},
+				Tty: false,
+			},
+		},
+		{
+			name: "TestHost_FQDN_not_set",
+			cf: container.Config{
 				AttachStderr: testing.Verbose(),
 				AttachStdout: testing.Verbose(),
 				WorkingDir:   "/usr/src/elastic/go-sysinfo",
@@ -70,24 +92,7 @@ func TestHost_FQDN(t *testing.T) {
 				Cmd: []string{
 					"go", "test", "-v", "-count", "1",
 					"-tags", "integration,docker",
-					"-run", "^TestHost_FQDN_No_Domain_Cgo",
-					"./providers/linux"},
-				Tty: false,
-			},
-		},
-		{
-			name: "debian no Cgo",
-			cf: container.Config{
-				Hostname:     wantHostname,
-				AttachStderr: testing.Verbose(),
-				AttachStdout: testing.Verbose(),
-				Env:          []string{"CGO_ENABLED=0"},
-				WorkingDir:   "/usr/src/elastic/go-sysinfo",
-				Image:        image,
-				Cmd: []string{
-					"go", "test", "-v",
-					"-tags", "integration,docker",
-					"-run", "^TestHost_FQDN_Domain_NoCgo",
+					"-run", "^TestHost_FQDN_not_set$",
 					"./providers/linux"},
 				Tty: false,
 			},

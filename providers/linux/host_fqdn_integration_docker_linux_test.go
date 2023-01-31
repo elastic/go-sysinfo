@@ -24,57 +24,69 @@ import (
 	"testing"
 )
 
-func TestHost_FQDN_Domain_Cgo(t *testing.T) {
+func TestHost_FQDN_set(t *testing.T) {
 	host, err := newLinuxSystem("").Host()
 	if err != nil {
 		t.Fatal(fmt.Errorf("could not het host information: %w", err))
 	}
 
 	got := host.Info()
-	if got.Hostname != wantHostname {
-		t.Errorf("got wrong hostname want: %q, got %q", wantHostname, got.Hostname)
-	}
-	if got.Domain != wantDomainCgo {
-		t.Errorf("got wrong domain want: %q, got %q", wantDomainCgo, got.Domain)
-	}
-	if got.FQDN != fmt.Sprintf("%s.%s", wantHostname, wantDomainCgo) {
-		t.Errorf("FQDN shpould not be empty")
-	}
-}
-
-func TestHost_FQDN_No_Domain_Cgo(t *testing.T) {
-	host, err := newLinuxSystem("").Host()
-	if err != nil {
-		t.Fatal(fmt.Errorf("could not het host information: %w", err))
-	}
-
-	got := host.Info()
-	if got.Hostname != wantHostname {
-		t.Errorf("got wrong hostname want: %s, got %s", wantHostname, got.Hostname)
-	}
-	if got.Domain != "" {
-		t.Errorf("got wrong domain should be empty but got %s", got.Domain)
-	}
-	wantFQDN := fmt.Sprintf("%s.%s", wantHostname, "lan")
 	if got.FQDN != wantFQDN {
-		t.Errorf("got wrong FQDN, want: %s, got %s", wantFQDN, got.FQDN)
+		t.Errorf("got FQDN %q, want: %q", got.FQDN, wantFQDN)
 	}
 }
 
-func TestHost_FQDN_Domain_NoCgo(t *testing.T) {
+func TestHost_FQDN_not_set(t *testing.T) {
 	host, err := newLinuxSystem("").Host()
 	if err != nil {
 		t.Fatal(fmt.Errorf("could not het host information: %w", err))
 	}
 
 	got := host.Info()
-	if got.Hostname != wantHostname {
-		t.Errorf("hostname want: %s, got %s", wantHostname, got.Hostname)
-	}
-	if got.Domain != "" {
-		t.Errorf("domain should be empty but got %s", got.Domain)
-	}
-	if got.FQDN != "" {
-		t.Errorf("FQDN should empty, got: %s", got.FQDN)
+	if got.Hostname != got.FQDN {
+		t.Errorf("name and FQDN should be the same but hostname: %s, FQDN %s", got.Hostname, got.FQDN)
 	}
 }
+
+// ❯ docker run --hostname myhost.co --rm -v "$PWD":/usr/src/elastic/go-sysinfo -it -w /usr/src/elastic/go-sysinfo golang:1.19 /bin/bash
+// root@myhost:/usr/src/elastic/go-sysinfo# hostname
+// myhost.co
+// root@myhost:/usr/src/elastic/go-sysinfo# hostname -s
+// myhost
+// root@myhost:/usr/src/elastic/go-sysinfo# hostname -f
+// myhost.co
+// root@myhost:/usr/src/elastic/go-sysinfo# hostname -d
+// co
+// root@myhost:/usr/src/elastic/go-sysinfo# cat /proc/sys/kernel/hostname
+// myhost.co
+// root@myhost:/usr/src/elastic/go-sysinfo# cat /proc/sys/kernel/domainname
+// (none)
+// root@myhost:/usr/src/elastic/go-sysinfo# cat /etc/hosts
+// 127.0.0.1	localhost
+// ::1	localhost ip6-localhost ip6-loopback
+// fe00::0	ip6-localnet
+// ff00::0	ip6-mcastprefix
+// ff02::1	ip6-allnodes
+// ff02::2	ip6-allrouters
+// 172.17.0.2	myhost.co myhost
+// root@myhost:/usr/src/elastic/go-sysinfo#
+
+// ❯ docker run --hostname myhost --domainname co --rm -v "$PWD":/usr/src/elastic/go-sysinfo -it -w /usr/src/elastic/go-sysinfo golang:1.19 /bin/bash
+// root@myhost:/usr/src/elastic/go-sysinfo# hostname
+// myhost
+// root@myhost:/usr/src/elastic/go-sysinfo# hostname -f
+// myhost.co
+// root@myhost:/usr/src/elastic/go-sysinfo# hostname -d
+// co
+// root@myhost:/usr/src/elastic/go-sysinfo# cat /proc/sys/kernel/hostname
+// myhost
+// root@myhost:/usr/src/elastic/go-sysinfo# cat /proc/sys/kernel/domainname
+// co
+// root@myhost:/usr/src/elastic/go-sysinfo# cat /etc/hosts
+// 127.0.0.1	localhost
+// ::1	localhost ip6-localhost ip6-loopback
+// fe00::0	ip6-localnet
+// ff00::0	ip6-mcastprefix
+// ff02::1	ip6-allnodes
+// ff02::2	ip6-allrouters
+// 172.17.0.2	myhost.co myhost

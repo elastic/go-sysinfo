@@ -88,7 +88,6 @@ func newHost() (*host, error) {
 	r.architecture(h)
 	r.bootTime(h)
 	r.hostname(h)
-	r.domain(h)
 	r.fqdn(h)
 	r.network(h)
 	r.kernelVersion(h)
@@ -143,14 +142,6 @@ func (r *reader) hostname(h *host) {
 	h.info.Hostname = v
 }
 
-func (r *reader) domain(h *host) {
-	v, err := domain()
-	if r.addErr(err) {
-		return
-	}
-	h.info.Domain = v
-}
-
 func (r *reader) fqdn(h *host) {
 	fqdn, err := getComputerNameEx(
 		stdwindows.ComputerNamePhysicalDnsFullyQualified)
@@ -160,15 +151,6 @@ func (r *reader) fqdn(h *host) {
 	}
 
 	h.info.FQDN = fqdn
-}
-
-func domain() (string, error) {
-	dns, err := getComputerNameEx(stdwindows.ComputerNamePhysicalDnsDomain)
-	if err != nil {
-		return "", fmt.Errorf("could not get windows dns: %s", err)
-	}
-
-	return dns, nil
 }
 
 func getComputerNameEx(name uint32) (string, error) {

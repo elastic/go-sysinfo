@@ -160,7 +160,6 @@ func newHost() (*host, error) {
 	r.architecture(h)
 	r.bootTime(h)
 	r.hostname(h)
-	r.domain(h)
 	r.fqdn(h)
 	r.network(h)
 	r.kernelVersion(h)
@@ -215,24 +214,14 @@ func (r *reader) hostname(h *host) {
 	h.info.Hostname = v
 }
 
-func (r *reader) domain(h *host) {
-	v, err := domainname()
+func (r *reader) fqdn(h *host) {
+	v, err := shared.FQDN()
 	if r.addErr(err) {
 		return
 	}
-	h.info.Domain = v
+
+	h.info.FQDN = v
 }
-
-func (r *reader) fqdn(h *host) {
-	fqdn, err := fqdn()
-	if err != nil {
-		r.addErr(fmt.Errorf("could not get darwin FQDN: %w", err))
-		return
-	}
-
-	h.info.FQDN = fqdn
-}
-
 func (r *reader) network(h *host) {
 	ips, macs, err := shared.Network()
 	if r.addErr(err) {
