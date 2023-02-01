@@ -113,7 +113,6 @@ func fqdnFromHosts(hostname string, hostsFile fs.File) (string, error) {
 func findInHostsLine(hostname, hostsEntry string) string {
 	line, _, _ := strings.Cut(hostsEntry, "#")
 	if len(line) < 1 {
-		fmt.Printf("skip comment or empty: %q\n", hostsEntry)
 		return ""
 	}
 
