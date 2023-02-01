@@ -48,7 +48,7 @@ func FQDN() (string, error) {
 
 	cname, err := net.LookupCNAME(hostname)
 	if err != nil {
-		errs = fmt.Errorf("%s: %w", errs, err)
+		errs = fmt.Errorf("%s: failed looking up CNAME: %w", errs, err)
 	}
 	if cname != "" {
 		return cname, nil
@@ -56,7 +56,7 @@ func FQDN() (string, error) {
 
 	ips, err := net.LookupIP(hostname)
 	if err != nil {
-		errs = fmt.Errorf("%s: %w", errs, err)
+		errs = fmt.Errorf("%s: failed looking up IP: %w", errs, err)
 	}
 
 	for _, ip := range ips {
