@@ -40,13 +40,13 @@ func TestParseLine(t *testing.T) {
 			name:     "find fqdn - tabs",
 			hostname: "thishost",
 			want:     "thishost.mydomain.org",
-			line: "127.0.1.1	thishost.mydomain.org	thishost",
+			line:     "127.0.1.1\tthishost.mydomain.org\tthishost",
 		},
 		{
 			name:     "find fqdn - tabs and spaces",
 			hostname: "thishost",
 			want:     "thishost.mydomain.org",
-			line: "127.0.1.1	 thishost.mydomain.org	  thishost",
+			line:     "127.0.1.1\t thishost.mydomain.org\t  thishost",
 		},
 		{
 			name:     "find fqdn - line with comment",
