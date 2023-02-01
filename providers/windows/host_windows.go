@@ -150,7 +150,7 @@ func (r *reader) fqdn(h *host) {
 		return
 	}
 
-	h.info.FQDN = fqdn
+	h.info.FQDN = strings.TrimSuffix(fqdn, ".")
 }
 
 func getComputerNameEx(name uint32) (string, error) {
