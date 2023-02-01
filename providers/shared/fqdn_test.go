@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux || darwin
+
 package shared
 
 import (
@@ -38,13 +40,13 @@ func TestParseLine(t *testing.T) {
 			name:     "find fqdn - tabs",
 			hostname: "thishost",
 			want:     "thishost.mydomain.org",
-			line: "127.0.1.1	thishost.mydomain.org	thishost",
+			line:     "127.0.1.1	thishost.mydomain.org	thishost",
 		},
 		{
 			name:     "find fqdn - tabs and spaces",
 			hostname: "thishost",
 			want:     "thishost.mydomain.org",
-			line: "127.0.1.1	 thishost.mydomain.org	  thishost",
+			line:     "127.0.1.1	 thishost.mydomain.org	  thishost",
 		},
 		{
 			name:     "find fqdn - line with comment",
