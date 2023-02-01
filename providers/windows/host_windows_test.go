@@ -29,7 +29,7 @@ var _ registry.HostProvider = windowsSystem{}
 func TestHost(t *testing.T) {
 	host, err := windowsSystem{}.Host()
 	if err != nil {
-		t.Logf("could not get all host info: %v", err)
+		t.Logf("could not get all host info: %v\n", err)
 	}
 
 	info := host.Info()

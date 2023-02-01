@@ -32,11 +32,12 @@ var _ registry.HostProvider = linuxSystem{}
 func TestHost(t *testing.T) {
 	host, err := newLinuxSystem("").Host()
 	if err != nil {
-		t.Logf("could not get all host info: %v", err)
+		t.Logf("could not get all host info: %v\n", err)
 	}
+
 	info := host.Info()
 	data, _ := json.MarshalIndent(info, "", "  ")
-	t.Log(string(data))
+	t.Logf(string(data))
 }
 
 func TestHostMemoryInfo(t *testing.T) {
