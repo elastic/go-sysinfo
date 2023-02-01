@@ -1,6 +1,6 @@
 module github.com/elastic/go-sysinfo
 
-go 1.17
+go 1.18
 
 require (
 	github.com/docker/docker v20.10.22+incompatible
