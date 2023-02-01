@@ -79,4 +79,3 @@ This table lists the OS and architectures for which a "provider" is implemented.
 | windows/arm    |              |        |
 
 * On darwin (macOS) host information like machineid and process information like memory, cpu, user and starttime require cgo.
-
