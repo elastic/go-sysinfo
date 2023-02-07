@@ -27,7 +27,7 @@ import (
 func TestHost_FQDN_set(t *testing.T) {
 	host, err := newLinuxSystem("").Host()
 	if err != nil {
-		t.Fatal(fmt.Errorf("could not het host information: %w", err))
+		t.Fatal(fmt.Errorf("could not get host information: %w", err))
 	}
 
 	got := host.Info()
