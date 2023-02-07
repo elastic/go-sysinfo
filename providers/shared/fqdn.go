@@ -33,7 +33,7 @@ const etcHosts = "/etc/hosts"
 func FQDN() (string, error) {
 	hostname, err := os.Hostname()
 	if err != nil {
-		return "", fmt.Errorf("could get hostname to look for FQDN: %w", err)
+		return "", fmt.Errorf("could not get hostname to look for FQDN: %w", err)
 	}
 
 	var errs error
