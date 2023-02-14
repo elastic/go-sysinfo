@@ -26,7 +26,10 @@ import (
 	"time"
 
 	"github.com/joeshaw/multierror"
+
 	stdwindows "golang.org/x/sys/windows"
+
+	windows "github.com/elastic/go-windows"
 
 	"github.com/elastic/go-sysinfo/internal/registry"
 	"github.com/elastic/go-sysinfo/providers/shared"
