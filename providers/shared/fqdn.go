@@ -75,6 +75,7 @@ func fqdnFromEtcHosts(hostname string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("could open %q to get FQDN: %w", etcHosts, err)
 	}
+	defer f.Close()
 
 	fqdn, err := fqdnFromHosts(hostname, f)
 	if err != nil {
@@ -107,8 +108,10 @@ func fqdnFromHosts(hostname string, hostsFile fs.File) (string, error) {
 }
 
 // findInHostsLine takes a HOSTS(5) line and searches for an alias matching
-// hostname, if found it returns the canonical_hostname. The canonical_hostname
+// hostname, if found, it returns the canonical hostname. The canonical hostname
 // should be the FQDN, see HOSTNAME(1).
+// It will return the first match and if an entry with only the hostname and no
+// aliases is found, the hostname is returned.
 // TODO: check k8s: https://kubernetes.io/docs/tasks/network/customize-hosts-file-for-pods/
 func findInHostsLine(hostname, hostsEntry string) string {
 	line, _, _ := strings.Cut(hostsEntry, "#")
@@ -116,35 +119,39 @@ func findInHostsLine(hostname, hostsEntry string) string {
 		return ""
 	}
 
-	fileds := strings.FieldsFunc(line, func(r rune) bool {
+	fields := strings.FieldsFunc(line, func(r rune) bool {
 		return r == ' ' || r == '\t'
 	})
 
-	if len(fileds) < 2 {
+	if len(fields) < 2 {
 		// invalid hostsEntry
 		return ""
 	}
 
 	// fields[0] is the ip address
-	cannonical, aliases := fileds[1], fileds[1:]
+	canonical, aliases := fields[1], fields[1:]
 
-	// TODO: confirm: a name should not repeat on different addresses.
-	if len(fileds) == 2 {
-		if fileds[1] == hostname {
-			return cannonical
+	// The hostname is the canonical hostname and there is no alias, then return
+	// it.
+	if len(fields) == 2 {
+		if fields[1] == hostname {
+			return canonical
 		}
 
-		// If hostname was not set as an alias for FQDN, but the fist name
-		// before the dot is the hostname:
-		//   192.168.1.10    foo.mydomain.org	#  foo
-		if hname, _, _ := strings.Cut(cannonical, "."); hname == hostname {
-			return cannonical
+		// If hostname was not set as an alias for the canonical hostname,
+		// but the fist name before the dot matches the hostname.
+		// If foo is the hostname we're looking for and the entry is as follows
+		//   192.168.1.10    foo.mydomain.org
+		// foo.mydomain.org will be returned.
+		if hname, _, _ := strings.Cut(canonical, "."); hname == hostname {
+			return canonical
 		}
 	}
 
+	// Default case
 	for _, h := range aliases {
 		if h == hostname {
-			return cannonical
+			return canonical
 		}
 	}
 

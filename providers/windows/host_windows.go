@@ -28,8 +28,6 @@ import (
 	"github.com/joeshaw/multierror"
 	stdwindows "golang.org/x/sys/windows"
 
-	"github.com/elastic/go-windows"
-
 	"github.com/elastic/go-sysinfo/internal/registry"
 	"github.com/elastic/go-sysinfo/providers/shared"
 	"github.com/elastic/go-sysinfo/types"
@@ -169,14 +167,13 @@ func getComputerNameEx(name uint32) (string, error) {
 		// number of bytes needed to store the FQDN. For details, see
 		// https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getcomputernameexw#return-value
 		if errors.Is(err, syscall.ERROR_MORE_DATA) {
+			// Safeguard to avoid an infinite loop.
 			if size <= uint32(len(buff)) {
-				// Safeguard to avoid an infinite loop.
 				return "", fmt.Errorf(
 					"windows.GetComputerNameEx returned ERROR_MORE_DATA, " +
 						"but data size should fit into buffer")
 			} else {
 				// Grow the buffer and try again.
-				// Should we limit its growth?
 				buff = make([]uint16, size)
 				continue
 			}
