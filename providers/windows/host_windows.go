@@ -19,11 +19,17 @@ package windows
 
 import (
 	"errors"
+	"fmt"
 	"os"
+	"strings"
+	"syscall"
 	"time"
 
-	windows "github.com/elastic/go-windows"
 	"github.com/joeshaw/multierror"
+
+	stdwindows "golang.org/x/sys/windows"
+
+	windows "github.com/elastic/go-windows"
 
 	"github.com/elastic/go-sysinfo/internal/registry"
 	"github.com/elastic/go-sysinfo/providers/shared"
@@ -84,6 +90,7 @@ func newHost() (*host, error) {
 	r.architecture(h)
 	r.bootTime(h)
 	r.hostname(h)
+	r.fqdn(h)
 	r.network(h)
 	r.kernelVersion(h)
 	r.os(h)
@@ -135,6 +142,48 @@ func (r *reader) hostname(h *host) {
 		return
 	}
 	h.info.Hostname = v
+}
+
+func (r *reader) fqdn(h *host) {
+	fqdn, err := getComputerNameEx(
+		stdwindows.ComputerNamePhysicalDnsFullyQualified)
+	if err != nil {
+		r.addErr(fmt.Errorf("could not get windows FQDN: %s", err))
+		return
+	}
+
+	h.info.FQDN = strings.TrimSuffix(fqdn, ".")
+}
+
+func getComputerNameEx(name uint32) (string, error) {
+	size := uint32(64)
+
+	for {
+		buff := make([]uint16, size)
+		err := stdwindows.GetComputerNameEx(
+			name, &buff[0], &size)
+		if err == nil {
+			return syscall.UTF16ToString(buff[:size]), nil
+		}
+
+		// ERROR_MORE_DATA means buff is too small and size is set to the
+		// number of bytes needed to store the FQDN. For details, see
+		// https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getcomputernameexw#return-value
+		if errors.Is(err, syscall.ERROR_MORE_DATA) {
+			// Safeguard to avoid an infinite loop.
+			if size <= uint32(len(buff)) {
+				return "", fmt.Errorf(
+					"windows.GetComputerNameEx returned ERROR_MORE_DATA, " +
+						"but data size should fit into buffer")
+			} else {
+				// Grow the buffer and try again.
+				buff = make([]uint16, size)
+				continue
+			}
+		}
+
+		return "", fmt.Errorf("could not get windows FQDN: could not get windows.ComputerNamePhysicalDnsFullyQualified: %w", err)
+	}
 }
 
 func (r *reader) network(h *host) {

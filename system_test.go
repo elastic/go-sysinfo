@@ -26,6 +26,7 @@ import (
 	"runtime"
 	"sort"
 	"strconv"
+	"strings"
 	"syscall"
 	"testing"
 	"time"
@@ -234,7 +235,7 @@ func TestHost(t *testing.T) {
 	host, err := Host()
 	if err == types.ErrNotImplemented {
 		t.Skip("host provider not implemented on", runtime.GOOS)
-	} else if err != nil {
+	} else if err != nil && !strings.Contains(err.Error(), "FQDN") {
 		t.Fatal(err)
 	}
 

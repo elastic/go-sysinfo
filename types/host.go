@@ -67,13 +67,14 @@ type HostInfo struct {
 	BootTime          time.Time `json:"boot_time"`               // Host boot time.
 	Containerized     *bool     `json:"containerized,omitempty"` // Is the process containerized.
 	Hostname          string    `json:"name"`                    // Hostname
-	IPs               []string  `json:"ip,omitempty"`            // List of all IPs.
-	KernelVersion     string    `json:"kernel_version"`          // Kernel version.
-	MACs              []string  `json:"mac"`                     // List of MAC addresses.
-	OS                *OSInfo   `json:"os"`                      // OS information.
-	Timezone          string    `json:"timezone"`                // System timezone.
-	TimezoneOffsetSec int       `json:"timezone_offset_sec"`     // Timezone offset (seconds from UTC).
-	UniqueID          string    `json:"id,omitempty"`            // Unique ID of the host (optional).
+	FQDN              string    `json:"fqdn"`
+	IPs               []string  `json:"ip,omitempty"`        // List of all IPs.
+	KernelVersion     string    `json:"kernel_version"`      // Kernel version.
+	MACs              []string  `json:"mac"`                 // List of MAC addresses.
+	OS                *OSInfo   `json:"os"`                  // OS information.
+	Timezone          string    `json:"timezone"`            // System timezone.
+	TimezoneOffsetSec int       `json:"timezone_offset_sec"` // Timezone offset (seconds from UTC).
+	UniqueID          string    `json:"id,omitempty"`        // Unique ID of the host (optional).
 }
 
 // Uptime returns the system uptime

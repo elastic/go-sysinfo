@@ -15,33 +15,45 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package linux
+//go:build linux || darwin
+
+package shared
 
 import (
-	"sync"
-	"time"
-
-	"github.com/prometheus/procfs"
+	"fmt"
+	"net"
+	"os"
+	"strings"
 )
 
-var (
-	bootTimeValue time.Time  // Cached boot time.
-	bootTimeLock  sync.Mutex // Lock that guards access to bootTime.
-)
-
-func bootTime(fs procfs.FS) (time.Time, error) {
-	bootTimeLock.Lock()
-	defer bootTimeLock.Unlock()
-
-	if !bootTimeValue.IsZero() {
-		return bootTimeValue, nil
-	}
-
-	stat, err := fs.Stat()
+func FQDN() (string, error) {
+	hostname, err := os.Hostname()
 	if err != nil {
-		return time.Time{}, err
+		return "", fmt.Errorf("could not get hostname to look for FQDN: %w", err)
 	}
 
-	bootTimeValue = time.Unix(int64(stat.BootTime), 0)
-	return bootTimeValue, nil
+	var errs error
+	cname, err := net.LookupCNAME(hostname)
+	if err != nil {
+		errs = fmt.Errorf("could not get FQDN, all methods failed: failed looking up CNAME: %w",
+			err)
+	}
+	if cname != "" {
+		return strings.TrimSuffix(cname, "."), nil
+	}
+
+	ips, err := net.LookupIP(hostname)
+	if err != nil {
+		errs = fmt.Errorf("%s: failed looking up IP: %w", errs, err)
+	}
+
+	for _, ip := range ips {
+		names, err := net.LookupAddr(ip.String())
+		if err != nil || len(names) == 0 {
+			continue
+		}
+		return strings.TrimSuffix(names[0], "."), nil
+	}
+
+	return "", errs
 }

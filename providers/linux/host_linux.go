@@ -120,7 +120,7 @@ func (h *host) NetworkCounters() (*types.NetworkCountersInfo, error) {
 }
 
 func (h *host) CPUTime() (types.CPUTimes, error) {
-	stat, err := h.procFS.NewStat()
+	stat, err := h.procFS.Stat()
 	if err != nil {
 		return types.CPUTimes{}, err
 	}
@@ -138,7 +138,7 @@ func (h *host) CPUTime() (types.CPUTimes, error) {
 }
 
 func newHost(fs procFS) (*host, error) {
-	stat, err := fs.NewStat()
+	stat, err := fs.Stat()
 	if err != nil {
 		return nil, fmt.Errorf("failed to read proc stat: %w", err)
 	}
@@ -149,11 +149,13 @@ func newHost(fs procFS) (*host, error) {
 	r.bootTime(h)
 	r.containerized(h)
 	r.hostname(h)
+	r.fqdn(h)
 	r.network(h)
 	r.kernelVersion(h)
 	r.os(h)
 	r.time(h)
 	r.uniqueID(h)
+
 	return h, r.Err()
 }
 
@@ -208,6 +210,15 @@ func (r *reader) hostname(h *host) {
 		return
 	}
 	h.info.Hostname = v
+}
+
+func (r *reader) fqdn(h *host) {
+	v, err := shared.FQDN()
+	if r.addErr(err) {
+		return
+	}
+
+	h.info.FQDN = v
 }
 
 func (r *reader) network(h *host) {

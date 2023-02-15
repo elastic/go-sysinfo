@@ -15,33 +15,35 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build integration && docker
+
 package linux
 
 import (
-	"sync"
-	"time"
-
-	"github.com/prometheus/procfs"
+	"fmt"
+	"testing"
 )
 
-var (
-	bootTimeValue time.Time  // Cached boot time.
-	bootTimeLock  sync.Mutex // Lock that guards access to bootTime.
-)
-
-func bootTime(fs procfs.FS) (time.Time, error) {
-	bootTimeLock.Lock()
-	defer bootTimeLock.Unlock()
-
-	if !bootTimeValue.IsZero() {
-		return bootTimeValue, nil
-	}
-
-	stat, err := fs.Stat()
+func TestHost_FQDN_set(t *testing.T) {
+	host, err := newLinuxSystem("").Host()
 	if err != nil {
-		return time.Time{}, err
+		t.Fatal(fmt.Errorf("could not get host information: %w", err))
 	}
 
-	bootTimeValue = time.Unix(int64(stat.BootTime), 0)
-	return bootTimeValue, nil
+	got := host.Info()
+	if got.FQDN != wantFQDN {
+		t.Errorf("got FQDN %q, want: %q", got.FQDN, wantFQDN)
+	}
+}
+
+func TestHost_FQDN_not_set(t *testing.T) {
+	host, err := newLinuxSystem("").Host()
+	if err != nil {
+		t.Fatal(fmt.Errorf("could not get host information: %w", err))
+	}
+
+	got := host.Info()
+	if got.Hostname != got.FQDN {
+		t.Errorf("name and FQDN should be the same but hostname: %s, FQDN %s", got.Hostname, got.FQDN)
+	}
 }

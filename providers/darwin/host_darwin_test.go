@@ -15,33 +15,26 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package linux
+//go:build amd64 || arm64
+
+package darwin
 
 import (
-	"sync"
-	"time"
+	"encoding/json"
+	"testing"
 
-	"github.com/prometheus/procfs"
+	"github.com/elastic/go-sysinfo/internal/registry"
 )
 
-var (
-	bootTimeValue time.Time  // Cached boot time.
-	bootTimeLock  sync.Mutex // Lock that guards access to bootTime.
-)
+var _ registry.HostProvider = darwinSystem{}
 
-func bootTime(fs procfs.FS) (time.Time, error) {
-	bootTimeLock.Lock()
-	defer bootTimeLock.Unlock()
-
-	if !bootTimeValue.IsZero() {
-		return bootTimeValue, nil
-	}
-
-	stat, err := fs.Stat()
+func TestHost(t *testing.T) {
+	host, err := darwinSystem{}.Host()
 	if err != nil {
-		return time.Time{}, err
+		t.Logf("could not get all host info: %v\n", err)
 	}
 
-	bootTimeValue = time.Unix(int64(stat.BootTime), 0)
-	return bootTimeValue, nil
+	info := host.Info()
+	data, _ := json.MarshalIndent(info, "", "  ")
+	t.Logf(string(data))
 }

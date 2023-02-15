@@ -10,8 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add OS family mappings for `opensuse-leap` and `opensuse-tumbleweed`. [#146](https://github.com/elastic/go-sysinfo/pull/146)
+- Add FQDN to host info. [#144](https://github.com/elastic/go-sysinfo/pull/144)
 
 ### Changed
+
+- Requires Go 1.18+ [#144](https://github.com/elastic/go-sysinfo/pull/144)
 
 ### Deprecated
 
