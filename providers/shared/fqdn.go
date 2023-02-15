@@ -20,15 +20,11 @@
 package shared
 
 import (
-	"bufio"
 	"fmt"
-	"io/fs"
 	"net"
 	"os"
 	"strings"
 )
-
-const etcHosts = "/etc/hosts"
 
 func FQDN() (string, error) {
 	hostname, err := os.Hostname()
@@ -37,18 +33,10 @@ func FQDN() (string, error) {
 	}
 
 	var errs error
-
-	fqdn, err := fqdnFromEtcHosts(hostname)
-	if err != nil {
-		errs = fmt.Errorf("could not get FQDN, all methods failed: %w", err)
-	}
-	if fqdn != "" {
-		return fqdn, nil
-	}
-
 	cname, err := net.LookupCNAME(hostname)
 	if err != nil {
-		errs = fmt.Errorf("%s: failed looking up CNAME: %w", errs, err)
+		errs = fmt.Errorf("could not get FQDN, all methods failed: failed looking up CNAME: %w",
+			err)
 	}
 	if cname != "" {
 		return strings.TrimSuffix(cname, "."), nil
@@ -68,92 +56,4 @@ func FQDN() (string, error) {
 	}
 
 	return "", errs
-}
-
-func fqdnFromEtcHosts(hostname string) (string, error) {
-	f, err := os.Open(etcHosts)
-	if err != nil {
-		return "", fmt.Errorf("could open %q to get FQDN: %w", etcHosts, err)
-	}
-	defer f.Close()
-
-	fqdn, err := fqdnFromHosts(hostname, f)
-	if err != nil {
-		return "", fmt.Errorf("error when looking for FQDN on %s: %w", etcHosts, err)
-	}
-	if fqdn != "" {
-		return fqdn, nil
-	}
-
-	return "", fmt.Errorf("no entry for %q on %q", hostname, etcHosts)
-}
-
-// fqdnFromHosts looks for the FQDN for hostname on hostFile.
-// If successfully it returns FQDN, nil. If no FQDN for hostname is found
-// it returns "", nil. It returns "", err if any error happens.
-func fqdnFromHosts(hostname string, hostsFile fs.File) (string, error) {
-	s := bufio.NewScanner(hostsFile)
-
-	for s.Scan() {
-		fqdn := findInHostsLine(hostname, s.Text())
-		if fqdn != "" {
-			return fqdn, nil
-		}
-	}
-	if err := s.Err(); err != nil {
-		return "", fmt.Errorf("error reading hosts file lines: %w", err)
-	}
-
-	return "", nil
-}
-
-// findInHostsLine takes a HOSTS(5) line and searches for an alias matching
-// hostname, if found, it returns the canonical hostname. The canonical hostname
-// should be the FQDN, see HOSTNAME(1).
-// It will return the first match and if an entry with only the hostname and no
-// aliases is found, the hostname is returned.
-// TODO: check k8s: https://kubernetes.io/docs/tasks/network/customize-hosts-file-for-pods/
-func findInHostsLine(hostname, hostsEntry string) string {
-	line, _, _ := strings.Cut(hostsEntry, "#")
-	if len(line) < 1 {
-		return ""
-	}
-
-	fields := strings.FieldsFunc(line, func(r rune) bool {
-		return r == ' ' || r == '\t'
-	})
-
-	if len(fields) < 2 {
-		// invalid hostsEntry
-		return ""
-	}
-
-	// fields[0] is the ip address
-	canonical, aliases := fields[1], fields[1:]
-
-	// The hostname is the canonical hostname and there is no alias, then return
-	// it.
-	if len(fields) == 2 {
-		if fields[1] == hostname {
-			return canonical
-		}
-
-		// If hostname was not set as an alias for the canonical hostname,
-		// but the fist name before the dot matches the hostname.
-		// If foo is the hostname we're looking for and the entry is as follows
-		//   192.168.1.10    foo.mydomain.org
-		// foo.mydomain.org will be returned.
-		if hname, _, _ := strings.Cut(canonical, "."); hname == hostname {
-			return canonical
-		}
-	}
-
-	// Default case
-	for _, h := range aliases {
-		if h == hostname {
-			return canonical
-		}
-	}
-
-	return ""
 }
