@@ -82,6 +82,16 @@ func (host HostInfo) Uptime() time.Duration {
 	return time.Since(host.BootTime)
 }
 
+// FQDNAwareHostname returns the system hostname, honoring the given
+// flag to report the FQDN or not.
+func (host HostInfo) FQDNAwareHostname(wantFQDN bool) string {
+	if wantFQDN {
+		return host.FQDN
+	}
+
+	return host.Hostname
+}
+
 // OSInfo contains basic OS information
 type OSInfo struct {
 	Type     string `json:"type"`               // OS Type (one of linux, macos, unix, windows).
