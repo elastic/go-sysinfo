@@ -18,17 +18,18 @@
 package types
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestHostInfo_FQDNAwareHostname(t *testing.T) {
 	hostInfo := HostInfo{
 		Hostname: "foo",
-		FQDN: "foo.bar.baz",
+		FQDN:     "foo.bar.baz",
 	}
 
-	tests := map[string]struct{
+	tests := map[string]struct {
 		wantFQDN bool
 		expected string
 	}{

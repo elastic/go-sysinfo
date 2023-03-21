@@ -222,6 +222,7 @@ func (r *reader) fqdn(h *host) {
 
 	h.info.FQDN = v
 }
+
 func (r *reader) network(h *host) {
 	ips, macs, err := shared.Network()
 	if r.addErr(err) {

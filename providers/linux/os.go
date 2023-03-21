@@ -50,8 +50,10 @@ var (
 
 // familyMap contains a mapping of family -> []platforms.
 var familyMap = map[string][]string{
-	"redhat": {"redhat", "fedora", "centos", "scientific", "oraclelinux", "ol",
-		"amzn", "rhel", "almalinux", "openeuler", "rocky"},
+	"redhat": {
+		"redhat", "fedora", "centos", "scientific", "oraclelinux", "ol",
+		"amzn", "rhel", "almalinux", "openeuler", "rocky",
+	},
 	"debian": {"debian", "ubuntu", "raspbian", "linuxmint"},
 	"suse":   {"suse", "sles", "opensuse", "opensuse-leap", "opensuse-tumbleweed"},
 }
