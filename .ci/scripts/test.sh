@@ -44,10 +44,12 @@ orig_hostname=$(hostname)
 
 # Case 1: where machine will report a FQDN (hostname + domain name)
 sudo hostname long.pants.local
+hostname -f
 gotestsum --format standard-verbose --junitfile "build/junit-${GO_VERSION}.xml" -- -tags integration,fqdn ./...
 
 # Case 2: where machine will report a short name (only hostname, no domain name)
 sudo hostname shortpants
+hostname -f
 gotestsum --format standard-verbose --junitfile "build/junit-${GO_VERSION}.xml" -- -tags integration,fqdn ./...
 
 sudo hostname $orig_hostname
