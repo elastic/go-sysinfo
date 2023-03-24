@@ -37,7 +37,7 @@ fi
 # Run the tests
 export OUT_FILE="build/test-report.out"
 mkdir -p build
-#gotestsum --format standard-verbose --junitfile "build/junit-${GO_VERSION}.xml" -- -tags integration ./...
+#gotestsum --format testname --junitfile "build/junit-${GO_VERSION}.xml" -- -tags integration ./...
 
 # Run tests for FQDN reporting functionality separately, so we can control the machine's hostname
 orig_hostname=$(hostname)
