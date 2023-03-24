@@ -37,7 +37,7 @@ fi
 # Run the tests
 export OUT_FILE="build/test-report.out"
 mkdir -p build
-#gotestsum --format testname --junitfile "build/junit-${GO_VERSION}.xml" -- -tags integration ./...
+gotestsum --format testname --junitfile "build/junit-${GO_VERSION}.xml" -- -tags integration ./...
 
 # Run tests for FQDN reporting functionality separately, so we can control the machine's hostname
 orig_hostname=$(hostname)
@@ -45,11 +45,11 @@ orig_hostname=$(hostname)
 # Case 1: where machine will report a FQDN (hostname + domain name)
 sudo hostname long.pants.local
 hostname -f
-gotestsum --format standard-verbose --junitfile "build/junit-${GO_VERSION}.xml" -- -tags integration,fqdn ./...
+gotestsum --format testname --junitfile "build/junit-${GO_VERSION}.xml" -- -tags integration,fqdn ./...
 
 # Case 2: where machine will report a short name (only hostname, no domain name)
 sudo hostname shortpants
 hostname -f
-gotestsum --format standard-verbose --junitfile "build/junit-${GO_VERSION}.xml" -- -tags integration,fqdn ./...
+gotestsum --format testname --junitfile "build/junit-${GO_VERSION}.xml" -- -tags integration,fqdn ./...
 
 sudo hostname $orig_hostname
