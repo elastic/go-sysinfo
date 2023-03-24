@@ -41,6 +41,8 @@ gotestsum --format testname --junitfile "build/junit-${GO_VERSION}.xml" -- -tags
 
 # Run tests for FQDN reporting functionality separately, so we can control the machine's hostname
 orig_hostname=$(hostname -f)
+echo $orig_hostname
+cat /etc/resolv.conf
 
 # Case 1: where machine will report a FQDN (hostname + domain name)
 sudo hostname long.pants.local
