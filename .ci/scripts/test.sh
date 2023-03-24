@@ -40,7 +40,7 @@ mkdir -p build
 gotestsum --format testname --junitfile "build/junit-${GO_VERSION}.xml" -- -tags integration ./...
 
 # Run tests for FQDN reporting functionality separately, so we can control the machine's hostname
-orig_hostname=$(hostname)
+orig_hostname=$(hostname -f)
 
 # Case 1: where machine will report a FQDN (hostname + domain name)
 sudo hostname long.pants.local
