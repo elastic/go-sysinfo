@@ -26,28 +26,28 @@ import (
 
 func TestFQDN(t *testing.T) {
 	tests := map[string]struct {
-		osHostname   string
-		expectedFQDN string
-		expectedErr  error
+		osHostname       string
+		expectedFQDN     string
+		expectedErrRegex string
 	}{
 		// This test case depends on network, particularly DNS,
 		// being available.  If it starts to fail often enough
 		// due to occasional network/DNS unavailability, we should
 		// probably just delete this test case.
 		"long_real_hostname": {
-			osHostname:   "elastic.co",
-			expectedFQDN: "elastic.co",
-			expectedErr:  nil,
+			osHostname:       "elastic.co",
+			expectedFQDN:     "elastic.co",
+			expectedErrRegex: "",
 		},
 		"long_nonexistent_hostname": {
-			osHostname:   "foo.bar.elastic.co",
-			expectedFQDN: "",
-			expectedErr:  makeError("foo.bar.elastic.co"),
+			osHostname:       "foo.bar.elastic.co",
+			expectedFQDN:     "",
+			expectedErrRegex: makeErrorRegex("foo.bar.elastic.co"),
 		},
 		"short_nonexistent_hostname": {
-			osHostname:   "foobarbaz",
-			expectedFQDN: "",
-			expectedErr:  makeError("foobarbaz"),
+			osHostname:       "foobarbaz",
+			expectedFQDN:     "",
+			expectedErrRegex: makeErrorRegex("foobarbaz"),
 		},
 	}
 
@@ -56,20 +56,20 @@ func TestFQDN(t *testing.T) {
 			actualFQDN, err := fqdn(test.osHostname)
 			require.Equal(t, test.expectedFQDN, actualFQDN)
 
-			if test.expectedErr == nil {
+			if test.expectedErrRegex == "" {
 				require.Nil(t, err)
 			} else {
-				require.Equal(t, test.expectedErr.Error(), err.Error())
+				require.Regexp(t, test.expectedErrRegex, err.Error())
 			}
 		})
 	}
 }
 
-func makeError(osHostname string) error {
-	return fmt.Errorf(
+func makeErrorRegex(osHostname string) string {
+	return fmt.Sprintf(
 		"could not get FQDN, all methods failed: "+
-			"failed looking up CNAME: lookup %s: no such host: "+
-			"failed looking up IP: lookup %s: no such host",
+			"failed looking up CNAME: lookup %s.*: no such host: "+
+			"failed looking up IP: lookup %s.*: no such host",
 		osHostname,
 		osHostname,
 	)
