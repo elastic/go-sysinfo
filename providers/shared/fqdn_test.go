@@ -19,8 +19,9 @@ package shared
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestFQDN(t *testing.T) {
