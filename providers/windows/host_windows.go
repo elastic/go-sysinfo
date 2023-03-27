@@ -84,13 +84,21 @@ func (h *host) Memory() (*types.HostMemoryInfo, error) {
 	}, nil
 }
 
+func (h *host) FQDN() (string, error) {
+	fqdn, err := getComputerNameEx(stdwindows.ComputerNamePhysicalDnsFullyQualified)
+	if err != nil {
+		return "", fmt.Errorf("could not get windows FQDN: %s", err)
+	}
+
+	return strings.TrimSuffix(fqdn, ".")
+}
+
 func newHost() (*host, error) {
 	h := &host{}
 	r := &reader{}
 	r.architecture(h)
 	r.bootTime(h)
 	r.hostname(h)
-	r.fqdn(h)
 	r.network(h)
 	r.kernelVersion(h)
 	r.os(h)
@@ -142,17 +150,6 @@ func (r *reader) hostname(h *host) {
 		return
 	}
 	h.info.Hostname = v
-}
-
-func (r *reader) fqdn(h *host) {
-	fqdn, err := getComputerNameEx(
-		stdwindows.ComputerNamePhysicalDnsFullyQualified)
-	if err != nil {
-		r.addErr(fmt.Errorf("could not get windows FQDN: %s", err))
-		return
-	}
-
-	h.info.FQDN = strings.TrimSuffix(fqdn, ".")
 }
 
 func getComputerNameEx(name uint32) (string, error) {

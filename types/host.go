@@ -26,6 +26,7 @@ type Host interface {
 	CPUTimer
 	Info() HostInfo
 	Memory() (*HostMemoryInfo, error)
+	FQDN() (string, error)
 }
 
 // NetworkCounters represents network stats from /proc/net
