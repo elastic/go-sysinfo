@@ -32,6 +32,10 @@ func FQDN() (string, error) {
 		return "", fmt.Errorf("could not get hostname to look for FQDN: %w", err)
 	}
 
+	return fqdn(hostname)
+}
+
+func fqdn(hostname string) (string, error) {
 	var errs error
 	cname, err := net.LookupCNAME(hostname)
 	if err != nil {
