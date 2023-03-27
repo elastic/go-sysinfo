@@ -30,6 +30,10 @@ func TestFQDN(t *testing.T) {
 		expectedFQDN string
 		expectedErr  error
 	}{
+		// This test case depends on network, particularly DNS,
+		// being available.  If it starts to fail often enough
+		// due to occasional network/DNS unavailability, we should
+		// probably just delete this test case.
 		"long_real_hostname": {
 			osHostname:   "elastic.co",
 			expectedFQDN: "elastic.co",
