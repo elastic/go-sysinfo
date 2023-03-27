@@ -90,7 +90,7 @@ func (h *host) FQDN() (string, error) {
 		return "", fmt.Errorf("could not get windows FQDN: %s", err)
 	}
 
-	return strings.TrimSuffix(fqdn, ".")
+	return strings.TrimSuffix(fqdn, "."), nil
 }
 
 func newHost() (*host, error) {
