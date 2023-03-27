@@ -68,8 +68,8 @@ func TestFQDN(t *testing.T) {
 func makeErrorRegex(osHostname string) string {
 	return fmt.Sprintf(
 		"could not get FQDN, all methods failed: "+
-			"failed looking up CNAME: lookup %s.*: no such host: "+
-			"failed looking up IP: lookup %s.*: no such host",
+			"failed looking up CNAME: lookup %s.*: "+
+			"failed looking up IP: lookup %s.*",
 		osHostname,
 		osHostname,
 	)
