@@ -216,7 +216,13 @@ func (r *reader) hostname(h *host) {
 
 func (r *reader) fqdn(h *host) {
 	v, err := shared.FQDN()
-	if r.addErr(err) {
+
+	// We record any FQDN lookup errors differently from errors in other
+	// lookup methods. FQDN lookup is "best effort" and we want consumers
+	// of the FQDN to decide how severely they want to treat the lookup
+	// errors.
+	if err != nil {
+		h.info.FQDNError = err
 		return
 	}
 

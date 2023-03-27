@@ -75,6 +75,12 @@ type HostInfo struct {
 	Timezone          string    `json:"timezone"`            // System timezone.
 	TimezoneOffsetSec int       `json:"timezone_offset_sec"` // Timezone offset (seconds from UTC).
 	UniqueID          string    `json:"id,omitempty"`        // Unique ID of the host (optional).
+
+	// FQDNError contains any errors that were encountered while looking up the FQDN for the host.
+	// FQDN lookup is "best effort". As such, we do want to capture any errors during the lookup, but
+	// separately from other errors, so users of the FQDN can treat any lookup errors less severely
+	// (or not) than errors looking up other host information, as it makes sense for their use case.
+	FQDNError error
 }
 
 // Uptime returns the system uptime
