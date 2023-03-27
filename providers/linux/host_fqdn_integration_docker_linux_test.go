@@ -30,9 +30,9 @@ func TestHost_FQDN_set(t *testing.T) {
 		t.Fatal(fmt.Errorf("could not get host information: %w", err))
 	}
 
-	got := host.Info()
-	if got.FQDN != wantFQDN {
-		t.Errorf("got FQDN %q, want: %q", got.FQDN, wantFQDN)
+	gotFQDN := host.FQDN()
+	if gotFQDN != wantFQDN {
+		t.Errorf("got FQDN %q, want: %q", gotFQDN, wantFQDN)
 	}
 }
 
@@ -42,8 +42,9 @@ func TestHost_FQDN_not_set(t *testing.T) {
 		t.Fatal(fmt.Errorf("could not get host information: %w", err))
 	}
 
-	got := host.Info()
-	if got.Hostname != got.FQDN {
-		t.Errorf("name and FQDN should be the same but hostname: %s, FQDN %s", got.Hostname, got.FQDN)
+	gotFQDN := host.FQDN()
+	hostname := host.Info().Hostname
+	if gotFQDN != hostname {
+		t.Errorf("name and FQDN should be the same but hostname: %s, FQDN %s", hostname, gotFQDN)
 	}
 }
