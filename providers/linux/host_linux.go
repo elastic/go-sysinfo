@@ -72,6 +72,10 @@ func (h *host) Memory() (*types.HostMemoryInfo, error) {
 	return parseMemInfo(content)
 }
 
+func (h *host) FQDN() (string, error) {
+	return shared.FQDN()
+}
+
 // VMStat reports data from /proc/vmstat on linux.
 func (h *host) VMStat() (*types.VMStatInfo, error) {
 	content, err := ioutil.ReadFile(h.procFS.path("vmstat"))
@@ -149,7 +153,6 @@ func newHost(fs procFS) (*host, error) {
 	r.bootTime(h)
 	r.containerized(h)
 	r.hostname(h)
-	r.fqdn(h)
 	r.network(h)
 	r.kernelVersion(h)
 	r.os(h)
@@ -210,15 +213,6 @@ func (r *reader) hostname(h *host) {
 		return
 	}
 	h.info.Hostname = v
-}
-
-func (r *reader) fqdn(h *host) {
-	v, err := shared.FQDN()
-	if r.addErr(err) {
-		return
-	}
-
-	h.info.FQDN = v
 }
 
 func (r *reader) network(h *host) {
