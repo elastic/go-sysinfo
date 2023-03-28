@@ -26,6 +26,20 @@ import (
 	"strings"
 )
 
+// FQDN attempts to lookup the host's fully-qualified domain name and returns it.
+// It does so using the following algorithm:
+//
+//  1. It gets the hostname from the OS. If this step fails, it returns an error.
+//
+//  2. It tries to perform a CNAME DNS lookup for the hostname. If this succeeds, it
+//     returns the CNAME (after trimming any trailing period) as the FQDN.
+//
+//  3. It tries to perform an IP lookup for the hostname. If this succeeds, it tries
+//     to perform a reverse DNS lookup on the returned IPs and returns the first
+//     successful result (after trimming any trailing period) as the FQDN.
+//
+//  4. If steps 2 and 3 both fail, an empty string is returned as the FQDN along with
+//     errors from those steps.
 func FQDN() (string, error) {
 	hostname, err := os.Hostname()
 	if err != nil {
