@@ -3,7 +3,7 @@ module github.com/elastic/go-sysinfo
 go 1.18
 
 require (
-	github.com/docker/docker v20.10.22+incompatible
+	github.com/docker/docker v20.10.24+incompatible
 	github.com/elastic/go-windows v1.0.0
 	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901
 	github.com/prometheus/procfs v0.8.0
