@@ -9,8 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+## [1.10.0]
+
+### Added
+
 - Add OS family mappings for `opensuse-leap` and `opensuse-tumbleweed`. [#146](https://github.com/elastic/go-sysinfo/pull/146)
 - Add FQDN to host info. [#144](https://github.com/elastic/go-sysinfo/pull/144)
+- Return FQDN and error via `FQDN()` method on `Host` interface. [#159](https://github.com/elastic/go-sysinfo/pull/159)
+- Bump golang.org/x/net from 0.0.0-20220722155237-a158d28d115b to 0.7.0 [#153](https://github.com/elastic/go-sysinfo/pull/153)
+- Bump github.com/docker/docker from 20.10.22+incompatible to 20.10.24+incompatible [#160](https://github.com/elastic/go-sysinfo/pull/160)
 
 ### Changed
 
