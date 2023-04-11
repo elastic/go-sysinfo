@@ -32,9 +32,11 @@ import (
 	"github.com/docker/docker/pkg/stdcopy"
 )
 
-const wantHostname = "hostname"
-const wantDomain = "some.domain"
-const wantFQDN = wantHostname + "." + wantDomain
+const (
+	wantHostname = "hostname"
+	wantDomain   = "some.domain"
+	wantFQDN     = wantHostname + "." + wantDomain
+)
 
 func TestHost_FQDN(t *testing.T) {
 	const envKey = "GO_VERSION"
@@ -62,7 +64,8 @@ func TestHost_FQDN(t *testing.T) {
 					"go", "test", "-v",
 					"-tags", "integration,docker",
 					"-run", "^TestHost_FQDN_set$",
-					"./providers/linux"},
+					"./providers/linux",
+				},
 				Tty: false,
 			},
 		},
@@ -78,7 +81,8 @@ func TestHost_FQDN(t *testing.T) {
 					"go", "test", "-v",
 					"-tags", "integration,docker",
 					"-run", "^TestHost_FQDN_set$",
-					"./providers/linux"},
+					"./providers/linux",
+				},
 				Tty: false,
 			},
 		},
@@ -93,7 +97,8 @@ func TestHost_FQDN(t *testing.T) {
 					"go", "test", "-v", "-count", "1",
 					"-tags", "integration,docker",
 					"-run", "^TestHost_FQDN_not_set$",
-					"./providers/linux"},
+					"./providers/linux",
+				},
 				Tty: false,
 			},
 		},
@@ -137,7 +142,8 @@ func runOnDocker(t *testing.T, cli *client.Client, cf *container.Config) {
 	}
 	defer func() {
 		err = cli.ContainerRemove(ctx, resp.ID, types.ContainerRemoveOptions{
-			Force: true, RemoveVolumes: true})
+			Force: true, RemoveVolumes: true,
+		})
 		if err != nil {
 			t.Logf("WARNING: could not remove docker container: %v", err)
 		}
