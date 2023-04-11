@@ -9,8 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Bump github.com/docker/docker from 20.10.24+incompatible to 23.0.3+incompatible [#163](https://github.com/elastic/go-sysinfo/pull/163)
-
 ### Changed
 
 ### Deprecated
@@ -18,6 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 ### Fixed
+
+## [1.10.1]
+
+### Added
+
+- Bump github.com/docker/docker from 20.10.24+incompatible to 23.0.3+incompatible [#163](https://github.com/elastic/go-sysinfo/pull/163)
 
 ## [1.10.0]
 
@@ -171,7 +175,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Changed the host containerized check to reduce false positives. [#42](https://github.com/elastic/go-sysinfo/pull/42) [#43](https://github.com/elastic/go-sysinfo/pull/43)
 
-[Unreleased]: https://github.com/elastic/go-sysinfo/compare/v1.10.0...HEAD
+[Unreleased]: https://github.com/elastic/go-sysinfo/compare/v1.10.1...HEAD
+[1.10.1]: https://github.com/elastic/go-sysinfo/releases/tag/v1.10.1
 [1.10.0]: https://github.com/elastic/go-sysinfo/releases/tag/v1.10.0
 [1.9.0]: https://github.com/elastic/go-sysinfo/releases/tag/v1.9.0
 [1.8.1]: https://github.com/elastic/go-sysinfo/releases/tag/v1.8.1
