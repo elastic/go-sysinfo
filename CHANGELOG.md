@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Bump github.com/docker/docker from 20.10.24+incompatible to 23.0.3+incompatible [#163](https://github.com/elastic/go-sysinfo/pull/163)
+
 ### Changed
 
 ### Deprecated
