@@ -186,6 +186,11 @@ func kern_procargs(pid int, p *process) error {
 		}
 		return err
 	}
+
+	return parseKernProcargs2(data, p)
+}
+
+func parseKernProcargs2(data []byte, p *process) error {
 	buf := bytes.NewBuffer(data)
 
 	// argc
@@ -209,7 +214,7 @@ func kern_procargs(pid int, p *process) error {
 	}
 
 	// args
-	for i := 0; i < int(argc); i++ {
+	for len(lines) > 0 && len(p.args) < int(argc) {
 		p.args = append(p.args, string(lines[0]))
 		lines = lines[1:]
 	}

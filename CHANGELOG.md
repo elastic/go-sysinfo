@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Prevent possible runtime panic while reading process arguments on darwin. [#172](https://github.com/elastic/go-sysinfo/pull/172)
+
 ## [1.10.1]
 
 ### Added

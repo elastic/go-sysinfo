@@ -20,7 +20,11 @@
 package darwin
 
 import (
+	"bytes"
+	"encoding/binary"
 	"errors"
+	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"syscall"
@@ -138,4 +142,94 @@ func TestProcesses(t *testing.T) {
 	}
 
 	assert.NotZero(t, count, "failed to get process info for any processes")
+}
+
+func TestParseKernProcargs2(t *testing.T) {
+	testCases := []struct {
+		data    []byte
+		process process
+		err     error
+	}{
+		{data: nil, err: io.EOF},
+		{data: []byte{}, err: io.EOF},
+		{data: []byte{0, 0, 0, 0}, process: process{env: map[string]string{}}},
+		{data: []byte{5, 0, 0, 0}, process: process{env: map[string]string{}}},
+		{
+			data: buildKernProcargs2Data(3, "./example", []string{"/Users/test/example", "--one", "--two"}, []string{"TZ=UTC"}),
+			process: process{
+				exe:  "./example",
+				args: []string{"/Users/test/example", "--one", "--two"},
+				env: map[string]string{
+					"TZ": "UTC",
+				},
+			},
+		},
+	}
+
+	for i, tc := range testCases {
+		tc := tc
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			var p process
+			err := parseKernProcargs2(tc.data, &p)
+			if tc.err != nil {
+				assert.ErrorIs(t, err, tc.err)
+			} else {
+				assert.EqualValues(t, tc.process, p)
+			}
+		})
+	}
+}
+
+func FuzzParseKernProcargs2(f *testing.F) {
+	f.Add([]byte(nil))
+	f.Add([]byte{0, 0, 0, 0})
+	f.Add([]byte{10, 0, 0, 0})
+	f.Add(buildKernProcargs2Data(2, "./foo", []string{"/Users/john/foo", "-c"}, []string{"TZ=UTC"}))
+	f.Add(buildKernProcargs2Data(100, "./foo", []string{"/Users/john/foo", "-c"}, []string{"TZ=UTC"}))
+
+	f.Fuzz(func(t *testing.T, b []byte) {
+		p := &process{}
+		_ = parseKernProcargs2(b, p)
+	})
+}
+
+// buildKernProcargs2Data builds a response that is similar to what
+// sysctl kern.procargs2 returns.
+func buildKernProcargs2Data(argc int32, exe string, args, envs []string) []byte {
+	// argc
+	data := make([]byte, 4)
+	binary.LittleEndian.PutUint32(data, uint32(argc))
+
+	// exe
+	data = append(data, []byte(exe)...)
+	data = append(data, nullTerminator...)
+
+	// args
+	for _, arg := range args {
+		data = append(data, []byte(arg)...)
+		data = append(data, nullTerminator...)
+	}
+
+	// env
+	for _, env := range envs {
+		data = append(data, []byte(env)...)
+		data = append(data, nullTerminator...)
+	}
+
+	// The returned buffer from the real kern.procargs2 contains more data than
+	// what go-sysinfo parses. This is a rough simulation of that extra data.
+	data = append(data, bytes.Repeat(nullTerminator, 100)...)
+	data = append(data, []byte("ptr_munge=")...)
+	data = append(data, bytes.Repeat(nullTerminator, 18)...)
+	data = append(data, []byte("main_stack==")...)
+	data = append(data, bytes.Repeat(nullTerminator, 43)...)
+	data = append(data, []byte("executable_file=0x1a01000010,0x36713a1")...)
+	data = append(data, []byte("dyld_file=0x1a01000010,0xfffffff0008839c")...)
+	data = append(data, []byte("executable_cdhash=5ca6024f9cdaa3a9fe515bfad77e1acf0f6b15b6")...)
+	data = append(data, []byte("executable_boothash=a4a5613c07091ef0a221ee75a924341406eab85e")...)
+	data = append(data, []byte("arm64e_abi=os")...)
+	data = append(data, []byte("th_port=")...)
+	data = append(data, bytes.Repeat(nullTerminator, 11)...)
+
+	return data
 }
