@@ -37,11 +37,11 @@ pipeline {
         axes {
           axis {
             name 'GO_VERSION'
-            values '1.18.10', '1.19.5'
+            values '1.20.4'
           }
           axis {
             name 'PLATFORM'
-            values 'ubuntu-18 && immutable', 'windows-2019 && immutable', 'orka && darwin && x86_64', 'orka && darwin && arm64'
+            values 'ubuntu-18 && immutable', 'orka && darwin && arm64'
           }
           axis {
             name 'CGO_ENABLED'
@@ -51,22 +51,12 @@ pipeline {
         excludes {
           exclude {
             axis {
-              name 'GO_VERSION'
-              values '1.18.10'
+              name 'CGO_ENABLED'
+              values '1'
             }
             axis {
               name 'PLATFORM'
-              values 'orka && darwin && arm64'
-            }
-          }
-          exclude {
-            axis {
-              name 'GO_VERSION'
-              values '1.19.5'
-            }
-            axis {
-              name 'PLATFORM'
-              notValues 'orka && darwin && arm64'
+              values 'ubuntu-18 && immutable'
             }
           }
         }

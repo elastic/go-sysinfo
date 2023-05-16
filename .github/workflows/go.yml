@@ -1,0 +1,85 @@
+name: go
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version: 1.20.4
+
+      - name: go.mod tidy
+        run: go mod tidy && git diff --exit-code
+
+      - name: license header
+        run: go run github.com/elastic/go-licenser@v0.4.1 -d
+
+      - name: cross-compile
+        run: .ci/scripts/check-cross-compile.sh
+
+  test:
+    needs: check
+    strategy:
+      matrix:
+        go:
+          - 1.20.4
+          - 1.18.10
+        os:
+          - macos-11
+          - macos-12
+          - macos-13
+          - windows-2019
+          - windows-2022
+          - ubuntu-20.04
+          - ubuntu-22.04
+        cgo:
+          - 0
+          - 1
+        exclude:
+          # Exclude cgo testing for platforms that don't use CGO.
+          - {cgo: 1, os: windows-2019}
+          - {cgo: 1, os: windows-2022}
+          - {cgo: 1, os: ubuntu-20.04}
+          - {cgo: 1, os: ubuntu-22.04}
+          # Limit the OS variants tested with the earliest supported Go version (save resources).
+          - {go: 1.18.10, os: macos-11}
+          - {go: 1.18.10, os: macos-12}
+          - {go: 1.18.10, os: windows-2019}
+          - {go: 1.18.10, os: ubuntu-22.04}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version: ${{ matrix.go }}
+
+      - name: Set GO_VERSION
+        run: echo "GO_VERSION=${{ matrix.go }}" >> $GITHUB_ENV
+
+      - name: Set CGO_ENABLED
+        run: echo "CGO_ENABLED=${{ matrix.cgo }}" >> $GITHUB_ENV
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        if: github.event_name == 'pull_request'
+        with:
+          version: latest
+          only-new-issues: true
+          args: --timeout=3m
+
+      - name: Test
+        if: runner.os != 'Windows'
+        run:  .ci/scripts/test.sh
+
+      - name: Test
+        if: runner.os == 'Windows'
+        run:  .ci/scripts/test.bat
