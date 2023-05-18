@@ -67,11 +67,11 @@ jobs:
         run: echo "GO_VERSION=${{ steps.setup_go.outputs.go-version }}" >> $GITHUB_ENV
 
       - name: Set CGO_ENABLED=1
-        if: ${{ matrix.cgo == "cgo" }}
+        if: ${{ matrix.cgo }} == "cgo"
         run: echo "CGO_ENABLED=1" >> $GITHUB_ENV
 
       - name: Set CGO_ENABLED=0
-        if: ${{ matrix.cgo == "nocgo" }}
+        if: ${{ matrix.cgo }} == "nocgo"
         run: echo "CGO_ENABLED=0" >> $GITHUB_ENV
 
       - name: golangci-lint
