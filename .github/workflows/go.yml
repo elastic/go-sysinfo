@@ -59,11 +59,12 @@ jobs:
       - uses: actions/checkout@v3
 
       - uses: actions/setup-go@v4
+        id: setup_go
         with:
           go-version: ${{ matrix.go }}
 
       - name: Set GO_VERSION
-        run: echo "GO_VERSION=${{ matrix.go }}" >> $GITHUB_ENV
+        run: echo "GO_VERSION=${{ steps.setup_go.outputs.go-version }}" >> $GITHUB_ENV
 
       - name: Set CGO_ENABLED
         run: echo "CGO_ENABLED=${{ matrix.cgo }}" >> $GITHUB_ENV
