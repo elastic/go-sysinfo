@@ -76,7 +76,7 @@ jobs:
           only-new-issues: true
           args: --timeout=3m
           # Don't cache or restore ~/go/pkg. It conflicts with caching from setup-go@v4.
-          skip-pkg-cache: false
+          skip-pkg-cache: true
 
       - name: Test
         if: runner.os != 'Windows'
