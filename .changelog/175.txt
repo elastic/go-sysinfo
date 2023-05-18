@@ -1,0 +1,4 @@
+```release-note:bug
+windows: On versions earlier than 10/2016, the `os.major` version was getting overwritten with
+what would have been the minor version, and the `os.minor` version was not being set.
+```
