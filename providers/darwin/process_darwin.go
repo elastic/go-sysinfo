@@ -26,6 +26,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"syscall"
 	"time"
 
@@ -33,6 +34,8 @@ import (
 
 	"github.com/elastic/go-sysinfo/types"
 )
+
+var errInvalidProcargs2Data = errors.New("invalid kern.procargs2 data")
 
 func (s darwinSystem) Processes() ([]types.Process, error) {
 	ps, err := unix.SysctlKinfoProcSlice("kern.proc.all")
@@ -171,8 +174,6 @@ func (p *process) Memory() (types.MemoryInfo, error) {
 	}, nil
 }
 
-var nullTerminator = []byte{0}
-
 // wrapper around sysctl KERN_PROCARGS2
 // callbacks params are optional,
 // up to the caller as to which pieces of data they want
@@ -191,32 +192,30 @@ func kern_procargs(pid int, p *process) error {
 }
 
 func parseKernProcargs2(data []byte, p *process) error {
-	buf := bytes.NewBuffer(data)
-
 	// argc
-	var argc int32
-	if err := binary.Read(buf, binary.LittleEndian, &argc); err != nil {
-		return err
+	if len(data) < 4 {
+		return errInvalidProcargs2Data
 	}
+	argc := binary.LittleEndian.Uint32(data)
+	data = data[4:]
 
 	// exe
-	lines := bytes.Split(buf.Bytes(), nullTerminator)
-	p.exe = string(lines[0])
+	lines := strings.Split(string(data), "\x00")
+	p.exe = lines[0]
 	lines = lines[1:]
 
-	// skip nulls
+	// Skip nulls that may be appended after the exe.
 	for len(lines) > 0 {
-		if len(lines[0]) == 0 {
-			lines = lines[1:]
-			continue
+		if lines[0] != "" {
+			break
 		}
-		break
+		lines = lines[1:]
 	}
 
-	// args
-	for len(lines) > 0 && len(p.args) < int(argc) {
-		p.args = append(p.args, string(lines[0]))
-		lines = lines[1:]
+	// argv
+	if c := min(argc, uint32(len(lines))); c > 0 {
+		p.args = lines[:c]
+		lines = lines[c:]
 	}
 
 	// env vars
@@ -226,11 +225,11 @@ func parseKernProcargs2(data []byte, p *process) error {
 			break
 		}
 
-		parts := bytes.SplitN(l, []byte{'='}, 2)
-		key := string(parts[0])
+		parts := strings.SplitN(l, "=", 2)
+		key := parts[0]
 		var value string
 		if len(parts) == 2 {
-			value = string(parts[1])
+			value = parts[1]
 		}
 		env[key] = value
 	}
@@ -250,4 +249,11 @@ func int8SliceToString(s []int8) string {
 		buf.WriteByte(byte(b))
 	}
 	return buf.String()
+}
+
+func min(a, b uint32) uint32 {
+	if a < b {
+		return a
+	}
+	return b
 }

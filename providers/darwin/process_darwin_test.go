@@ -24,7 +24,6 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-	"io"
 	"os"
 	"os/exec"
 	"syscall"
@@ -150,8 +149,9 @@ func TestParseKernProcargs2(t *testing.T) {
 		process process
 		err     error
 	}{
-		{data: nil, err: io.EOF},
-		{data: []byte{}, err: io.EOF},
+		{data: nil, err: errInvalidProcargs2Data},
+		{data: []byte{}, err: errInvalidProcargs2Data},
+		{data: []byte{0xFF, 0xFF, 0xFF, 0xFF}, process: process{env: map[string]string{}}},
 		{data: []byte{0, 0, 0, 0}, process: process{env: map[string]string{}}},
 		{data: []byte{5, 0, 0, 0}, process: process{env: map[string]string{}}},
 		{
@@ -184,6 +184,8 @@ func FuzzParseKernProcargs2(f *testing.F) {
 	f.Add([]byte(nil))
 	f.Add([]byte{0, 0, 0, 0})
 	f.Add([]byte{10, 0, 0, 0})
+	f.Add([]byte{0xFF, 0xFF, 0xFF, 0xFF})
+	f.Add(buildKernProcargs2Data(-1, "./foo", []string{"/Users/john/foo", "-c"}, []string{"TZ=UTC"}))
 	f.Add(buildKernProcargs2Data(2, "./foo", []string{"/Users/john/foo", "-c"}, []string{"TZ=UTC"}))
 	f.Add(buildKernProcargs2Data(100, "./foo", []string{"/Users/john/foo", "-c"}, []string{"TZ=UTC"}))
 
@@ -199,37 +201,39 @@ func buildKernProcargs2Data(argc int32, exe string, args, envs []string) []byte 
 	// argc
 	data := make([]byte, 4)
 	binary.LittleEndian.PutUint32(data, uint32(argc))
+	buf := bytes.NewBuffer(data)
 
-	// exe
-	data = append(data, []byte(exe)...)
-	data = append(data, nullTerminator...)
+	// exe with optional extra null padding
+	buf.WriteString(exe)
+	buf.WriteByte(0)
+	buf.WriteByte(0)
 
-	// args
+	// argv
 	for _, arg := range args {
-		data = append(data, []byte(arg)...)
-		data = append(data, nullTerminator...)
+		buf.WriteString(arg)
+		buf.WriteByte(0)
 	}
 
 	// env
 	for _, env := range envs {
-		data = append(data, []byte(env)...)
-		data = append(data, nullTerminator...)
+		buf.WriteString(env)
+		buf.WriteByte(0)
 	}
 
 	// The returned buffer from the real kern.procargs2 contains more data than
 	// what go-sysinfo parses. This is a rough simulation of that extra data.
-	data = append(data, bytes.Repeat(nullTerminator, 100)...)
-	data = append(data, []byte("ptr_munge=")...)
-	data = append(data, bytes.Repeat(nullTerminator, 18)...)
-	data = append(data, []byte("main_stack==")...)
-	data = append(data, bytes.Repeat(nullTerminator, 43)...)
-	data = append(data, []byte("executable_file=0x1a01000010,0x36713a1")...)
-	data = append(data, []byte("dyld_file=0x1a01000010,0xfffffff0008839c")...)
-	data = append(data, []byte("executable_cdhash=5ca6024f9cdaa3a9fe515bfad77e1acf0f6b15b6")...)
-	data = append(data, []byte("executable_boothash=a4a5613c07091ef0a221ee75a924341406eab85e")...)
-	data = append(data, []byte("arm64e_abi=os")...)
-	data = append(data, []byte("th_port=")...)
-	data = append(data, bytes.Repeat(nullTerminator, 11)...)
+	buf.Write(bytes.Repeat([]byte{0}, 100))
+	buf.WriteString("ptr_munge=")
+	buf.Write(bytes.Repeat([]byte{0}, 18))
+	buf.WriteString("main_stack==")
+	buf.Write(bytes.Repeat([]byte{0}, 43))
+	buf.WriteString("executable_file=0x1a01000010,0x36713a1")
+	buf.WriteString("dyld_file=0x1a01000010,0xfffffff0008839c")
+	buf.WriteString("executable_cdhash=5ca6024f9cdaa3a9fe515bfad77e1acf0f6b15b6")
+	buf.WriteString("executable_boothash=a4a5613c07091ef0a221ee75a924341406eab85e")
+	buf.WriteString("arm64e_abi=os")
+	buf.WriteString("th_port=")
+	buf.Write(bytes.Repeat([]byte{0}, 11))
 
-	return data
+	return buf.Bytes()
 }
