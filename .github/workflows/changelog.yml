@@ -1,0 +1,20 @@
+name: changelog
+
+on:
+  pull_request:
+    types: [opened, synchronize, labeled, unlabeled]
+    branches:
+      - main
+
+jobs:
+  check:
+    if: "!contains(github.event.pull_request.labels.*.name, 'skip-changelog')"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: changelog
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        run: .ci/scripts/check-changelog.sh
