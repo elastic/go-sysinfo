@@ -41,14 +41,14 @@ jobs:
           - ubuntu-20.04
           - ubuntu-22.04
         cgo:
-          - 0
-          - 1
+          - cgo
+          - nocgo
         exclude:
           # Exclude cgo testing for platforms that don't use CGO.
-          - {cgo: 1, os: windows-2019}
-          - {cgo: 1, os: windows-2022}
-          - {cgo: 1, os: ubuntu-20.04}
-          - {cgo: 1, os: ubuntu-22.04}
+          - {cgo: cgo, os: windows-2019}
+          - {cgo: cgo, os: windows-2022}
+          - {cgo: cgo, os: ubuntu-20.04}
+          - {cgo: cgo, os: ubuntu-22.04}
           # Limit the OS variants tested with the earliest supported Go version (save resources).
           - {go: 1.18.10, os: macos-11}
           - {go: 1.18.10, os: macos-12}
@@ -66,8 +66,13 @@ jobs:
       - name: Set GO_VERSION
         run: echo "GO_VERSION=${{ steps.setup_go.outputs.go-version }}" >> $GITHUB_ENV
 
-      - name: Set CGO_ENABLED
-        run: echo "CGO_ENABLED=${{ matrix.cgo }}" >> $GITHUB_ENV
+      - name: Set CGO_ENABLED=1
+        if: ${{ matrix.cgo == "cgo" }}
+        run: echo "CGO_ENABLED=1" >> $GITHUB_ENV
+
+      - name: Set CGO_ENABLED=0
+        if: ${{ matrix.cgo == "nocgo" }}
+        run: echo "CGO_ENABLED=0" >> $GITHUB_ENV
 
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
