@@ -28,15 +28,15 @@ jobs:
       - name: release notes
         run: >-
           go run github.com/hashicorp/go-changelog/cmd/changelog-build@ba40b3a
-            -changelog-template .ci/release/changelog.gotmpl
-            -entries-dir ./.changelog
-            -note-template .ci/release/release-note.gotmpl
-            -last-release "${{ inputs.last_release }}"
-            -this-release HEAD | tee /tmp/release-notes.txt
+          -changelog-template .ci/release/changelog.gotmpl
+          -note-template .ci/release/release-note.gotmpl
+          -entries-dir ./.changelog
+          -last-release "${{ inputs.last_release }}"
+          -this-release HEAD | tee /tmp/release-notes.txt
 
       - name: draft GH release
         run: >-
           gh release create "${{ inputs.version }}"
-            --draft
-            --notes-file /tmp/release-notes.txt
-            --title "${{ inputs.version }}"
+          --draft
+          --notes-file /tmp/release-notes.txt
+          --title "${{ inputs.version }}"
