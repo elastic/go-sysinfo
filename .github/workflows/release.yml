@@ -22,8 +22,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        ref: main
-        fetch-depth: 0 # Need full history.
+        with:
+          fetch-depth: 0 # Need full history.
 
       - name: release notes
         run: >-
