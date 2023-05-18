@@ -225,13 +225,8 @@ func parseKernProcargs2(data []byte, p *process) error {
 			break
 		}
 
-		parts := strings.SplitN(l, "=", 2)
-		key := parts[0]
-		var value string
-		if len(parts) == 2 {
-			value = parts[1]
-		}
-		env[key] = value
+		key, val, _ := strings.Cut(l, "=")
+		env[key] = val
 	}
 	p.env = env
 

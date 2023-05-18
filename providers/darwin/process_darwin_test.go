@@ -155,12 +155,13 @@ func TestParseKernProcargs2(t *testing.T) {
 		{data: []byte{0, 0, 0, 0}, process: process{env: map[string]string{}}},
 		{data: []byte{5, 0, 0, 0}, process: process{env: map[string]string{}}},
 		{
-			data: buildKernProcargs2Data(3, "./example", []string{"/Users/test/example", "--one", "--two"}, []string{"TZ=UTC"}),
+			data: buildKernProcargs2Data(3, "./example", []string{"/Users/test/example", "--one", "--two"}, []string{"TZ=UTC", "FOO="}),
 			process: process{
 				exe:  "./example",
 				args: []string{"/Users/test/example", "--one", "--two"},
 				env: map[string]string{
-					"TZ": "UTC",
+					"TZ":  "UTC",
+					"FOO": "",
 				},
 			},
 		},
