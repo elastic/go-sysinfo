@@ -14,7 +14,7 @@ jobs:
 
       - uses: actions/setup-go@v4
         with:
-          go-version: 1.20.4
+          go-version: 1.20.x
 
       - name: go.mod tidy
         run: go mod tidy && git diff --exit-code
@@ -30,8 +30,8 @@ jobs:
     strategy:
       matrix:
         go:
-          - 1.20.4
-          - 1.18.10
+          - 1.20.x
+          - 1.18.x
         os:
           - macos-11
           - macos-12
@@ -75,6 +75,8 @@ jobs:
           version: latest
           only-new-issues: true
           args: --timeout=3m
+          # Don't cache or restore ~/go/pkg. It conflicts with caching from setup-go@v4.
+          skip-pkg-cache: false
 
       - name: Test
         if: runner.os != 'Windows'
