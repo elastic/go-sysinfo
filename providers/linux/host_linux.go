@@ -23,6 +23,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/joeshaw/multierror"
@@ -212,7 +213,7 @@ func (r *reader) hostname(h *host) {
 	if r.addErr(err) {
 		return
 	}
-	h.info.Hostname = v
+	h.info.Hostname = strings.ToLower(v)
 }
 
 func (r *reader) network(h *host) {
