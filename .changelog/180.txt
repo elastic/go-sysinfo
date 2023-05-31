@@ -1,0 +1,4 @@
+```release-note:enhancement
+Per ECS guidelines for the `host.name` field, always lowercase the FQDN and
+Hostname values before reporting them.
+```
