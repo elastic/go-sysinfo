@@ -1,0 +1,4 @@
+```release-note:enhancement
+linux: Update the Linux capability name mapping to add names for the
+`perfmon`, `bpf`, and `checkpoint_restore` capabilities.
+```
