@@ -80,6 +80,20 @@ func TestOperatingSystem(t *testing.T) {
 		}, *os)
 		t.Logf("%#v", os)
 	})
+	t.Run("archlinux", func(t *testing.T) {
+		os, err := getOSInfo("testdata/archlinux")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
+			Family:   "arch",
+			Platform: "archarm",
+			Name:     "Arch Linux ARM",
+			Build:    "rolling",
+		}, *os)
+		t.Logf("%#v", os)
+	})
 	t.Run("centos6", func(t *testing.T) {
 		os, err := getOSInfo("testdata/centos6")
 		if err != nil {
@@ -178,6 +192,22 @@ func TestOperatingSystem(t *testing.T) {
 			Version:  "20 (Ulyana)",
 			Major:    20,
 			Codename: "ulyana",
+		}, *os)
+		t.Logf("%#v", os)
+	})
+	t.Run("manjaro23", func(t *testing.T) {
+		os, err := getOSInfo("testdata/manjaro23")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
+			Family:   "arch",
+			Platform: "manjaro-arm",
+			Name:     "Manjaro ARM",
+			Version:  "23.02",
+			Major:    23,
+			Minor:    2,
 		}, *os)
 		t.Logf("%#v", os)
 	})

@@ -1,0 +1,7 @@
+```release-note:enhancement
+linux: Added an `os.Family` mapping for Arch Linux based distributions.
+```
+
+```release-note:bug
+linux: Fix OS metadata collection for Manjaro Linux.
+```
