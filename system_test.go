@@ -298,6 +298,7 @@ func TestProcesses(t *testing.T) {
 		case errors.Is(err, syscall.ESRCH),
 			errors.Is(err, syscall.EPERM),
 			errors.Is(err, syscall.EINVAL),
+			errors.Is(err, syscall.ENOENT),
 			errors.Is(err, fs.ErrPermission):
 			continue
 		case err != nil:
