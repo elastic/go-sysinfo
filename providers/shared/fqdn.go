@@ -57,7 +57,7 @@ func fqdn(hostname string) (string, error) {
 			err)
 	}
 	if cname != "" {
-		return strings.TrimSuffix(cname, "."), nil
+		return strings.ToLower(strings.TrimSuffix(cname, ".")), nil
 	}
 
 	ips, err := net.LookupIP(hostname)
@@ -70,7 +70,7 @@ func fqdn(hostname string) (string, error) {
 		if err != nil || len(names) == 0 {
 			continue
 		}
-		return strings.TrimSuffix(names[0], "."), nil
+		return strings.ToLower(strings.TrimSuffix(names[0], ".")), nil
 	}
 
 	return "", errs
