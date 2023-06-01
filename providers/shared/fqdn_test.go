@@ -51,6 +51,11 @@ func TestFQDN(t *testing.T) {
 			expectedFQDN:     "",
 			expectedErrRegex: makeErrorRegex("foobarbaz"),
 		},
+		"long_mixed_case_hostname": {
+			osHostname:       "eLaSTic.co",
+			expectedFQDN:     "elastic.co",
+			expectedErrRegex: "",
+		},
 	}
 
 	for name, test := range tests {

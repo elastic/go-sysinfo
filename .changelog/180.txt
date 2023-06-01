@@ -1,0 +1,4 @@
+```release-note:enhancement
+Lowercase the returned OS.Hostname and FQDN values as per Elastic
+Common Schema (ECS) guidelines for the `host.name` field.
+```
