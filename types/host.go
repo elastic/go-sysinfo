@@ -27,7 +27,7 @@ type Host interface {
 	Info() HostInfo
 	Memory() (*HostMemoryInfo, error)
 
-	// FQDN returns the fully-qualified domain name of the host, lower-cased.
+	// FQDN returns the fully-qualified domain name of the host, lowercased.
 	FQDN() (string, error)
 }
 
