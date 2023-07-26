@@ -26,20 +26,26 @@ import (
 	"strconv"
 )
 
-func parseKeyValue(content []byte, separator string, callback func(key, value []byte) error) error {
-	sc := bufio.NewScanner(bytes.NewReader(content))
-	for sc.Scan() {
-		parts := bytes.SplitN(sc.Bytes(), []byte(separator), 2)
-		if len(parts) != 2 {
+// parseKeyValue extracts KEY<separator>VALUE in each line of content and calls callback(KEY, VALUE)
+// empty lines are ignored. if a non empty line does not contain separator an error is returned
+func parseKeyValue(content []byte, separator byte, callback func(key, value []byte) error) error {
+	var line []byte
+
+	for len(content) > 0 {
+		line, content, _ = bytes.Cut(content, []byte{'\n'})
+		if len(line) == 0 {
 			continue
 		}
 
-		if err := callback(parts[0], bytes.TrimSpace(parts[1])); err != nil {
-			return err
+		key, value, ok := bytes.Cut(line, []byte{separator})
+		if !ok {
+			return fmt.Errorf("separator %q not found", separator)
 		}
+
+		callback(key, bytes.TrimSpace(value))
 	}
 
-	return sc.Err()
+	return nil
 }
 
 func findValue(filename, separator, key string) (string, error) {

@@ -10,7 +10,7 @@ func TestParseKeyValueNoEOL(t *testing.T) {
 	vals := [][2]string{}
 	err := parseKeyValue([]byte(
 		"Name:	zsh\nUmask:	0022\nState:	S (sleeping)\nUid:	1000	1000	1000	1000",
-	), ":", func(key, value []byte) error {
+	), ':', func(key, value []byte) error {
 		vals = append(vals, [2]string{string(key), string(value)})
 		return nil
 	})
@@ -28,7 +28,7 @@ func TestParseKeyValueEmptyLine(t *testing.T) {
 	vals := [][2]string{}
 	err := parseKeyValue([]byte(
 		"Name:	zsh\nUmask:	0022\nState:	S (sleeping)\n\nUid:	1000	1000	1000	1000",
-	), ":", func(key, value []byte) error {
+	), ':', func(key, value []byte) error {
 		vals = append(vals, [2]string{string(key), string(value)})
 		return nil
 	})
@@ -46,7 +46,7 @@ func TestParseKeyValueEOL(t *testing.T) {
 	vals := [][2]string{}
 	err := parseKeyValue([]byte(
 		"Name:	zsh\nUmask:	0022\nState:	S (sleeping)\nUid:	1000	1000	1000	1000\n",
-	), ":", func(key, value []byte) error {
+	), ':', func(key, value []byte) error {
 		vals = append(vals, [2]string{string(key), string(value)})
 		return nil
 	})
@@ -121,8 +121,25 @@ nonvoluntary_ctxt_switches:	25
 
 func BenchmarkParseKeyValue(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		parseKeyValue(testProcStatus, ":", func(key, value []byte) error {
+		_ = parseKeyValue(testProcStatus, ':', func(key, value []byte) error {
 			return nil
 		})
 	}
+}
+
+func FuzzParseKeyValue(f *testing.F) {
+	testcases := []string{
+		"no_separator",
+		"no_value:",
+		"empty_value: ",
+		"normal:	223",
+	}
+	for _, tc := range testcases {
+		f.Add(tc)
+	}
+	f.Fuzz(func(t *testing.T, orig string) {
+		_ = parseKeyValue([]byte(orig), ':', func(key, value []byte) error {
+			return nil
+		})
+	})
 }

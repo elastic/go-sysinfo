@@ -86,7 +86,7 @@ func capabilityName(num int) string {
 func readCapabilities(content []byte) (*types.CapabilityInfo, error) {
 	var cap types.CapabilityInfo
 
-	err := parseKeyValue(content, ":", func(key, value []byte) error {
+	err := parseKeyValue(content, ':', func(key, value []byte) error {
 		var err error
 		switch string(key) {
 		case "CapInh":
