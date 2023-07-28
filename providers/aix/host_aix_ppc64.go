@@ -118,6 +118,10 @@ func (*host) Memory() (*types.HostMemoryInfo, error) {
 	return &mem, nil
 }
 
+func (h *host) FQDN() (string, error) {
+	return shared.FQDN()
+}
+
 func newHost() (*host, error) {
 	h := &host{}
 	r := &reader{}
