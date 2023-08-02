@@ -115,6 +115,16 @@ func (*host) Memory() (*types.HostMemoryInfo, error) {
 	mem.VirtualFree = mem.Free + uint64(meminfo.pgsp_free)*pagesize
 	mem.VirtualUsed = mem.VirtualTotal - mem.VirtualFree
 
+	mem.Metrics = map[string]uint64{
+		"bytes_coalesced":         uint64(meminfo.bytes_coalesced),
+		"bytes_coalesced_mempool": uint64(meminfo.bytes_coalesced_mempool),
+		"real_pinned":             uint64(meminfo.real_pinned) * pagesize,
+		"pgins":                   uint64(meminfo.pgins),
+		"pgouts":                  uint64(meminfo.pgouts),
+		"pgsp_free":               uint64(meminfo.pgsp_free) * pagesize,
+		"pgsp_rsvd":               uint64(meminfo.pgsp_rsvd) * pagesize,
+	}
+
 	return &mem, nil
 }
 
