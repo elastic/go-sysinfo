@@ -1,7 +1,6 @@
 # go-sysinfo
 
-[![Build Status](https://beats-ci.elastic.co/job/Library/job/go-sysinfo-mbp/job/main/badge/icon)](https://beats-ci.elastic.co/job/Library/job/go-sysinfo-mbp/job/main/)
-![Github Workflow](https://github.com/elastic/go-sysinfo/actions/workflows/go.yml/badge.svg)
+[![go](https://github.com/elastic/go-sysinfo/actions/workflows/go.yml/badge.svg)](https://github.com/elastic/go-sysinfo/actions/workflows/go.yml)
 [![Go Documentation](http://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)][godocs]
 
 [godocs]: http://godoc.org/github.com/elastic/go-sysinfo
