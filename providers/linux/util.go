@@ -26,8 +26,9 @@ import (
 	"strconv"
 )
 
-// parseKeyValue extracts KEY<separator>VALUE in each line of content and calls callback(KEY, VALUE)
-// empty lines are ignored. if a non empty line does not contain separator an error is returned
+// parseKeyValue parses KEY<separator>VALUE from each line in content and invokes callback(KEY, VALUE).
+// White-space is trimmed from VALUE. Empty lines are ignored. All non-empty lines must contain
+// the separator otherwise an error is returned.
 func parseKeyValue(content []byte, separator byte, callback func(key, value []byte) error) error {
 	var line []byte
 
