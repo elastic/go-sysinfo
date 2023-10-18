@@ -23,6 +23,7 @@ package freebsd
 import "C"
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"time"
@@ -82,6 +83,21 @@ func (h *host) Memory() (*types.HostMemoryInfo, error) {
 
 func (h *host) FQDN() (string, error) {
 	return shared.FQDN()
+}
+
+func (h *host) LoadAverage() (*types.LoadAverageInfo, error) {
+	load, err := getLoadAverage()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get loadavg: %w", err)
+	}
+
+	scale := float64(load.scale)
+
+	return &types.LoadAverageInfo{
+		One:     float64(load.load[0]) / scale,
+		Five:    float64(load.load[1]) / scale,
+		Fifteen: float64(load.load[2]) / scale,
+	}, nil
 }
 
 func newHost() (*host, error) {
