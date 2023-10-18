@@ -18,28 +18,28 @@
 package freebsd
 
 // #cgo LDFLAGS: -lkvm -lprocstat
-//#include <sys/types.h>
-//#include <sys/sysctl.h>
-//#include <sys/time.h>
-//#include <sys/param.h>
-//#include <sys/queue.h>
-//#include <sys/socket.h>
-//#include <sys/user.h>
+// #include <sys/types.h>
+// #include <sys/sysctl.h>
+// #include <sys/time.h>
+// #include <sys/param.h>
+// #include <sys/queue.h>
+// #include <sys/socket.h>
+// #include <sys/user.h>
 //
-//#include <libprocstat.h>
-//#include <string.h>
-//struct kinfo_proc getProcInfoAt(struct kinfo_proc *procs, unsigned int index) {
+// #include <libprocstat.h>
+// #include <string.h>
+// struct kinfo_proc getProcInfoAt(struct kinfo_proc *procs, unsigned int index) {
 //  return procs[index];
-//}
-//unsigned int countArrayItems(char **items) {
+// }
+// unsigned int countArrayItems(char **items) {
 //  unsigned int i = 0;
 //  for (i = 0; items[i] != NULL; ++i);
 //  return i;
-//}
-//char * itemAtIndex(char **items, unsigned int index) {
+// }
+// char * itemAtIndex(char **items, unsigned int index) {
 //  return items[index];
-//}
-//unsigned int countFileStats(struct filestat_list *head) {
+// }
+// unsigned int countFileStats(struct filestat_list *head) {
 //  unsigned int count = 0;
 //  struct filestat *fst;
 //  STAILQ_FOREACH(fst, head, next) {
@@ -47,8 +47,8 @@ package freebsd
 //  }
 //
 //  return count;
-//}
-//void copyFileStats(struct filestat_list *head, struct filestat *out, unsigned int size) {
+// }
+// void copyFileStats(struct filestat_list *head, struct filestat *out, unsigned int size) {
 //  unsigned int index = 0;
 //  struct filestat *fst;
 //  STAILQ_FOREACH(fst, head, next) {
@@ -59,13 +59,13 @@ package freebsd
 //    ++out;
 //    --size;
 //  }
-//}
+// }
 //
 import "C"
 
 import (
-	"os"
 	"io/ioutil"
+	"os"
 	"strconv"
 	"strings"
 	"syscall"
@@ -218,7 +218,7 @@ func getProcCWD(p *process) (string, error) {
 
 type process struct {
 	pid   int
-	fs   procFS
+	fs    procFS
 	kinfo C.struct_kinfo_proc
 }
 
@@ -304,8 +304,7 @@ func (p *process) User() (types.UserInfo, error) {
 	}, nil
 }
 
-
-// NetworkStats reports network stats for an individual PID.
+// NetworkCounters reports network stats for an individual PID.
 func (p *process) NetworkCounters() (*types.NetworkCountersInfo, error) {
 	snmpRaw, err := ioutil.ReadFile(p.path("net/snmp"))
 	if err != nil {
