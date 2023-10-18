@@ -72,6 +72,12 @@ var expectedProcessFeatures = map[string]*ProcessFeatures{
 		OpenHandleEnumerator: false,
 		OpenHandleCounter:    false,
 	},
+	"freebsd": &ProcessFeatures{
+		ProcessInfo:          true,
+		Environment:          true,
+		OpenHandleEnumerator: true,
+		OpenHandleCounter:    true,
+	},
 }
 
 func TestProcessFeaturesMatrix(t *testing.T) {

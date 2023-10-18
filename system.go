@@ -28,6 +28,7 @@ import (
 	_ "github.com/elastic/go-sysinfo/providers/darwin"
 	_ "github.com/elastic/go-sysinfo/providers/linux"
 	_ "github.com/elastic/go-sysinfo/providers/windows"
+    _ "github.com/elastic/go-sysinfo/providers/freebsd"
 )
 
 // Go returns information about the Go runtime.
