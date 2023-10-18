@@ -26,7 +26,7 @@ import (
 )
 
 func TestOperatingSystem(t *testing.T) {
-	t.Run("freebsd13", func(t *testing.T) {
+	t.Run("freebsd13.1", func(t *testing.T) {
 		os, err := getOSInfo("")
 		if err != nil {
 			t.Fatal(err)
@@ -40,6 +40,24 @@ func TestOperatingSystem(t *testing.T) {
 			Major:    13,
 			Minor:    1,
 			Patch:    0,
+		}, *os)
+		t.Logf("%#v", os)
+	})
+
+	t.Run("freebsd13.2", func(t *testing.T) {
+		os, err := getOSInfo("")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Type:     "",
+			Family:   "freebsd",
+			Platform: "freebsd",
+			Name:     "FreeBSD",
+			Version:  "13.2-RELEASE-p3",
+			Major:    13,
+			Minor:    2,
+			Patch:    3,
 		}, *os)
 		t.Logf("%#v", os)
 	})

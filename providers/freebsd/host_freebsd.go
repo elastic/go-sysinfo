@@ -18,8 +18,8 @@
 package freebsd
 
 // #cgo LDFLAGS: -lkvm
-//#include <kvm.h>
-//#include <sys/vmmeter.h>
+// #include <kvm.h>
+// #include <sys/vmmeter.h>
 import "C"
 
 import (
@@ -58,7 +58,7 @@ func (s freebsdSystem) Host() (types.Host, error) {
 
 type host struct {
 	procFS procFS
-	info types.HostInfo
+	info   types.HostInfo
 }
 
 func (h *host) Info() types.HostInfo {
@@ -78,6 +78,10 @@ func (h *host) Memory() (*types.HostMemoryInfo, error) {
 	r := &reader{}
 	r.memInfo(m)
 	return m, r.Err()
+}
+
+func (h *host) FQDN() (string, error) {
+	return shared.FQDN()
 }
 
 func newHost() (*host, error) {
