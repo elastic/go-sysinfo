@@ -4,12 +4,13 @@ go 1.18
 
 require (
 	github.com/docker/docker v23.0.3+incompatible
-	github.com/elastic/go-windows v1.0.0
+	github.com/elastic/go-windows v1.0.1
 	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901
-	github.com/prometheus/procfs v0.8.0
+	github.com/pkg/errors v0.9.1
+	github.com/prometheus/procfs v0.12.0
 	github.com/stretchr/testify v1.7.0
 	golang.org/x/sys v0.13.0
-	howett.net/plist v0.0.0-20181124034731-591f970eefbb
+	howett.net/plist v1.0.0
 )
 
 require (
@@ -23,7 +24,6 @@ require (
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.0.2 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
 	golang.org/x/net v0.17.0 // indirect
