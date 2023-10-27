@@ -24,7 +24,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/elastic/go-sysinfo/types"
+	"github.com/jetrmm/go-sysinfo/types"
 )
 
 // fillStruct is some reflection work that can dynamically fill one of our tagged `netstat` structs with netstat data

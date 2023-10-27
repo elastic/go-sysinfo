@@ -22,7 +22,7 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/elastic/go-sysinfo/types"
+	"github.com/jetrmm/go-sysinfo/types"
 )
 
 const ostypeMIB = "kern.ostype"

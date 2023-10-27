@@ -19,7 +19,7 @@
 
 package darwin
 
-import "github.com/elastic/go-sysinfo/types"
+import "github.com/jetrmm/go-sysinfo/types"
 
 func getProcTaskAllInfo(pid int, info *procTaskAllInfo) error {
 	return types.ErrNotImplemented

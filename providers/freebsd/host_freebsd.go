@@ -32,9 +32,9 @@ import (
 	"github.com/pkg/errors"
 	"github.com/prometheus/procfs"
 
-	"github.com/elastic/go-sysinfo/internal/registry"
-	"github.com/elastic/go-sysinfo/providers/shared"
-	"github.com/elastic/go-sysinfo/types"
+	"github.com/jetrmm/go-sysinfo/internal/registry"
+	"github.com/jetrmm/go-sysinfo/providers/shared"
+	"github.com/jetrmm/go-sysinfo/types"
 )
 
 func init() {

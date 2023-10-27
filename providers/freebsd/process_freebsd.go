@@ -73,7 +73,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/go-sysinfo/types"
+	"github.com/jetrmm/go-sysinfo/types"
 )
 
 func getProcInfo(op int, arg int) ([]process, error) {

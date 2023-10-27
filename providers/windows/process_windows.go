@@ -31,7 +31,7 @@ import (
 
 	windows "github.com/elastic/go-windows"
 
-	"github.com/elastic/go-sysinfo/types"
+	"github.com/jetrmm/go-sysinfo/types"
 )
 
 var (

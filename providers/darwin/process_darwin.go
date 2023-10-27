@@ -32,7 +32,7 @@ import (
 
 	"golang.org/x/sys/unix"
 
-	"github.com/elastic/go-sysinfo/types"
+	"github.com/jetrmm/go-sysinfo/types"
 )
 
 var errInvalidProcargs2Data = errors.New("invalid kern.procargs2 data")

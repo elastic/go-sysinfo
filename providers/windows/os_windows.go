@@ -24,7 +24,7 @@ import (
 
 	"golang.org/x/sys/windows/registry"
 
-	"github.com/elastic/go-sysinfo/types"
+	"github.com/jetrmm/go-sysinfo/types"
 )
 
 func OperatingSystem() (*types.OSInfo, error) {

@@ -22,8 +22,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/go-sysinfo/internal/registry"
-	"github.com/elastic/go-sysinfo/types"
+	"github.com/jetrmm/go-sysinfo/internal/registry"
+	"github.com/jetrmm/go-sysinfo/types"
 )
 
 var (

@@ -20,7 +20,7 @@ package linux
 import (
 	"strconv"
 
-	"github.com/elastic/go-sysinfo/types"
+	"github.com/jetrmm/go-sysinfo/types"
 )
 
 // capabilityNames is mapping of capability constant values to names.

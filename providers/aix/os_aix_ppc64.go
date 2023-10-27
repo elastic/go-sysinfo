@@ -25,7 +25,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/elastic/go-sysinfo/types"
+	"github.com/jetrmm/go-sysinfo/types"
 )
 
 // OperatingSystem returns information of the host operating system

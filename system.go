@@ -20,15 +20,15 @@ package sysinfo
 import (
 	"runtime"
 
-	"github.com/elastic/go-sysinfo/internal/registry"
-	"github.com/elastic/go-sysinfo/types"
+	"github.com/jetrmm/go-sysinfo/internal/registry"
+	"github.com/jetrmm/go-sysinfo/types"
 
 	// Register host and process providers.
-	_ "github.com/elastic/go-sysinfo/providers/aix"
-	_ "github.com/elastic/go-sysinfo/providers/darwin"
-	_ "github.com/elastic/go-sysinfo/providers/linux"
-	_ "github.com/elastic/go-sysinfo/providers/windows"
-    _ "github.com/elastic/go-sysinfo/providers/freebsd"
+	_ "github.com/jetrmm/go-sysinfo/providers/aix"
+	_ "github.com/jetrmm/go-sysinfo/providers/darwin"
+	_ "github.com/jetrmm/go-sysinfo/providers/freebsd"
+	_ "github.com/jetrmm/go-sysinfo/providers/linux"
+	_ "github.com/jetrmm/go-sysinfo/providers/windows"
 )
 
 // Go returns information about the Go runtime.

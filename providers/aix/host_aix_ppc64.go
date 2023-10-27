@@ -38,9 +38,9 @@ import (
 
 	"github.com/joeshaw/multierror"
 
-	"github.com/elastic/go-sysinfo/internal/registry"
-	"github.com/elastic/go-sysinfo/providers/shared"
-	"github.com/elastic/go-sysinfo/types"
+	"github.com/jetrmm/go-sysinfo/internal/registry"
+	"github.com/jetrmm/go-sysinfo/providers/shared"
+	"github.com/jetrmm/go-sysinfo/types"
 )
 
 //go:generate sh -c "go tool cgo -godefs defs_aix.go | sed 's/*byte/uint64/g' > ztypes_aix_ppc64.go"

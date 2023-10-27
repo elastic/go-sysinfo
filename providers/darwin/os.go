@@ -25,7 +25,7 @@ import (
 
 	"howett.net/plist"
 
-	"github.com/elastic/go-sysinfo/types"
+	"github.com/jetrmm/go-sysinfo/types"
 )
 
 const (

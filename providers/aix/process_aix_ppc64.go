@@ -44,7 +44,7 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/elastic/go-sysinfo/types"
+	"github.com/jetrmm/go-sysinfo/types"
 )
 
 // Processes returns a list of all actives processes.

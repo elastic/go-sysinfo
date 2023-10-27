@@ -18,13 +18,13 @@
 package freebsd
 
 import (
-	"strings"
-	"fmt"
 	"errors"
-	"strconv"
+	"fmt"
 	"reflect"
+	"strconv"
+	"strings"
 
-	"github.com/elastic/go-sysinfo/types"
+	"github.com/jetrmm/go-sysinfo/types"
 )
 
 // getNetSnmpStats pulls snmp stats from /proc/net

@@ -22,7 +22,7 @@ package darwin
 import (
 	"fmt"
 
-	"github.com/elastic/go-sysinfo/types"
+	"github.com/jetrmm/go-sysinfo/types"
 )
 
 func MachineID() (string, error) {
