@@ -1,4 +1,4 @@
-module github.com/elastic/go-sysinfo
+module github.com/jetrmm/go-sysinfo
 
 go 1.18
 
