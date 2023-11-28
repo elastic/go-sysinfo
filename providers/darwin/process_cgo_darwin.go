@@ -19,7 +19,6 @@
 
 package darwin
 
-// #cgo LDFLAGS:-lproc
 // #include <sys/sysctl.h>
 // #include <libproc.h>
 import "C"
