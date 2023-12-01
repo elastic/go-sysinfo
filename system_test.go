@@ -310,3 +310,25 @@ func TestProcesses(t *testing.T) {
 			info.StartTime)
 	}
 }
+
+func TestCapabilities(t *testing.T) {
+	if runtime.GOOS != "linux" {
+		t.Skip("capabilities is linux only")
+	}
+	init, err := Process(1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	v, ok := init.(types.Capabilities)
+	if !ok {
+		t.Fatal("capabilities is expected to be implemented for linux")
+	}
+	capInfo, err := v.Capabilities()
+	if err != nil {
+		t.Fatal(err)
+	}
+	totalCaps := 41
+	assert.EqualValues(t, len(capInfo.Permitted), totalCaps)
+	assert.EqualValues(t, len(capInfo.Effective), totalCaps)
+	assert.EqualValues(t, len(capInfo.Bounding), totalCaps)
+}

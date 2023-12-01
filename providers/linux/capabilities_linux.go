@@ -83,40 +83,36 @@ func capabilityName(num int) string {
 	return strconv.Itoa(num)
 }
 
-func readCapabilities(content []byte) (*types.CapabilityInfo, error) {
-	var cap types.CapabilityInfo
-
-	err := parseKeyValue(content, ':', func(key, value []byte) error {
+func decodeCapabilityLine(content string, capInfo *types.CapabilityInfo) error {
+	return parseKeyValue([]byte(content), ':', func(key, value []byte) error {
 		var err error
 		switch string(key) {
 		case "CapInh":
-			cap.Inheritable, err = decodeBitMap(string(value), capabilityName)
+			capInfo.Inheritable, err = decodeBitMap(string(value), capabilityName)
 			if err != nil {
 				return err
 			}
 		case "CapPrm":
-			cap.Permitted, err = decodeBitMap(string(value), capabilityName)
+			capInfo.Permitted, err = decodeBitMap(string(value), capabilityName)
 			if err != nil {
 				return err
 			}
 		case "CapEff":
-			cap.Effective, err = decodeBitMap(string(value), capabilityName)
+			capInfo.Effective, err = decodeBitMap(string(value), capabilityName)
 			if err != nil {
 				return err
 			}
 		case "CapBnd":
-			cap.Bounding, err = decodeBitMap(string(value), capabilityName)
+			capInfo.Bounding, err = decodeBitMap(string(value), capabilityName)
 			if err != nil {
 				return err
 			}
 		case "CapAmb":
-			cap.Ambient, err = decodeBitMap(string(value), capabilityName)
+			capInfo.Ambient, err = decodeBitMap(string(value), capabilityName)
 			if err != nil {
 				return err
 			}
 		}
 		return nil
 	})
-
-	return &cap, err
 }

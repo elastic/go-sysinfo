@@ -18,6 +18,7 @@
 package linux
 
 import (
+	"bufio"
 	"bytes"
 	"io/ioutil"
 	"os"
@@ -213,13 +214,29 @@ func (p *process) Seccomp() (*types.SeccompInfo, error) {
 	return readSeccompFields(content)
 }
 
+// Returns error if at least one capability errored out, while still
+// returning the successful ones
 func (p *process) Capabilities() (*types.CapabilityInfo, error) {
-	content, err := ioutil.ReadFile(p.path("status"))
+	var gotErr error
+	f, err := os.OpenFile(p.path("status"), os.O_RDONLY, 0644)
 	if err != nil {
 		return nil, err
 	}
+	defer f.Close()
+	scanner := bufio.NewScanner(bufio.NewReader(f))
+	var capInfo types.CapabilityInfo
+	for scanner.Scan() {
+		line := scanner.Text()
+		if len(line) != 24 || line[:3] != "Cap" {
+			continue
+		}
+		err = decodeCapabilityLine(line, &capInfo)
+		if err != nil && gotErr == nil {
+			gotErr = err
+		}
+	}
 
-	return readCapabilities(content)
+	return &capInfo, gotErr
 }
 
 func (p *process) User() (types.UserInfo, error) {
