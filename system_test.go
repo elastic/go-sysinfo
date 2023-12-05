@@ -74,6 +74,19 @@ var expectedProcessFeatures = map[string]*ProcessFeatures{
 	},
 }
 
+func TestSystemHostFS(t *testing.T) {
+	if runtime.GOOS != "linux" {
+		t.Skip("test is linux-only")
+	}
+
+	handler, err := HostFS("providers/linux/testdata/ubuntu1710")
+	require.NoError(t, err)
+	memInfo, err := handler.Memory()
+	require.NoError(t, err)
+	// make sure we read the testdata file
+	require.Equal(t, memInfo.Free, uint64(2612703232))
+}
+
 func TestProcessFeaturesMatrix(t *testing.T) {
 	const GOOS = runtime.GOOS
 	var features ProcessFeatures

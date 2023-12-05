@@ -52,6 +52,16 @@ func Host() (types.Host, error) {
 	return provider.Host()
 }
 
+// HostFS is the same as Host, but allows for a custom root hostfs mountpoint
+// a custom filesystem root is only supported on linux, and this will fallback to the default provider on other platforms
+func HostFS(hostfs string) (types.Host, error) {
+	provider := registry.GetHostProviderWithRoot(hostfs)
+	if provider == nil {
+		return nil, types.ErrNotImplemented
+	}
+	return provider.Host()
+}
+
 // Process returns a types.Process object representing the process associated
 // with the given PID. The types.Process object can be used to query information
 // about the process.  If process information collection is not implemented for
@@ -64,11 +74,31 @@ func Process(pid int) (types.Process, error) {
 	return provider.Process(pid)
 }
 
+// ProcessFS is the same as Process, but allows for a custom root hostfs mountpoint
+// a custom filesystem root is only supported on linux, and this will fallback to the default provider on other platforms
+func ProcessFS(hostfs string, pid int) (types.Process, error) {
+	provider := registry.GetProcessProviderWithRoot(hostfs)
+	if provider == nil {
+		return nil, types.ErrNotImplemented
+	}
+	return provider.Process(pid)
+}
+
 // Processes return a list of all processes. If process information collection
 // is not implemented for this platform then types.ErrNotImplemented is
 // returned.
 func Processes() ([]types.Process, error) {
 	provider := registry.GetProcessProvider()
+	if provider == nil {
+		return nil, types.ErrNotImplemented
+	}
+	return provider.Processes()
+}
+
+// ProcessesFS is the same as Processes, but allows for a custom root hostfs mountpoint
+// a custom filesystem root is only supported on linux, and this will fallback to the default provider on other platforms
+func ProcessesFS(hostfs string) ([]types.Process, error) {
+	provider := registry.GetProcessProviderWithRoot(hostfs)
 	if provider == nil {
 		return nil, types.ErrNotImplemented
 	}
