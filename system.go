@@ -52,6 +52,14 @@ func Host() (types.Host, error) {
 	return provider.Host()
 }
 
+func HostFS(hostfs string) (types.Host, error) {
+	provider := registry.GetHostProviderWithRoot(hostfs)
+	if provider == nil {
+		return nil, types.ErrNotImplemented
+	}
+	return provider.Host()
+}
+
 // Process returns a types.Process object representing the process associated
 // with the given PID. The types.Process object can be used to query information
 // about the process.  If process information collection is not implemented for
