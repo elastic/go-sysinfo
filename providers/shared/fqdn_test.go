@@ -90,7 +90,7 @@ func TestFQDN(t *testing.T) {
 }
 
 func makeErrorRegex(osHostname string, withTimeout bool) string {
-	timeoutStr := ".*"
+	timeoutStr := ""
 	if withTimeout {
 		timeoutStr = ": i/o timeout"
 	}
