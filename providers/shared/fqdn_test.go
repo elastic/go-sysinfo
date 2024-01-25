@@ -20,8 +20,10 @@
 package shared
 
 import (
+	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 )
@@ -60,7 +62,10 @@ func TestFQDN(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			actualFQDN, err := fqdn(test.osHostname)
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer cancel()
+
+			actualFQDN, err := fqdn(ctx, test.osHostname)
 			require.Equal(t, test.expectedFQDN, actualFQDN)
 
 			if test.expectedErrRegex == "" {
