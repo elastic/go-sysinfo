@@ -30,6 +30,7 @@ package aix
 import "C"
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -128,8 +129,8 @@ func (*host) Memory() (*types.HostMemoryInfo, error) {
 	return &mem, nil
 }
 
-func (h *host) FQDN() (string, error) {
-	return shared.FQDN()
+func (h *host) FQDN(ctx context.Context) (string, error) {
+	return shared.FQDN(ctx)
 }
 
 func newHost() (*host, error) {

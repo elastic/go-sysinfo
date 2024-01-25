@@ -20,6 +20,7 @@
 package darwin
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -139,8 +140,8 @@ func (h *host) Memory() (*types.HostMemoryInfo, error) {
 	return &mem, nil
 }
 
-func (h *host) FQDN() (string, error) {
-	return shared.FQDN()
+func (h *host) FQDN(ctx context.Context) (string, error) {
+	return shared.FQDN(ctx)
 }
 
 func (h *host) LoadAverage() (*types.LoadAverageInfo, error) {

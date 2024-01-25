@@ -18,6 +18,7 @@
 package linux
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -73,8 +74,8 @@ func (h *host) Memory() (*types.HostMemoryInfo, error) {
 	return parseMemInfo(content)
 }
 
-func (h *host) FQDN() (string, error) {
-	return shared.FQDN()
+func (h *host) FQDN(ctx context.Context) (string, error) {
+	return shared.FQDN(ctx)
 }
 
 // VMStat reports data from /proc/vmstat on linux.

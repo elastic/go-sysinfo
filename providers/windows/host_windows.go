@@ -18,6 +18,7 @@
 package windows
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -84,7 +85,7 @@ func (h *host) Memory() (*types.HostMemoryInfo, error) {
 	}, nil
 }
 
-func (h *host) FQDN() (string, error) {
+func (h *host) FQDN(_ context.Context) (string, error) {
 	fqdn, err := getComputerNameEx(stdwindows.ComputerNamePhysicalDnsFullyQualified)
 	if err != nil {
 		return "", fmt.Errorf("could not get windows FQDN: %s", err)

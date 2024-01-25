@@ -17,7 +17,10 @@
 
 package types
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
 // Host is the interface that wraps methods for returning Host stats
 // It may return partial information if the provider
@@ -28,7 +31,7 @@ type Host interface {
 	Memory() (*HostMemoryInfo, error)
 
 	// FQDN returns the fully-qualified domain name of the host, lowercased.
-	FQDN() (string, error)
+	FQDN(ctx context.Context) (string, error)
 }
 
 // NetworkCounters represents network stats from /proc/net
