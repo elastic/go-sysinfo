@@ -30,8 +30,12 @@ type Host interface {
 	Info() HostInfo
 	Memory() (*HostMemoryInfo, error)
 
-	// FQDN returns the fully-qualified domain name of the host, lowercased.
-	FQDN(ctx context.Context) (string, error)
+	// FQDNWithContext returns the fully-qualified domain name of the host, lowercased.
+	FQDNWithContext(ctx context.Context) (string, error)
+
+	// FQDN calls FQDNWithContext with a background context.
+	// Deprecated: Use FQDNWithContext instead.
+	FQDN() (string, error)
 }
 
 // NetworkCounters represents network stats from /proc/net
