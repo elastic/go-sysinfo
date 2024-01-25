@@ -61,7 +61,7 @@ func fqdn(ctx context.Context, hostname string) (string, error) {
 		return strings.ToLower(strings.TrimSuffix(cname, ".")), nil
 	}
 
-	ips, err := net.DefaultResolver.LookupIPAddr(ctx, hostname)
+	ips, err := net.DefaultResolver.LookupIP(ctx, "ip", hostname)
 	if err != nil {
 		errs = fmt.Errorf("%s: failed looking up IP: %w", errs, err)
 	}
