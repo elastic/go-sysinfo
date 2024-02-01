@@ -17,7 +17,10 @@
 
 package types
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
 // Host is the interface that wraps methods for returning Host stats
 // It may return partial information if the provider
@@ -27,7 +30,11 @@ type Host interface {
 	Info() HostInfo
 	Memory() (*HostMemoryInfo, error)
 
-	// FQDN returns the fully-qualified domain name of the host, lowercased.
+	// FQDNWithContext returns the fully-qualified domain name of the host, lowercased.
+	FQDNWithContext(ctx context.Context) (string, error)
+
+	// FQDN calls FQDNWithContext with a background context.
+	// Deprecated: Use FQDNWithContext instead.
 	FQDN() (string, error)
 }
 

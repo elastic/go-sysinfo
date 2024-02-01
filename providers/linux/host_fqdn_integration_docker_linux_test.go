@@ -20,8 +20,10 @@
 package linux
 
 import (
+	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 )
@@ -32,7 +34,10 @@ func TestHost_FQDN_set(t *testing.T) {
 		t.Fatal(fmt.Errorf("could not get host information: %w", err))
 	}
 
-	gotFQDN, err := host.FQDN()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	gotFQDN, err := host.FQDNWithContext(ctx)
 	require.NoError(t, err)
 	if gotFQDN != wantFQDN {
 		t.Errorf("got FQDN %q, want: %q", gotFQDN, wantFQDN)
@@ -45,7 +50,10 @@ func TestHost_FQDN_not_set(t *testing.T) {
 		t.Fatal(fmt.Errorf("could not get host information: %w", err))
 	}
 
-	gotFQDN, err := host.FQDN()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	gotFQDN, err := host.FQDNWithContext(ctx)
 	require.NoError(t, err)
 	hostname := host.Info().Hostname
 	if gotFQDN != hostname {

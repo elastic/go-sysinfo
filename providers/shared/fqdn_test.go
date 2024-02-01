@@ -20,8 +20,10 @@
 package shared
 
 import (
+	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 )
@@ -31,6 +33,7 @@ func TestFQDN(t *testing.T) {
 		osHostname       string
 		expectedFQDN     string
 		expectedErrRegex string
+		timeout          time.Duration
 	}{
 		// This test case depends on network, particularly DNS,
 		// being available.  If it starts to fail often enough
@@ -44,23 +47,37 @@ func TestFQDN(t *testing.T) {
 		"long_nonexistent_hostname": {
 			osHostname:       "foo.bar.elastic.co",
 			expectedFQDN:     "",
-			expectedErrRegex: makeErrorRegex("foo.bar.elastic.co"),
+			expectedErrRegex: makeErrorRegex("foo.bar.elastic.co", false),
 		},
 		"short_nonexistent_hostname": {
 			osHostname:       "foobarbaz",
 			expectedFQDN:     "",
-			expectedErrRegex: makeErrorRegex("foobarbaz"),
+			expectedErrRegex: makeErrorRegex("foobarbaz", false),
 		},
 		"long_mixed_case_hostname": {
 			osHostname:       "eLaSTic.co",
 			expectedFQDN:     "elastic.co",
 			expectedErrRegex: "",
 		},
+		"nonexistent_timeout": {
+			osHostname:       "foobarbaz",
+			expectedFQDN:     "",
+			expectedErrRegex: makeErrorRegex("foobarbaz", true),
+			timeout:          1 * time.Millisecond,
+		},
 	}
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			actualFQDN, err := fqdn(test.osHostname)
+			timeout := test.timeout
+			if timeout == 0 {
+				timeout = 10 * time.Second
+			}
+
+			ctx, cancel := context.WithTimeout(context.Background(), timeout)
+			defer cancel()
+
+			actualFQDN, err := fqdn(ctx, test.osHostname)
 			require.Equal(t, test.expectedFQDN, actualFQDN)
 
 			if test.expectedErrRegex == "" {
@@ -72,11 +89,16 @@ func TestFQDN(t *testing.T) {
 	}
 }
 
-func makeErrorRegex(osHostname string) string {
+func makeErrorRegex(osHostname string, withTimeout bool) string {
+	timeoutStr := ""
+	if withTimeout {
+		timeoutStr = ": i/o timeout"
+	}
+
 	return fmt.Sprintf(
 		"could not get FQDN, all methods failed: "+
 			"failed looking up CNAME: lookup %s.*: "+
-			"failed looking up IP: lookup %s.*",
+			"failed looking up IP: lookup %s"+timeoutStr,
 		osHostname,
 		osHostname,
 	)
