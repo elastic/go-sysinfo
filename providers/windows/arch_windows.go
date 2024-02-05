@@ -24,10 +24,10 @@ import (
 )
 
 const (
-	IMAGE_FILE_MACHINE_AMD64 = 0x8664
-	IMAGE_FILE_MACHINE_ARM64 = 0xAA64
-	archIntel                = "x86_64"
-	archArm64                = "arm64"
+	imageFileMachineAmd64 = 0x8664
+	imageFileMachineArm64 = 0xAA64
+	archIntel             = "x86_64"
+	archArm64             = "arm64"
 )
 
 func Architecture() (string, error) {
@@ -52,10 +52,10 @@ func NativeArchitecture() (string, error) {
 	nativeArch := ""
 
 	switch nativeMachine {
-	case IMAGE_FILE_MACHINE_AMD64:
+	case imageFileMachineAmd64:
 		// for parity with Architecture() as amd64 and x86_64 are used interchangeably
 		nativeArch = archIntel
-	case IMAGE_FILE_MACHINE_ARM64:
+	case imageFileMachineArm64:
 		nativeArch = archArm64
 	default:
 	}

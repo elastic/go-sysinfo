@@ -24,7 +24,13 @@ import (
 	"syscall"
 )
 
-const procSysKernelArch = "/proc/sys/kernel/arch"
+const (
+	procSysKernelArch = "/proc/sys/kernel/arch"
+	procVersion       = "/proc/version"
+	archAmd64         = "amd64"
+	archArm64         = "arm64"
+	archAarch64       = "aarch64"
+)
 
 func Architecture() (string, error) {
 	var uname syscall.Utsname
@@ -47,6 +53,20 @@ func NativeArchitecture() (string, error) {
 	data, err := os.ReadFile(procSysKernelArch)
 	if err != nil {
 		if os.IsNotExist(err) {
+			// fallback to checking version string
+			version, err := os.ReadFile(procVersion)
+			if err != nil {
+				return "", nil
+			}
+
+			versionStr := string(version)
+			if strings.Contains(versionStr, archAmd64) {
+				return archAmd64, nil
+			} else if strings.Contains(versionStr, archArm64) {
+				// for parity with Architecture() and /proc/sys/kernel/arch
+				// as aarch64 and arm64 are used interchangeably
+				return archAarch64, nil
+			}
 			return "", nil
 		}
 
@@ -54,7 +74,7 @@ func NativeArchitecture() (string, error) {
 	}
 
 	nativeArch := string(data)
-	nativeArch = strings.TrimSpace(nativeArch)
+	nativeArch = strings.TrimRight(nativeArch, "\n")
 
 	return string(data), nil
 }
