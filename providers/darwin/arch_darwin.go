@@ -21,11 +21,17 @@ package darwin
 
 import (
 	"fmt"
+	"os"
 
 	"golang.org/x/sys/unix"
 )
 
-const hardwareMIB = "hw.machine"
+const (
+	hardwareMIB    = "hw.machine"
+	procTranslated = "sysctl.proc_translated"
+	archIntel      = "x86_64"
+	archApple      = "arm64"
+)
 
 func Architecture() (string, error) {
 	arch, err := unix.Sysctl(hardwareMIB)
@@ -34,4 +40,38 @@ func Architecture() (string, error) {
 	}
 
 	return arch, nil
+}
+
+func NativeArchitecture() (string, error) {
+	processArch, err := Architecture()
+	if err != nil {
+		return "", err
+	}
+
+	// https://developer.apple.com/documentation/apple-silicon/about-the-rosetta-translation-environment
+
+	data, err := unix.Sysctl(procTranslated)
+	if err != nil {
+		// macos without Rosetta installed doesn't have sysctl.proc_translated
+		if os.IsNotExist(err) {
+			return processArch, nil
+		}
+		return "", fmt.Errorf("failed to read sysctl.proc_translated: %w", err)
+	}
+
+	nativeArch := ""
+	translated := data[0]
+
+	switch translated {
+	case 0:
+		nativeArch = processArch
+	case 1:
+		// Rosetta 2 is supported only on Apple silicon
+		if processArch == archIntel {
+			nativeArch = archApple
+		}
+	default:
+	}
+
+	return nativeArch, nil
 }

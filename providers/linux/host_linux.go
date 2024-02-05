@@ -156,6 +156,7 @@ func newHost(fs procFS) (*host, error) {
 	h := &host{stat: stat, procFS: fs}
 	r := &reader{}
 	r.architecture(h)
+	r.nativeArchitecture(h)
 	r.bootTime(h)
 	r.containerized(h)
 	r.hostname(h)
@@ -195,6 +196,14 @@ func (r *reader) architecture(h *host) {
 		return
 	}
 	h.info.Architecture = v
+}
+
+func (r *reader) nativeArchitecture(h *host) {
+	v, err := NativeArchitecture()
+	if r.addErr(err) {
+		return
+	}
+	h.info.NativeArchitecture = v
 }
 
 func (r *reader) bootTime(h *host) {

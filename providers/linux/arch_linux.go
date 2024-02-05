@@ -19,8 +19,12 @@ package linux
 
 import (
 	"fmt"
+	"os"
+	"strings"
 	"syscall"
 )
+
+const procSysKernelArch = "/proc/sys/kernel/arch"
 
 func Architecture() (string, error) {
 	var uname syscall.Utsname
@@ -35,6 +39,22 @@ func Architecture() (string, error) {
 		}
 		data = append(data, byte(v))
 	}
+
+	return string(data), nil
+}
+
+func NativeArchitecture() (string, error) {
+	data, err := os.ReadFile(procSysKernelArch)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return "", nil
+		}
+
+		return "", fmt.Errorf("failed to read kernel arch: %w", err)
+	}
+
+	nativeArch := string(data)
+	nativeArch = strings.TrimSpace(nativeArch)
 
 	return string(data), nil
 }

@@ -18,14 +18,47 @@
 package windows
 
 import (
-	windows "github.com/elastic/go-windows"
+	"golang.org/x/sys/windows"
+
+	go_windows "github.com/elastic/go-windows"
+)
+
+const (
+	IMAGE_FILE_MACHINE_AMD64 = 0x8664
+	IMAGE_FILE_MACHINE_ARM64 = 0xAA64
+	archIntel                = "x86_64"
+	archArm64                = "arm64"
 )
 
 func Architecture() (string, error) {
-	systemInfo, err := windows.GetNativeSystemInfo()
+	systemInfo, err := go_windows.GetNativeSystemInfo()
 	if err != nil {
 		return "", err
 	}
 
 	return systemInfo.ProcessorArchitecture.String(), nil
+}
+
+func NativeArchitecture() (string, error) {
+	var processMachine, nativeMachine uint16
+	// the pseudo handle doesn't need to be closed
+	var currentProcessHandle = windows.CurrentProcess()
+
+	err := windows.IsWow64Process2(currentProcessHandle, &processMachine, &nativeMachine)
+	if err != nil {
+		return "", err
+	}
+
+	nativeArch := ""
+
+	switch nativeMachine {
+	case IMAGE_FILE_MACHINE_AMD64:
+		// for parity with Architecture() as amd64 and x86_64 are used interchangeably
+		nativeArch = archIntel
+	case IMAGE_FILE_MACHINE_ARM64:
+		nativeArch = archArm64
+	default:
+	}
+
+	return nativeArch, nil
 }
