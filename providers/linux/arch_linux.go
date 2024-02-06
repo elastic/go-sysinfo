@@ -54,6 +54,7 @@ func NativeArchitecture() (string, error) {
 	if err != nil {
 		if os.IsNotExist(err) {
 			// fallback to checking version string
+			// as /proc/sys/kernel/arch was added in 6.1
 			version, err := os.ReadFile(procVersion)
 			if err != nil {
 				return "", nil
