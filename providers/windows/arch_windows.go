@@ -20,7 +20,7 @@ package windows
 import (
 	"golang.org/x/sys/windows"
 
-	go_windows "github.com/elastic/go-windows"
+	gowindows "github.com/elastic/go-windows"
 )
 
 const (
@@ -31,7 +31,7 @@ const (
 )
 
 func Architecture() (string, error) {
-	systemInfo, err := go_windows.GetNativeSystemInfo()
+	systemInfo, err := gowindows.GetNativeSystemInfo()
 	if err != nil {
 		return "", err
 	}
@@ -49,7 +49,7 @@ func NativeArchitecture() (string, error) {
 		return "", err
 	}
 
-	nativeArch := ""
+	var nativeArch string
 
 	switch nativeMachine {
 	case imageFileMachineAmd64:
@@ -57,7 +57,6 @@ func NativeArchitecture() (string, error) {
 		nativeArch = archIntel
 	case imageFileMachineArm64:
 		nativeArch = archArm64
-	default:
 	}
 
 	return nativeArch, nil

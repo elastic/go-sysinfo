@@ -50,7 +50,7 @@ func NativeArchitecture() (string, error) {
 
 	// https://developer.apple.com/documentation/apple-silicon/about-the-rosetta-translation-environment
 
-	data, err := unix.Sysctl(procTranslated)
+	translated, err := unix.SysctlUint32(procTranslated)
 	if err != nil {
 		// macos without Rosetta installed doesn't have sysctl.proc_translated
 		if os.IsNotExist(err) {
@@ -59,18 +59,14 @@ func NativeArchitecture() (string, error) {
 		return "", fmt.Errorf("failed to read sysctl.proc_translated: %w", err)
 	}
 
-	nativeArch := ""
-	translated := data[0]
+	var nativeArch string
 
 	switch translated {
 	case 0:
 		nativeArch = processArch
 	case 1:
 		// Rosetta 2 is supported only on Apple silicon
-		if processArch == archIntel {
-			nativeArch = archApple
-		}
-	default:
+		nativeArch = archApple
 	}
 
 	return nativeArch, nil
