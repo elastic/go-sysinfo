@@ -50,11 +50,15 @@ func Architecture() (string, error) {
 }
 
 func NativeArchitecture() (string, error) {
+	// /proc/sys/kernel/arch was introduced in Kernel 6.1
+	// https://www.kernel.org/doc/html/v6.1/admin-guide/sysctl/kernel.html#arch
+	// It's the same as uname -m, except that for a process running in emulation
+	// machine returned from syscall reflects the emulated machine, whilst /proc
+	// filesystem is read as file so its value is not emulated
 	data, err := os.ReadFile(procSysKernelArch)
 	if err != nil {
 		if os.IsNotExist(err) {
-			// fallback to checking version string
-			// as /proc/sys/kernel/arch was added in 6.1
+			// fallback to checking version string for older kernels
 			version, err := os.ReadFile(procVersion)
 			if err != nil {
 				return "", nil
