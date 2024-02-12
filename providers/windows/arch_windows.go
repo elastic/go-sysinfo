@@ -18,6 +18,8 @@
 package windows
 
 import (
+	"errors"
+
 	"golang.org/x/sys/windows"
 
 	gowindows "github.com/elastic/go-windows"
@@ -44,8 +46,17 @@ func NativeArchitecture() (string, error) {
 	// the pseudo handle doesn't need to be closed
 	var currentProcessHandle = windows.CurrentProcess()
 
+	// IsWow64Process2 was introduced in version 1709 (build 16299 acording to the tables)
+	// https://learn.microsoft.com/en-us/windows/release-health/release-information
+	// https://learn.microsoft.com/en-us/windows/release-health/windows-server-release-info
 	err := windows.IsWow64Process2(currentProcessHandle, &processMachine, &nativeMachine)
 	if err != nil {
+		if errors.Is(err, windows.ERROR_PROC_NOT_FOUND) {
+			major, minor, build := windows.RtlGetNtVersionNumbers()
+			if major < 10 || (major == 10 && minor == 0 && build < 16299) {
+				return "", nil
+			}
+		}
 		return "", err
 	}
 
