@@ -6,6 +6,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   check:
     if: "!contains(github.event.pull_request.labels.*.name, 'skip-changelog')"
