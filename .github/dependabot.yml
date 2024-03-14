@@ -1,0 +1,17 @@
+version: 2
+updates:
+  # Maintain dependencies for GitHub Actions (/.github/workflows)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "22:00"
+    reviewers:
+      - "elastic/observablt-ci"
+    labels:
+      - dependencies
+    groups:
+      github-actions:
+        patterns:
+          - "*"
