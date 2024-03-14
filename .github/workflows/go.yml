@@ -94,3 +94,35 @@ jobs:
       - name: Test
         if: runner.os == 'Windows'
         run:  .ci/scripts/test.bat
+
+  test-freebsd:
+    runs-on: ubuntu-latest
+    env:
+      # Only GITHUB_* are passed into the VM.
+      GITHUB_GOLANG_VERSION: 1.22.1
+    name: test (1.22.1, freebsd-14.0, cgo)
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Test
+        # TODO: Skip until freebsd provider is merged. Then this 'if' should be removed.
+        if: ${{ hashFiles('providers/freebsd/') != '' }}
+        id: test
+        uses: vmactions/freebsd-vm@35a5b20a98476a681c7576a344775be7e7f77f06  #v1.0.6
+        with:
+          usesh: true
+          prepare: |
+            freebsd-version
+            pwd
+            ls -lah
+            whoami
+
+            pkg install -y curl
+            curl -sL -o /usr/bin/gvm https://github.com/andrewkroh/gvm/releases/download/v0.5.2/gvm-freebsd-amd64
+            chmod +x /usr/bin/gvm
+            eval "$(gvm ${GITHUB_GOLANG_VERSION})"
+            go version
+
+          run: |
+            eval "$(gvm ${GITHUB_GOLANG_VERSION})"
+            go test -v ./...
