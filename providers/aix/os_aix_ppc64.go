@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build aix && ppc64 && cgo
-// +build aix,ppc64,cgo
 
 package aix
 

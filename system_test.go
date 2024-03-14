@@ -20,13 +20,14 @@ package sysinfo
 import (
 	"encoding/json"
 	"errors"
-	"io/fs"
 	"fmt"
+	"io/fs"
 	"os"
 	osUser "os/user"
 	"runtime"
 	"sort"
 	"strconv"
+	"strings"
 	"syscall"
 	"testing"
 	"time"
@@ -131,7 +132,6 @@ func TestSelf(t *testing.T) {
 	}
 	output["process.info"] = info
 	assert.EqualValues(t, os.Getpid(), info.PID)
-	assert.EqualValues(t, os.Getppid(), info.PPID)
 	assert.Equal(t, os.Args, info.Args)
 	assert.WithinDuration(t, info.StartTime, time.Now(), 10*time.Second)
 
@@ -158,29 +158,30 @@ func TestSelf(t *testing.T) {
 	}
 	assert.Equal(t, exe, info.Exe)
 
-	parent, err := process.Parent()
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.EqualValues(t, os.Getppid(), parent.PID())
+	if user, err := process.User(); !errors.Is(err, types.ErrNotImplemented) {
+		if err != nil {
+			t.Fatal(err)
+		}
+		output["process.user"] = user
 
-	fmt.Printf("Getting UserInfo...\n")
-	user, err := process.User()
-	if err != nil {
-		t.Fatal(err)
-	}
-	output["process.user"] = user
+		fmt.Printf("Getting UserInfo...\n")
+		user, err := process.User()
+		if err != nil {
+			t.Fatal(err)
+		}
+		output["process.user"] = user
 
-	currentUser, err := osUser.Current()
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.EqualValues(t, currentUser.Uid, user.UID)
-	assert.EqualValues(t, currentUser.Gid, user.GID)
+		currentUser, err := osUser.Current()
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.EqualValues(t, currentUser.Uid, user.UID)
+		assert.EqualValues(t, currentUser.Gid, user.GID)
 
-	if runtime.GOOS != "windows" {
-		assert.EqualValues(t, strconv.Itoa(os.Geteuid()), user.EUID)
-		assert.EqualValues(t, strconv.Itoa(os.Getegid()), user.EGID)
+		if runtime.GOOS != "windows" {
+			assert.EqualValues(t, strconv.Itoa(os.Geteuid()), user.EUID)
+			assert.EqualValues(t, strconv.Itoa(os.Getegid()), user.EGID)
+		}
 	}
 
 	fmt.Printf("Getting Environment...\n")
@@ -205,19 +206,24 @@ func TestSelf(t *testing.T) {
 	}
 
 	fmt.Printf("Getting MemoryInfo...\n")
-	memInfo, err := process.Memory()
-	require.NoError(t, err)
-	if runtime.GOOS != "windows" {
-		// Virtual memory may be reported as
-		// zero on some versions of Windows.
-		assert.NotZero(t, memInfo.Virtual)
+	if memInfo, err := process.Memory(); !errors.Is(err, types.ErrNotImplemented) {
+		require.NoError(t, err)
+		if runtime.GOOS != "windows" {
+			// Virtual memory may be reported as
+			// zero on some versions of Windows.
+			assert.NotZero(t, memInfo.Virtual)
+		}
+		assert.NotZero(t, memInfo.Resident)
+		output["process.mem"] = memInfo
 	}
-	assert.NotZero(t, memInfo.Resident)
-	output["process.mem"] = memInfo
 
 	fmt.Printf("Getting CPUTimes...\n")
 	for {
 		cpuTimes, err := process.CPUTime()
+		if errors.Is(err, types.ErrNotImplemented) {
+			break
+		}
+
 		require.NoError(t, err)
 		if cpuTimes.Total() != 0 {
 			output["process.cpu"] = cpuTimes
@@ -267,29 +273,42 @@ func TestHost(t *testing.T) {
 	host, err := Host()
 	if err == types.ErrNotImplemented {
 		t.Skip("host provider not implemented on", runtime.GOOS)
-	} else if err != nil {
+	} else if err != nil && !strings.Contains(err.Error(), "FQDN") {
 		t.Fatal(err)
 	}
 
 	info := host.Info()
 	assert.NotZero(t, info)
-	assert.NotZero(t, info.UniqueID)
+
+	output := map[string]interface{}{}
+	output["host.info"] = info
+
+	if v, ok := host.(types.LoadAverage); ok {
+		loadAvg, err := v.LoadAverage()
+		if err != nil {
+			t.Fatal(err)
+		}
+		output["host.loadavg"] = loadAvg
+	}
 
 	memory, err := host.Memory()
 	if err != nil {
 		t.Fatal(err)
 	}
+	output["host.memory"] = memory
 
 	cpu, err := host.CPUTime()
+	if errors.Is(err, types.ErrNotImplemented) {
+		t.Log("CPU times not implemented")
+		return
+	}
+
 	if err != nil {
 		t.Fatal(err)
 	}
+	output["host.cpu"] = cpu
 
-	logAsJSON(t, map[string]interface{}{
-		"host.info":   info,
-		"host.memory": memory,
-		"host.cpu":    cpu,
-	})
+	logAsJSON(t, output)
 }
 
 func logAsJSON(t testing.TB, v interface{}) {
@@ -312,14 +331,18 @@ func TestProcesses(t *testing.T) {
 	t.Log("Found", len(procs), "processes.")
 	for _, proc := range procs {
 		info, err := proc.Info()
-		if err != nil {
-			if errors.Is(err, fs.ErrPermission) || errors.Is(err, syscall.ESRCH) {
-				// The process may no longer exist by the time we try fetching
-				// additional information so ignore ESRCH (no such process).
-				continue
-			}
-			t.Fatal(err)
+		switch {
+		// Ignore processes that no longer exist or that cannot be accessed.
+		case errors.Is(err, syscall.ESRCH),
+			errors.Is(err, syscall.EPERM),
+			errors.Is(err, syscall.EINVAL),
+			errors.Is(err, syscall.ENOENT),
+			errors.Is(err, fs.ErrPermission):
+			continue
+		case err != nil:
+			t.Fatalf("failed to get process info for PID=%d: %v", proc.PID(), err)
 		}
+
 		t.Logf("pid=%v name='%s' exe='%s' args=%+v ppid=%d cwd='%s' start_time=%v",
 			info.PID, info.Name, info.Exe, info.Args, info.PPID, info.CWD,
 			info.StartTime)

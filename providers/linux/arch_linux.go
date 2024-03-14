@@ -19,7 +19,17 @@ package linux
 
 import (
 	"fmt"
+	"os"
+	"strings"
 	"syscall"
+)
+
+const (
+	procSysKernelArch = "/proc/sys/kernel/arch"
+	procVersion       = "/proc/version"
+	archAmd64         = "amd64"
+	archArm64         = "arm64"
+	archAarch64       = "aarch64"
 )
 
 func Architecture() (string, error) {
@@ -35,6 +45,41 @@ func Architecture() (string, error) {
 		}
 		data = append(data, byte(v))
 	}
+
+	return string(data), nil
+}
+
+func NativeArchitecture() (string, error) {
+	// /proc/sys/kernel/arch was introduced in Kernel 6.1
+	// https://www.kernel.org/doc/html/v6.1/admin-guide/sysctl/kernel.html#arch
+	// It's the same as uname -m, except that for a process running in emulation
+	// machine returned from syscall reflects the emulated machine, whilst /proc
+	// filesystem is read as file so its value is not emulated
+	data, err := os.ReadFile(procSysKernelArch)
+	if err != nil {
+		if os.IsNotExist(err) {
+			// fallback to checking version string for older kernels
+			version, err := os.ReadFile(procVersion)
+			if err != nil {
+				return "", nil
+			}
+
+			versionStr := string(version)
+			if strings.Contains(versionStr, archAmd64) {
+				return archAmd64, nil
+			} else if strings.Contains(versionStr, archArm64) {
+				// for parity with Architecture() and /proc/sys/kernel/arch
+				// as aarch64 and arm64 are used interchangeably
+				return archAarch64, nil
+			}
+			return "", nil
+		}
+
+		return "", fmt.Errorf("failed to read kernel arch: %w", err)
+	}
+
+	nativeArch := string(data)
+	nativeArch = strings.TrimRight(nativeArch, "\n")
 
 	return string(data), nil
 }

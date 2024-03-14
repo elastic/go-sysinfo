@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !windows
-// +build !windows
 
 package linux
 
@@ -29,6 +28,41 @@ import (
 )
 
 func TestOperatingSystem(t *testing.T) {
+	t.Run("almalinux9", func(t *testing.T) {
+		// Data from 'docker pull almalinux:9'.
+		os, err := getOSInfo("testdata/almalinux9")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
+			Family:   "redhat",
+			Platform: "almalinux",
+			Name:     "AlmaLinux",
+			Version:  "9.1 (Lime Lynx)",
+			Major:    9,
+			Minor:    1,
+			Codename: "Lime Lynx",
+		}, *os)
+		t.Logf("%#v", os)
+	})
+	t.Run("alpine3.17", func(t *testing.T) {
+		// Data from 'docker pull alpine:3.17.3'.
+		os, err := getOSInfo("testdata/alpine3.17")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
+			Platform: "alpine",
+			Name:     "Alpine Linux",
+			Version:  "3.17.3",
+			Major:    3,
+			Minor:    17,
+			Patch:    3,
+		}, *os)
+		t.Logf("%#v", os)
+	})
 	t.Run("amazon2017.03", func(t *testing.T) {
 		os, err := getOSInfo("testdata/amazon2017.03")
 		if err != nil {
@@ -43,6 +77,20 @@ func TestOperatingSystem(t *testing.T) {
 			Major:    2017,
 			Minor:    3,
 			Patch:    0,
+		}, *os)
+		t.Logf("%#v", os)
+	})
+	t.Run("archlinux", func(t *testing.T) {
+		os, err := getOSInfo("testdata/archlinux")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
+			Family:   "arch",
+			Platform: "archarm",
+			Name:     "Arch Linux ARM",
+			Build:    "rolling",
 		}, *os)
 		t.Logf("%#v", os)
 	})
@@ -147,6 +195,22 @@ func TestOperatingSystem(t *testing.T) {
 		}, *os)
 		t.Logf("%#v", os)
 	})
+	t.Run("manjaro23", func(t *testing.T) {
+		os, err := getOSInfo("testdata/manjaro23")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
+			Family:   "arch",
+			Platform: "manjaro-arm",
+			Name:     "Manjaro ARM",
+			Version:  "23.02",
+			Major:    23,
+			Minor:    2,
+		}, *os)
+		t.Logf("%#v", os)
+	})
 	t.Run("redhat7", func(t *testing.T) {
 		os, err := getOSInfo("testdata/redhat7")
 		if err != nil {
@@ -179,6 +243,72 @@ func TestOperatingSystem(t *testing.T) {
 			Major:    9,
 			Minor:    0,
 			Codename: "Plow",
+		}, *os)
+		t.Logf("%#v", os)
+	})
+	t.Run("rockylinux9", func(t *testing.T) {
+		// Data from 'docker pull rockylinux:9.0'.
+		os, err := getOSInfo("testdata/rockylinux9")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
+			Family:   "redhat",
+			Platform: "rocky",
+			Name:     "Rocky Linux",
+			Version:  "9.0 (Blue Onyx)",
+			Major:    9,
+			Minor:    0,
+			Codename: "Blue Onyx",
+		}, *os)
+		t.Logf("%#v", os)
+	})
+	t.Run("openeuler20.03", func(t *testing.T) {
+		os, err := getOSInfo("testdata/openeuler20.03")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
+			Family:   "redhat",
+			Platform: "openEuler",
+			Name:     "openEuler",
+			Version:  "20.03 (LTS-SP3)",
+			Major:    20,
+			Minor:    3,
+			Codename: "LTS-SP3",
+		}, *os)
+		t.Logf("%#v", os)
+	})
+	t.Run("opensuse-leap15.4", func(t *testing.T) {
+		os, err := getOSInfo("testdata/opensuse-leap15.4")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
+			Family:   "suse",
+			Platform: "opensuse-leap",
+			Name:     "openSUSE Leap",
+			Version:  "15.4",
+			Major:    15,
+			Minor:    4,
+		}, *os)
+		t.Logf("%#v", os)
+	})
+	t.Run("opensuse-tumbleweed", func(t *testing.T) {
+		os, err := getOSInfo("testdata/opensuse-tumbleweed")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
+			Family:   "suse",
+			Platform: "opensuse-tumbleweed",
+			Name:     "openSUSE Tumbleweed",
+			Version:  "20230108",
+			Major:    20230108,
 		}, *os)
 		t.Logf("%#v", os)
 	})

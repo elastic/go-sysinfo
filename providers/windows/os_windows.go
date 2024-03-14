@@ -68,7 +68,7 @@ func OperatingSystem() (*types.OSInfo, error) {
 			case 0:
 				osInfo.Major, _ = strconv.Atoi(p)
 			case 1:
-				osInfo.Major, _ = strconv.Atoi(p)
+				osInfo.Minor, _ = strconv.Atoi(p)
 			}
 		}
 	}

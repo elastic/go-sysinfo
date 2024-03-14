@@ -15,22 +15,22 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build (amd64 && cgo) || (arm64 && cgo)
-// +build amd64,cgo arm64,cgo
+//go:build amd64 || arm64
 
 package darwin
 
 import (
 	"fmt"
-	"syscall"
 	"time"
+
+	"golang.org/x/sys/unix"
 )
 
 const kernBoottimeMIB = "kern.boottime"
 
 func BootTime() (time.Time, error) {
-	var tv syscall.Timeval
-	if err := sysctlByName(kernBoottimeMIB, &tv); err != nil {
+	tv, err := unix.SysctlTimeval(kernBoottimeMIB)
+	if err != nil {
 		return time.Time{}, fmt.Errorf("failed to get host uptime: %w", err)
 	}
 

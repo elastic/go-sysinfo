@@ -32,12 +32,12 @@ var _ registry.HostProvider = linuxSystem{}
 func TestHost(t *testing.T) {
 	host, err := newLinuxSystem("").Host()
 	if err != nil {
-		t.Fatal(err)
+		t.Logf("could not get all host info: %v\n", err)
 	}
 
 	info := host.Info()
 	data, _ := json.MarshalIndent(info, "", "  ")
-	t.Log(string(data))
+	t.Logf(string(data))
 }
 
 func TestHostMemoryInfo(t *testing.T) {
@@ -66,6 +66,23 @@ func TestHostVMStat(t *testing.T) {
 	}
 
 	data, err := json.MarshalIndent(s, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(string(data))
+}
+
+func TestHostLoadAverage(t *testing.T) {
+	host, err := newLinuxSystem("testdata/ubuntu1710").Host()
+	if err != nil {
+		t.Fatal(err)
+	}
+	s, err := host.(types.LoadAverage).LoadAverage()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	data, err := json.Marshal(s)
 	if err != nil {
 		t.Fatal(err)
 	}

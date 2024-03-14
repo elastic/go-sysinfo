@@ -1,0 +1,3 @@
+```release-note:bug
+darwin: Prevent possible runtime panic while reading process arguments.
+```

@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build aix && ppc64 && cgo
-// +build aix,ppc64,cgo
 
 package aix
 
@@ -31,9 +30,11 @@ package aix
 import "C"
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/joeshaw/multierror"
@@ -115,7 +116,25 @@ func (*host) Memory() (*types.HostMemoryInfo, error) {
 	mem.VirtualFree = mem.Free + uint64(meminfo.pgsp_free)*pagesize
 	mem.VirtualUsed = mem.VirtualTotal - mem.VirtualFree
 
+	mem.Metrics = map[string]uint64{
+		"bytes_coalesced":         uint64(meminfo.bytes_coalesced),
+		"bytes_coalesced_mempool": uint64(meminfo.bytes_coalesced_mempool),
+		"real_pinned":             uint64(meminfo.real_pinned) * pagesize,
+		"pgins":                   uint64(meminfo.pgins),
+		"pgouts":                  uint64(meminfo.pgouts),
+		"pgsp_free":               uint64(meminfo.pgsp_free) * pagesize,
+		"pgsp_rsvd":               uint64(meminfo.pgsp_rsvd) * pagesize,
+	}
+
 	return &mem, nil
+}
+
+func (h *host) FQDNWithContext(ctx context.Context) (string, error) {
+	return shared.FQDNWithContext(ctx)
+}
+
+func (h *host) FQDN() (string, error) {
+	return h.FQDNWithContext(context.Background())
 }
 
 func newHost() (*host, error) {
@@ -174,7 +193,7 @@ func (r *reader) hostname(h *host) {
 	if r.addErr(err) {
 		return
 	}
-	h.info.Hostname = v
+	h.info.Hostname = strings.ToLower(v)
 }
 
 func (r *reader) network(h *host) {

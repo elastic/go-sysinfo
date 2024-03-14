@@ -1,0 +1,44 @@
+name: release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Tag name (e.g. v1.2.3) for this version (does not need to exist).
+        required: true
+        type: string
+      last_release:
+        description: Last release tag.
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  draft:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Need full history.
+
+      - name: release notes
+        run: >-
+          go run github.com/hashicorp/go-changelog/cmd/changelog-build@ba40b3a
+          -changelog-template .ci/release/changelog.gotmpl
+          -note-template .ci/release/release-note.gotmpl
+          -entries-dir ./.changelog
+          -last-release "${{ inputs.last_release }}"
+          -this-release HEAD | tee /tmp/release-notes.txt
+
+      - name: draft GH release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "${{ inputs.version }}"
+          --draft
+          --notes-file /tmp/release-notes.txt
+          --title "${{ inputs.version }}"

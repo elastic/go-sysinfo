@@ -15,23 +15,59 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build (amd64 && cgo) || (arm64 && cgo)
-// +build amd64,cgo arm64,cgo
+//go:build amd64 || arm64
 
 package darwin
 
 import (
 	"fmt"
-	"syscall"
+	"os"
+
+	"golang.org/x/sys/unix"
 )
 
-const hardwareMIB = "hw.machine"
+const (
+	hardwareMIB    = "hw.machine"
+	procTranslated = "sysctl.proc_translated"
+	archIntel      = "x86_64"
+	archApple      = "arm64"
+)
 
 func Architecture() (string, error) {
-	arch, err := syscall.Sysctl(hardwareMIB)
+	arch, err := unix.Sysctl(hardwareMIB)
 	if err != nil {
 		return "", fmt.Errorf("failed to get architecture: %w", err)
 	}
 
 	return arch, nil
+}
+
+func NativeArchitecture() (string, error) {
+	processArch, err := Architecture()
+	if err != nil {
+		return "", err
+	}
+
+	// https://developer.apple.com/documentation/apple-silicon/about-the-rosetta-translation-environment
+
+	translated, err := unix.SysctlUint32(procTranslated)
+	if err != nil {
+		// macos without Rosetta installed doesn't have sysctl.proc_translated
+		if os.IsNotExist(err) {
+			return processArch, nil
+		}
+		return "", fmt.Errorf("failed to read sysctl.proc_translated: %w", err)
+	}
+
+	var nativeArch string
+
+	switch translated {
+	case 0:
+		nativeArch = processArch
+	case 1:
+		// Rosetta 2 is supported only on Apple silicon
+		nativeArch = archApple
+	}
+
+	return nativeArch, nil
 }

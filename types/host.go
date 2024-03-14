@@ -17,13 +17,25 @@
 
 package types
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
 // Host is the interface that wraps methods for returning Host stats
+// It may return partial information if the provider
+// implementation is unable to collect all of the necessary data.
 type Host interface {
 	CPUTimer
 	Info() HostInfo
 	Memory() (*HostMemoryInfo, error)
+
+	// FQDNWithContext returns the fully-qualified domain name of the host, lowercased.
+	FQDNWithContext(ctx context.Context) (string, error)
+
+	// FQDN calls FQDNWithContext with a background context.
+	// Deprecated: Use FQDNWithContext instead.
+	FQDN() (string, error)
 }
 
 // NetworkCounters represents network stats from /proc/net
@@ -61,17 +73,18 @@ type VMStat interface {
 
 // HostInfo contains basic host information.
 type HostInfo struct {
-	Architecture      string    `json:"architecture"`            // Hardware architecture (e.g. x86_64, arm, ppc, mips).
-	BootTime          time.Time `json:"boot_time"`               // Host boot time.
-	Containerized     *bool     `json:"containerized,omitempty"` // Is the process containerized.
-	Hostname          string    `json:"name"`                    // Hostname
-	IPs               []string  `json:"ip,omitempty"`            // List of all IPs.
-	KernelVersion     string    `json:"kernel_version"`          // Kernel version.
-	MACs              []string  `json:"mac"`                     // List of MAC addresses.
-	OS                *OSInfo   `json:"os"`                      // OS information.
-	Timezone          string    `json:"timezone"`                // System timezone.
-	TimezoneOffsetSec int       `json:"timezone_offset_sec"`     // Timezone offset (seconds from UTC).
-	UniqueID          string    `json:"id,omitempty"`            // Unique ID of the host (optional).
+	Architecture       string    `json:"architecture"`            // Process hardware architecture (e.g. x86_64, arm, ppc, mips).
+	NativeArchitecture string    `json:"native_architecture"`     // Native OS hardware architecture (e.g. x86_64, arm, ppc, mips).
+	BootTime           time.Time `json:"boot_time"`               // Host boot time.
+	Containerized      *bool     `json:"containerized,omitempty"` // Is the process containerized.
+	Hostname           string    `json:"name"`                    // Hostname, lowercased.
+	IPs                []string  `json:"ip,omitempty"`            // List of all IPs.
+	KernelVersion      string    `json:"kernel_version"`          // Kernel version.
+	MACs               []string  `json:"mac"`                     // List of MAC addresses.
+	OS                 *OSInfo   `json:"os"`                      // OS information.
+	Timezone           string    `json:"timezone"`                // System timezone.
+	TimezoneOffsetSec  int       `json:"timezone_offset_sec"`     // Timezone offset (seconds from UTC).
+	UniqueID           string    `json:"id,omitempty"`            // Unique ID of the host (optional).
 }
 
 // Uptime returns the system uptime
@@ -96,7 +109,7 @@ type OSInfo struct {
 // LoadAverage is the interface that wraps the LoadAverage method.
 // LoadAverage returns load info on the host
 type LoadAverage interface {
-	LoadAverage() LoadAverageInfo
+	LoadAverage() (*LoadAverageInfo, error)
 }
 
 // LoadAverageInfo contains load statistics

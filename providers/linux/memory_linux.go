@@ -29,7 +29,7 @@ func parseMemInfo(content []byte) (*types.HostMemoryInfo, error) {
 	}
 
 	hasAvailable := false
-	err := parseKeyValue(content, ":", func(key, value []byte) error {
+	err := parseKeyValue(content, ':', func(key, value []byte) error {
 		num, err := parseBytesOrNumber(value)
 		if err != nil {
 			return fmt.Errorf("failed to parse %v value of %v: %w", string(key), string(value), err)
