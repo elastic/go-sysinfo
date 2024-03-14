@@ -11,6 +11,7 @@ updates:
       - "elastic/observablt-ci"
     labels:
       - dependencies
+      - skip-changelog
     groups:
       github-actions:
         patterns:
