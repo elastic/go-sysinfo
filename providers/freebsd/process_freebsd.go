@@ -64,8 +64,8 @@ package freebsd
 import "C"
 
 import (
-	"os"
 	"io/ioutil"
+	"os"
 	"strconv"
 	"strings"
 	"syscall"
@@ -76,7 +76,7 @@ import (
 	"github.com/elastic/go-sysinfo/types"
 )
 
-func getProcInfo(op int, arg int) ([]process, error) {
+func getProcInfo(op, arg int) ([]process, error) {
 	procstat, err := C.procstat_open_sysctl()
 
 	if procstat == nil {
@@ -218,7 +218,7 @@ func getProcCWD(p *process) (string, error) {
 
 type process struct {
 	pid   int
-	fs   procFS
+	fs    procFS
 	kinfo C.struct_kinfo_proc
 }
 
@@ -228,7 +228,6 @@ func timevalToDuration(tm C.struct_timeval) time.Duration {
 
 func (p *process) CPUTime() (types.CPUTimes, error) {
 	procs, err := getProcInfo(C.KERN_PROC_PID, p.PID())
-
 	if err != nil {
 		return types.CPUTimes{}, err
 	}
@@ -242,7 +241,6 @@ func (p *process) CPUTime() (types.CPUTimes, error) {
 
 func (p *process) Info() (types.ProcessInfo, error) {
 	procs, err := getProcInfo(C.KERN_PROC_PID, p.PID())
-
 	if err != nil {
 		return types.ProcessInfo{}, err
 	}
@@ -273,7 +271,6 @@ func (p *process) Info() (types.ProcessInfo, error) {
 
 func (p *process) Memory() (types.MemoryInfo, error) {
 	procs, err := getProcInfo(C.KERN_PROC_PID, p.PID())
-
 	if err != nil {
 		return types.MemoryInfo{}, err
 	}
@@ -287,7 +284,6 @@ func (p *process) Memory() (types.MemoryInfo, error) {
 
 func (p *process) User() (types.UserInfo, error) {
 	procs, err := getProcInfo(C.KERN_PROC_PID, p.PID())
-
 	if err != nil {
 		return types.UserInfo{}, err
 	}
@@ -303,7 +299,6 @@ func (p *process) User() (types.UserInfo, error) {
 		SGID: strconv.FormatUint(uint64(p.kinfo.ki_svgid), 10),
 	}, nil
 }
-
 
 // NetworkStats reports network stats for an individual PID.
 func (p *process) NetworkCounters() (*types.NetworkCountersInfo, error) {
@@ -395,8 +390,10 @@ func (s freebsdSystem) Self() (types.Process, error) {
 	return s.Process(os.Getpid())
 }
 
-const kernCptimeMIB = "kern.cp_time"
-const kernClockrateMIB = "kern.clockrate"
+const (
+	kernCptimeMIB    = "kern.cp_time"
+	kernClockrateMIB = "kern.clockrate"
+)
 
 func Cptime() (map[string]uint64, error) {
 	var clock clockInfo
@@ -417,7 +414,6 @@ func Cptime() (map[string]uint64, error) {
 
 	for index, time := range times {
 		i, err := strconv.ParseUint(time, 10, 64)
-
 		if err != nil {
 			return cpMap, errors.Wrap(err, "error parsing kern.cp_time")
 		}

@@ -18,11 +18,11 @@
 package freebsd
 
 import (
-	"strings"
-	"fmt"
 	"errors"
-	"strconv"
+	"fmt"
 	"reflect"
+	"strconv"
+	"strings"
 
 	"github.com/elastic/go-sysinfo/types"
 )

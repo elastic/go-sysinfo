@@ -58,7 +58,7 @@ func (s freebsdSystem) Host() (types.Host, error) {
 
 type host struct {
 	procFS procFS
-	info types.HostInfo
+	info   types.HostInfo
 }
 
 func (h *host) Info() types.HostInfo {

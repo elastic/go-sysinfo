@@ -25,9 +25,11 @@ import (
 	"github.com/elastic/go-sysinfo/types"
 )
 
-const ostypeMIB = "kern.ostype"
-const osreleaseMIB = "kern.osrelease"
-const osrevisionMIB = "kern.osrevision"
+const (
+	ostypeMIB     = "kern.ostype"
+	osreleaseMIB  = "kern.osrelease"
+	osrevisionMIB = "kern.osrevision"
+)
 
 func OperatingSystem() (*types.OSInfo, error) {
 	return getOSInfo("")
