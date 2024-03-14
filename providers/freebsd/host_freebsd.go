@@ -23,6 +23,7 @@ package freebsd
 import "C"
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"time"
@@ -78,6 +79,14 @@ func (h *host) Memory() (*types.HostMemoryInfo, error) {
 	r := &reader{}
 	r.memInfo(m)
 	return m, r.Err()
+}
+
+func (h *host) FQDNWithContext(ctx context.Context) (string, error) {
+	return shared.FQDNWithContext(ctx)
+}
+
+func (h *host) FQDN() (string, error) {
+	return h.FQDNWithContext(context.Background())
 }
 
 func newHost() (*host, error) {
