@@ -1,4 +1,4 @@
-.phony: update
+.PHONY: update
 update: fmt lic imports
 
 .PHONY: lic
