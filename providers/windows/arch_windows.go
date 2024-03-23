@@ -44,7 +44,7 @@ func Architecture() (string, error) {
 func NativeArchitecture() (string, error) {
 	var processMachine, nativeMachine uint16
 	// the pseudo handle doesn't need to be closed
-	var currentProcessHandle = windows.CurrentProcess()
+	currentProcessHandle := windows.CurrentProcess()
 
 	// IsWow64Process2 was introduced in version 1709 (build 16299 acording to the tables)
 	// https://learn.microsoft.com/en-us/windows/release-health/release-information

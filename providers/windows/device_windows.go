@@ -153,7 +153,7 @@ func (winapiDeviceProvider) GetLogicalDrives() (uint32, error) {
 	return windows.GetLogicalDrives()
 }
 
-func (winapiDeviceProvider) QueryDosDevice(name *uint16, buf *uint16, length uint32) (uint32, error) {
+func (winapiDeviceProvider) QueryDosDevice(name, buf *uint16, length uint32) (uint32, error) {
 	return windows.QueryDosDevice(name, buf, length)
 }
 
@@ -168,7 +168,7 @@ func ptrOffset(ptr *uint16, off uint32) *uint16 {
 	return (*uint16)(unsafe.Pointer(uintptr(unsafe.Pointer(ptr)) + uintptr(off*2)))
 }
 
-func (m testingDeviceProvider) QueryDosDevice(nameW *uint16, buf *uint16, length uint32) (uint32, error) {
+func (m testingDeviceProvider) QueryDosDevice(nameW, buf *uint16, length uint32) (uint32, error) {
 	drive := byte(*nameW)
 	if byte(*ptrOffset(nameW, 1)) != ':' {
 		return 0, errors.New("not a drive")

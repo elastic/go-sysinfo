@@ -26,6 +26,7 @@ import (
 	// Register host and process providers.
 	_ "github.com/elastic/go-sysinfo/providers/aix"
 	_ "github.com/elastic/go-sysinfo/providers/darwin"
+	_ "github.com/elastic/go-sysinfo/providers/freebsd"
 	_ "github.com/elastic/go-sysinfo/providers/linux"
 	_ "github.com/elastic/go-sysinfo/providers/windows"
 )
