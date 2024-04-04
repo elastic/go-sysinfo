@@ -34,7 +34,7 @@ jobs:
       matrix:
         go:
           - 1.22.x
-          - 1.18.x
+          - 1.21.x
         os:
           - macos-11
           - macos-12
@@ -53,10 +53,10 @@ jobs:
           - {cgo: cgo, os: ubuntu-20.04}
           - {cgo: cgo, os: ubuntu-22.04}
           # Limit the OS variants tested with the earliest supported Go version (save resources).
-          - {go: 1.18.10, os: macos-11}
-          - {go: 1.18.10, os: macos-12}
-          - {go: 1.18.10, os: windows-2019}
-          - {go: 1.18.10, os: ubuntu-22.04}
+          - {go: 1.21.x, os: macos-11}
+          - {go: 1.21.x, os: macos-12}
+          - {go: 1.21.x, os: windows-2019}
+          - {go: 1.21.x, os: ubuntu-22.04}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -99,8 +99,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # Only GITHUB_* are passed into the VM.
-      GITHUB_GOLANG_VERSION: 1.22.1
-    name: test (1.22.1, freebsd-14.0, cgo)
+      GITHUB_GOLANG_VERSION: 1.22.2
+    name: test (1.22.2, freebsd-14.0, cgo)
     steps:
       - uses: actions/checkout@v4
 
