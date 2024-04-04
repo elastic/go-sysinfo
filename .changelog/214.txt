@@ -1,0 +1,7 @@
+```release-note:enhancement
+build: Require Go 1.21 for the module.
+```
+
+```release-note:enhancement
+docs: Add policy of supporting the two most recent Go releases.
+```
