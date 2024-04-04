@@ -1,3 +1,0 @@
-```release-note:enhancement
-Upgrade github/docker/docker package to fix security vulnerability
-```
