@@ -226,7 +226,7 @@ func findDistribRelease(baseDir string) (*types.OSInfo, error) {
 			errs = append(errs, fmt.Errorf("in %s: %w", path, err))
 			continue
 		}
-		return osInfo, err
+		return osInfo, nil
 	}
 	return nil, fmt.Errorf("no valid /etc/<distrib>-release file found: %w", errors.Join(errs...))
 }
