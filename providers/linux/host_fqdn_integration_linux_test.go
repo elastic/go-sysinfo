@@ -20,8 +20,8 @@
 package linux
 
 import (
+	"bytes"
 	"go/build"
-	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -121,12 +121,17 @@ func dockerRun(t *testing.T, hostname, domain string, command []string) {
 	args = append(args, "golang:"+goVersion)
 	args = append(args, command...)
 
+	buf := new(bytes.Buffer)
 	cmd := execabs.Command("docker", args...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	cmd.Stdout = buf
+	cmd.Stderr = buf
+
 	t.Logf("Running docker container using %q", args)
 	defer t.Log("Exiting container")
-	if err = cmd.Run(); err != nil {
+
+	err = cmd.Run()
+	t.Logf("Container output:\n%s", buf.String())
+	if err != nil {
 		t.Fatal(err)
 	}
 }
