@@ -27,7 +27,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/joeshaw/multierror"
 	"github.com/prometheus/procfs"
 
 	"github.com/elastic/go-sysinfo/internal/registry"
@@ -185,7 +184,7 @@ func (r *reader) addErr(err error) bool {
 
 func (r *reader) Err() error {
 	if len(r.errs) > 0 {
-		return &multierror.MultiError{Errors: r.errs}
+		return errors.Join(r.errs...)
 	}
 	return nil
 }

@@ -4,7 +4,6 @@ go 1.21
 
 require (
 	github.com/elastic/go-windows v1.0.0
-	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901
 	github.com/prometheus/procfs v0.8.0
 	github.com/stretchr/testify v1.7.0
 	golang.org/x/sys v0.13.0
