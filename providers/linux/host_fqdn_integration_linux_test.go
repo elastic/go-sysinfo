@@ -37,6 +37,10 @@ const (
 )
 
 func TestHost_FQDN(t *testing.T) {
+	if _, err := execabs.LookPath("docker"); err != nil {
+		t.Skipf("Skipping because docker was not found: %v", err)
+	}
+
 	tcs := []struct {
 		name       string
 		Hostname   string
@@ -90,10 +94,6 @@ func TestHost_FQDN(t *testing.T) {
 // if docker run returns a non-zero exit code.
 func dockerRun(t *testing.T, hostname, domain string, command []string) {
 	t.Helper()
-
-	if _, err := execabs.LookPath("docker"); err != nil {
-		t.Skipf("Skipping because docker was not found: %v", err)
-	}
 
 	// Determine the repository root.
 	_, filename, _, _ := runtime.Caller(0)
