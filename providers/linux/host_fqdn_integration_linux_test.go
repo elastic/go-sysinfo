@@ -20,16 +20,14 @@
 package linux
 
 import (
-	"context"
-	"fmt"
-	"io"
-	"os"
+	"bytes"
+	"go/build"
+	"path/filepath"
+	"runtime"
+	"strings"
 	"testing"
 
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/client"
-	"github.com/docker/docker/pkg/stdcopy"
+	"golang.org/x/sys/execabs"
 )
 
 const (
@@ -39,145 +37,101 @@ const (
 )
 
 func TestHost_FQDN(t *testing.T) {
-	const envKey = "GO_VERSION"
-	goversion, ok := os.LookupEnv(envKey)
-	if !ok {
-		t.Fatalf("environment variable %s not set, please set a Go version",
-			envKey)
+	if _, err := execabs.LookPath("docker"); err != nil {
+		t.Skipf("Skipping because docker was not found: %v", err)
 	}
-	image := "golang:" + goversion
 
 	tcs := []struct {
-		name string
-		cf   container.Config
+		name       string
+		Hostname   string
+		Domainname string
+		Cmd        []string
 	}{
 		{
-			name: "TestHost_FQDN_set_hostname+domainname",
-			cf: container.Config{
-				Hostname:     wantHostname,
-				Domainname:   wantDomain,
-				AttachStderr: testing.Verbose(),
-				AttachStdout: testing.Verbose(),
-				WorkingDir:   "/usr/src/elastic/go-sysinfo",
-				Image:        image,
-				Cmd: []string{
-					"go", "test", "-v",
-					"-tags", "integration,docker",
-					"-run", "^TestHost_FQDN_set$",
-					"./providers/linux",
-				},
-				Tty: false,
+			name:       "TestHost_FQDN_set_hostname+domainname",
+			Hostname:   wantHostname,
+			Domainname: wantDomain,
+			Cmd: []string{
+				"go", "test", "-v",
+				"-tags", "integration,docker",
+				"-run", "^TestHost_FQDN_set$",
+				"./providers/linux",
 			},
 		},
 		{
-			name: "TestHost_FQDN_set_hostname_only",
-			cf: container.Config{
-				Hostname:     wantFQDN,
-				AttachStderr: testing.Verbose(),
-				AttachStdout: testing.Verbose(),
-				WorkingDir:   "/usr/src/elastic/go-sysinfo",
-				Image:        image,
-				Cmd: []string{
-					"go", "test", "-v",
-					"-tags", "integration,docker",
-					"-run", "^TestHost_FQDN_set$",
-					"./providers/linux",
-				},
-				Tty: false,
+			name:     "TestHost_FQDN_set_hostname_only",
+			Hostname: wantFQDN,
+			Cmd: []string{
+				"go", "test", "-v",
+				"-tags", "integration,docker",
+				"-run", "^TestHost_FQDN_set$",
+				"./providers/linux",
 			},
 		},
 		{
 			name: "TestHost_FQDN_not_set",
-			cf: container.Config{
-				AttachStderr: testing.Verbose(),
-				AttachStdout: testing.Verbose(),
-				WorkingDir:   "/usr/src/elastic/go-sysinfo",
-				Image:        image,
-				Cmd: []string{
-					"go", "test", "-v", "-count", "1",
-					"-tags", "integration,docker",
-					"-run", "^TestHost_FQDN_not_set$",
-					"./providers/linux",
-				},
-				Tty: false,
+			Cmd: []string{
+				"go", "test", "-v", "-count", "1",
+				"-tags", "integration,docker",
+				"-run", "^TestHost_FQDN_not_set$",
+				"./providers/linux",
 			},
 		},
 	}
 
-	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-	if err != nil {
-		t.Fatalf("failed to create docker client: %v", err)
-	}
-	defer cli.Close()
-
 	for _, tc := range tcs {
 		t.Run(tc.name, func(t *testing.T) {
-			runOnDocker(t, cli, &tc.cf)
+			dockerRun(t, tc.Hostname, tc.Domainname, tc.Cmd)
 		})
 	}
 }
 
-func runOnDocker(t *testing.T, cli *client.Client, cf *container.Config) {
-	ctx := context.Background()
+// dockerRun executes the given command inside the golang Docker container.
+// It will set the container's hostname and domain according to the given
+// values.
+//
+// The container's stdout and stderr are passed through. The test will fail
+// if docker run returns a non-zero exit code.
+func dockerRun(t *testing.T, hostname, domain string, command []string) {
+	t.Helper()
 
-	pwd, err := os.Getwd()
+	// Determine the repository root.
+	_, filename, _, _ := runtime.Caller(0)
+	repoRoot, err := filepath.Abs(filepath.Join(filepath.Dir(filename), "../.."))
 	if err != nil {
-		t.Fatalf("could not get current directory: %v", err)
+		t.Fatal(err)
 	}
-	wd := pwd + "../../../"
 
-	reader, err := cli.ImagePull(ctx, cf.Image, types.ImagePullOptions{})
+	// Use the same version of Go inside the container.
+	goVersion := strings.TrimPrefix(runtime.Version(), "go")
+
+	args := []string{
+		"run",
+		"--rm",
+		"-v", build.Default.GOPATH + ":/go", // Mount GOPATH for caching.
+		"-v", repoRoot + ":/go-sysinfo",
+		"-w=/go-sysinfo",
+	}
+	if hostname != "" {
+		args = append(args, "--hostname="+hostname)
+	}
+	if domain != "" {
+		args = append(args, "--domainname="+domain)
+	}
+	args = append(args, "golang:"+goVersion)
+	args = append(args, command...)
+
+	buf := new(bytes.Buffer)
+	cmd := execabs.Command("docker", args...)
+	cmd.Stdout = buf
+	cmd.Stderr = buf
+
+	t.Logf("Running docker container using %q", args)
+	defer t.Log("Exiting container")
+
+	err = cmd.Run()
+	t.Logf("Container output:\n%s", buf.String())
 	if err != nil {
-		t.Fatalf("failed to pull image %s: %v", cf.Image, err)
+		t.Fatal(err)
 	}
-	defer reader.Close()
-	io.Copy(os.Stderr, reader)
-
-	resp, err := cli.ContainerCreate(ctx, cf, &container.HostConfig{
-		AutoRemove: false,
-		Binds:      []string{wd + ":/usr/src/elastic/go-sysinfo"},
-	}, nil, nil, "")
-	if err != nil {
-		t.Fatalf("could not create docker conteiner: %v", err)
-	}
-	defer func() {
-		err = cli.ContainerRemove(ctx, resp.ID, types.ContainerRemoveOptions{
-			Force: true, RemoveVolumes: true,
-		})
-		if err != nil {
-			t.Logf("WARNING: could not remove docker container: %v", err)
-		}
-	}()
-
-	if err := cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
-		t.Fatalf("could not start docker container: %v", err)
-	}
-
-	statusCh, errCh := cli.ContainerWait(ctx, resp.ID, container.WaitConditionNotRunning)
-	select {
-	case err := <-errCh:
-		if err != nil {
-			// Not using fatal as we might be able to recover the container
-			// logs.
-			t.Errorf("docker ContainerWait failed: %v", err)
-		}
-	case s := <-statusCh:
-		if s.StatusCode != 0 {
-			msg := fmt.Sprintf("container exited with status code %d", s.StatusCode)
-			if s.Error != nil {
-				msg = fmt.Sprintf("%s: error: %s", msg, s.Error.Message)
-			}
-
-			// Not using fatal as we might be able to recover the container
-			// logs.
-			t.Errorf(msg)
-		}
-	}
-
-	out, err := cli.ContainerLogs(ctx, resp.ID, types.ContainerLogsOptions{ShowStderr: true, ShowStdout: true})
-	if err != nil {
-		t.Fatalf("could not get container logs: %v", err)
-	}
-
-	stdcopy.StdCopy(os.Stdout, os.Stderr, out)
 }
