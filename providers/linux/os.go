@@ -20,14 +20,13 @@ package linux
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
-
-	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/go-sysinfo/types"
 )
@@ -207,11 +206,11 @@ func makeOSInfo(osRelease map[string]string) (*types.OSInfo, error) {
 }
 
 func findDistribRelease(baseDir string) (*types.OSInfo, error) {
-	var errs []error
 	matches, err := filepath.Glob(filepath.Join(baseDir, distribRelease))
 	if err != nil {
 		return nil, err
 	}
+	var errs []error
 	for _, path := range matches {
 		if strings.HasSuffix(path, osRelease) || strings.HasSuffix(path, lsbRelease) {
 			continue
@@ -229,7 +228,7 @@ func findDistribRelease(baseDir string) (*types.OSInfo, error) {
 		}
 		return osInfo, err
 	}
-	return nil, fmt.Errorf("no valid /etc/<distrib>-release file found: %w", &multierror.MultiError{Errors: errs})
+	return nil, fmt.Errorf("no valid /etc/<distrib>-release file found: %w", errors.Join(errs...))
 }
 
 func getDistribRelease(file string) (*types.OSInfo, error) {

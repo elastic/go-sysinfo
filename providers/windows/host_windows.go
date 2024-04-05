@@ -26,8 +26,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/joeshaw/multierror"
-
 	stdwindows "golang.org/x/sys/windows"
 
 	windows "github.com/elastic/go-windows"
@@ -129,7 +127,7 @@ func (r *reader) addErr(err error) bool {
 
 func (r *reader) Err() error {
 	if len(r.errs) > 0 {
-		return &multierror.MultiError{Errors: r.errs}
+		return errors.Join(r.errs...)
 	}
 	return nil
 }
