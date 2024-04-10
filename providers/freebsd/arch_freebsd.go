@@ -15,17 +15,20 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build freebsd
+
 package freebsd
 
 import (
 	"fmt"
-	"syscall"
+
+	"golang.org/x/sys/unix"
 )
 
 const hardwareMIB = "hw.machine"
 
 func Architecture() (string, error) {
-	arch, err := syscall.Sysctl(hardwareMIB)
+	arch, err := unix.Sysctl(hardwareMIB)
 	if err != nil {
 		return "", fmt.Errorf("failed to get architecture: %w", err)
 	}

@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build freebsd && cgo
-// +build freebsd,cgo
 
 package freebsd
 

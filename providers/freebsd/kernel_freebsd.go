@@ -15,17 +15,20 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build freebsd
+
 package freebsd
 
 import (
 	"fmt"
-	"syscall"
+
+	"golang.org/x/sys/unix"
 )
 
 const kernelReleaseMIB = "kern.osrelease"
 
 func KernelVersion() (string, error) {
-	version, err := syscall.Sysctl(kernelReleaseMIB)
+	version, err := unix.Sysctl(kernelReleaseMIB)
 	if err != nil {
 		return "", fmt.Errorf("failed to get kernel version: %w", err)
 	}

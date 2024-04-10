@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build freebsd && cgo
-// +build freebsd,cgo
 
 package freebsd
 
@@ -32,8 +31,9 @@ import "C"
 
 import (
 	"fmt"
-	"syscall"
 	"unsafe"
+
+	"golang.org/x/sys/unix"
 )
 
 const (
@@ -99,7 +99,7 @@ func KvmGetSwapInfo() (kvmSwap, error) {
 	kvmOpenC := C.CString(kvmOpen)
 	defer C.free(unsafe.Pointer(kvmOpenC))
 
-	if kdC, err := C.kvm_open(nil, devNullC, nil, syscall.O_RDONLY, kvmOpenC); kdC == nil {
+	if kdC, err := C.kvm_open(nil, devNullC, nil, unix.O_RDONLY, kvmOpenC); kdC == nil {
 		return kvmSwap{}, fmt.Errorf("failed to open kvm: %w", err)
 	}
 

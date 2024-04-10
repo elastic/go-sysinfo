@@ -16,5 +16,5 @@
 // under the License.
 
 // Package freebsd implements the HostProvider and ProcessProvider interfaces
-// for providing information about FreeBSD
+// for providing information about FreeBSD.
 package freebsd

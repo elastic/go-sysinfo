@@ -15,12 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build freebsd
+
 package freebsd
 
 import (
 	"strconv"
 	"strings"
-	"syscall"
+
+	"golang.org/x/sys/unix"
 
 	"github.com/elastic/go-sysinfo/types"
 )
@@ -41,13 +44,13 @@ func getOSInfo(baseDir string) (*types.OSInfo, error) {
 		Platform: "freebsd",
 	}
 
-	ostype, err := syscall.Sysctl(ostypeMIB)
+	ostype, err := unix.Sysctl(ostypeMIB)
 	if err != nil {
 		return info, err
 	}
 	info.Name = ostype
 
-	osrelease, err := syscall.Sysctl(osreleaseMIB)
+	osrelease, err := unix.Sysctl(osreleaseMIB)
 	if err != nil {
 		return info, err
 	}

@@ -15,18 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build freebsd && cgo
+
 package freebsd
 
 import (
 	"fmt"
-	"syscall"
 	"time"
+
+	"golang.org/x/sys/unix"
 )
 
 const kernBoottimeMIB = "kern.boottime"
 
 func BootTime() (time.Time, error) {
-	var tv syscall.Timeval
+	var tv unix.Timeval
 	if err := sysctlByName(kernBoottimeMIB, &tv); err != nil {
 		return time.Time{}, fmt.Errorf("failed to get host uptime: %w", err)
 	}

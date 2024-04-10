@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build freebsd && cgo
+
 package freebsd
 
 // #cgo LDFLAGS: -lkvm -lprocstat
@@ -64,15 +66,15 @@ package freebsd
 import "C"
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
-	"syscall"
 	"time"
 
-	"github.com/pkg/errors"
+	"golang.org/x/sys/unix"
 
 	"github.com/elastic/go-sysinfo/types"
 )
@@ -403,7 +405,7 @@ func Cptime() (map[string]uint64, error) {
 		return make(map[string]uint64), fmt.Errorf("failed to get kern.clockrate: %w", err)
 	}
 
-	cptime, err := syscall.Sysctl(kernCptimeMIB)
+	cptime, err := unix.Sysctl(kernCptimeMIB)
 	if err != nil {
 		return make(map[string]uint64), fmt.Errorf("failed to get kern.cp_time: %w", err)
 	}
