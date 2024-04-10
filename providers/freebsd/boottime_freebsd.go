@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build freebsd && cgo
+//go:build freebsd
 
 package freebsd
 
@@ -29,8 +29,8 @@ import (
 const kernBoottimeMIB = "kern.boottime"
 
 func BootTime() (time.Time, error) {
-	var tv unix.Timeval
-	if err := sysctlByName(kernBoottimeMIB, &tv); err != nil {
+	tv, err := unix.SysctlTimeval(kernBoottimeMIB)
+	if err != nil {
 		return time.Time{}, fmt.Errorf("failed to get host uptime: %w", err)
 	}
 
