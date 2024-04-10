@@ -18,3 +18,5 @@
 // Package freebsd implements the HostProvider and ProcessProvider interfaces
 // for providing information about FreeBSD.
 package freebsd
+
+//go:generate sh -c "go tool cgo -godefs defs_freebsd.go > ztypes_freebsd.go"
