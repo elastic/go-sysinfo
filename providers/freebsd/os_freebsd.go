@@ -34,10 +34,6 @@ const (
 )
 
 func OperatingSystem() (*types.OSInfo, error) {
-	return getOSInfo("")
-}
-
-func getOSInfo(baseDir string) (*types.OSInfo, error) {
 	info := &types.OSInfo{
 		Type:     "freebsd",
 		Family:   "freebsd",

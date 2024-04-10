@@ -29,7 +29,7 @@ import (
 
 func TestOperatingSystem(t *testing.T) {
 	t.Run("freebsd", func(t *testing.T) {
-		os, err := getOSInfo("")
+		os, err := OperatingSystem()
 		if err != nil {
 			t.Fatal(err)
 		}
