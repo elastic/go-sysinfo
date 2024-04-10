@@ -20,7 +20,6 @@ package sysinfo
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/fs"
 	"os"
 	osUser "os/user"
@@ -107,7 +106,7 @@ func TestProcessFeaturesMatrix(t *testing.T) {
 }
 
 func TestSelf(t *testing.T) {
-	fmt.Printf("Getting Self()...\n")
+	t.Log("Getting Self() process")
 	process, err := Self()
 	if err == types.ErrNotImplemented {
 		t.Skip("process provider not implemented on", runtime.GOOS)
@@ -124,8 +123,8 @@ func TestSelf(t *testing.T) {
 		}
 	}
 
+	t.Log("Getting process Info()")
 	output := map[string]interface{}{}
-	fmt.Printf("Getting ProcessInfo...\n")
 	info, err := process.Info()
 	if err != nil {
 		t.Fatal(err)
@@ -159,12 +158,13 @@ func TestSelf(t *testing.T) {
 	assert.Equal(t, exe, info.Exe)
 
 	if user, err := process.User(); !errors.Is(err, types.ErrNotImplemented) {
+		t.Log("Getting process User()")
+
 		if err != nil {
 			t.Fatal(err)
 		}
 		output["process.user"] = user
 
-		fmt.Printf("Getting UserInfo...\n")
 		user, err := process.User()
 		if err != nil {
 			t.Fatal(err)
@@ -184,8 +184,9 @@ func TestSelf(t *testing.T) {
 		}
 	}
 
-	fmt.Printf("Getting Environment...\n")
 	if v, ok := process.(types.Environment); ok {
+		t.Log("Getting process Environment()")
+
 		actualEnv, err := v.Environment()
 		if err != nil {
 			t.Fatal(err)
@@ -205,8 +206,9 @@ func TestSelf(t *testing.T) {
 		assert.Equal(t, expectedEnv, keyEqualsValueList)
 	}
 
-	fmt.Printf("Getting MemoryInfo...\n")
 	if memInfo, err := process.Memory(); !errors.Is(err, types.ErrNotImplemented) {
+		t.Log("Getting process Memory()")
+
 		require.NoError(t, err)
 		if runtime.GOOS != "windows" {
 			// Virtual memory may be reported as
@@ -217,7 +219,7 @@ func TestSelf(t *testing.T) {
 		output["process.mem"] = memInfo
 	}
 
-	fmt.Printf("Getting CPUTimes...\n")
+	t.Log("Getting process CPUTime()")
 	for {
 		cpuTimes, err := process.CPUTime()
 		if errors.Is(err, types.ErrNotImplemented) {
@@ -235,8 +237,9 @@ func TestSelf(t *testing.T) {
 		// measurement.
 	}
 
-	fmt.Printf("Getting OpenHandleEnumerator...\n")
 	if v, ok := process.(types.OpenHandleEnumerator); ok {
+		t.Log("Getting process OpenHandles()")
+
 		fds, err := v.OpenHandles()
 		if assert.NoError(t, err) {
 			output["process.fd"] = fds
@@ -244,6 +247,8 @@ func TestSelf(t *testing.T) {
 	}
 
 	if v, ok := process.(types.OpenHandleCounter); ok {
+		t.Log("Getting process OpenHandleCount()")
+
 		count, err := v.OpenHandleCount()
 		if assert.NoError(t, err) {
 			t.Log("open handles count:", count)
@@ -251,6 +256,8 @@ func TestSelf(t *testing.T) {
 	}
 
 	if v, ok := process.(types.Seccomp); ok {
+		t.Log("Getting process Seccomp()")
+
 		seccompInfo, err := v.Seccomp()
 		if assert.NoError(t, err) {
 			assert.NotZero(t, seccompInfo)
@@ -259,6 +266,8 @@ func TestSelf(t *testing.T) {
 	}
 
 	if v, ok := process.(types.Capabilities); ok {
+		t.Log("Getting process Capabilities()")
+
 		capInfo, err := v.Capabilities()
 		if assert.NoError(t, err) {
 			assert.NotZero(t, capInfo)
