@@ -47,27 +47,27 @@ const (
 )
 
 func PageSize() (uint32, error) {
-	var pageSize uint32
-	if err := sysctlByName(hwPagesizeMIB, &pageSize); err != nil {
-		return 0, fmt.Errorf("failed to get hw.pagesize: %w", err)
+	pageSize, err := unix.SysctlUint32(hwPagesizeMIB)
+	if err != nil {
+		return 0, fmt.Errorf("failed to get %s: %w", hwPagesizeMIB, err)
 	}
 
 	return pageSize, nil
 }
 
 func SwapMaxPages() (uint32, error) {
-	var maxPages uint32
-	if err := sysctlByName(hwPhysmemMIB, &maxPages); err != nil {
-		return 0, fmt.Errorf("failed to get vm.swap_maxpages: %w", err)
+	maxPages, err := unix.SysctlUint32(hwPhysmemMIB)
+	if err != nil {
+		return 0, fmt.Errorf("failed to get %s: %w", hwPhysmemMIB, err)
 	}
 
 	return maxPages, nil
 }
 
 func TotalMemory() (uint64, error) {
-	var size uint64
-	if err := sysctlByName(hwPhysmemMIB, &size); err != nil {
-		return 0, fmt.Errorf("failed to get hw.physmem: %w", err)
+	size, err := unix.SysctlUint64(hwPhysmemMIB)
+	if err != nil {
+		return 0, fmt.Errorf("failed to get %s: %w", hwPhysmemMIB, err)
 	}
 
 	return size, nil
@@ -83,12 +83,12 @@ func VmTotal() (vmTotal, error) {
 }
 
 func NumFreeBuffers() (uint32, error) {
-	var numfreebuffers uint32
-	if err := sysctlByName(vfsNumfreebuffersMIB, &numfreebuffers); err != nil {
-		return 0, fmt.Errorf("failed to get vfs.numfreebuffers: %w", err)
+	numFreeBuffers, err := unix.SysctlUint32(vfsNumfreebuffersMIB)
+	if err != nil {
+		return 0, fmt.Errorf("failed to get %s: %w", vfsNumfreebuffersMIB, err)
 	}
 
-	return numfreebuffers, nil
+	return numFreeBuffers, nil
 }
 
 func KvmGetSwapInfo() (kvmSwap, error) {
