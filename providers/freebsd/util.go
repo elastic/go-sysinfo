@@ -22,7 +22,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"strconv"
 )
 
@@ -40,49 +39,6 @@ func parseKeyValue(content []byte, separator string, callback func(key, value []
 	}
 
 	return sc.Err()
-}
-
-func findValue(filename, separator, key string) (string, error) {
-	content, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return "", err
-	}
-
-	var line []byte
-	sc := bufio.NewScanner(bytes.NewReader(content))
-	for sc.Scan() {
-		if bytes.HasPrefix(sc.Bytes(), []byte(key)) {
-			line = sc.Bytes()
-			break
-		}
-	}
-	if len(line) == 0 {
-		return "", fmt.Errorf("%v not found", key)
-	}
-
-	parts := bytes.SplitN(line, []byte(separator), 2)
-	if len(parts) != 2 {
-		return "", fmt.Errorf("unexpected line format for '%v'", string(line))
-	}
-
-	return string(bytes.TrimSpace(parts[1])), nil
-}
-
-func decodeBitMap(s string, lookupName func(int) string) ([]string, error) {
-	mask, err := strconv.ParseUint(s, 16, 64)
-	if err != nil {
-		return nil, err
-	}
-
-	var names []string
-	for i := 0; i < 64; i++ {
-		bit := mask & (1 << uint(i))
-		if bit > 0 {
-			names = append(names, lookupName(i))
-		}
-	}
-
-	return names, nil
 }
 
 func parseBytesOrNumber(data []byte) (uint64, error) {
