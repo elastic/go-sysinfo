@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/go-sysinfo/types"
 )
 
+
 func init() {
 	registry.Register(newFreeBSDSystem(""))
 }

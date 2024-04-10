@@ -34,6 +34,6 @@ func BootTime() (time.Time, error) {
 		return time.Time{}, fmt.Errorf("failed to get host uptime: %w", err)
 	}
 
-	bootTime := time.Unix(int64(tv.Sec), int64(tv.Usec)*int64(time.Microsecond))
+	bootTime := time.Unix(tv.Sec, tv.Usec*int64(time.Microsecond))
 	return bootTime, nil
 }

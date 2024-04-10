@@ -15,23 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build freebsd && cgo
+//go:build freebsd
 
 package freebsd
 
 import (
 	"testing"
+	"time"
 
-	"github.com/elastic/go-sysinfo/internal/registry"
+	"github.com/stretchr/testify/assert"
 )
 
-var _ registry.HostProvider = freebsdSystem{}
-
 func TestBootTime(t *testing.T) {
-	boottime, err := BootTime()
+	bootTime, err := BootTime()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	t.Log(boottime)
+	// Apply a sanity check. This assumes the host has rebooted in the last year.
+	assert.WithinDuration(t, time.Now().UTC(), bootTime, 365*24*time.Hour)
 }
