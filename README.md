@@ -30,28 +30,28 @@ if handleCounter, ok := process.(types.OpenHandleCounter); ok {
 These tables show what methods are implemented as well as the extra interfaces
 that are implemented.
 
-| `Host` Features  | Darwin | Linux | Windows | AIX |
-|------------------|--------|-------|---------|-----|
-| `Info()`         | x      | x     | x       | x   |
-| `Memory()`       | x      | x     | x       | x   |
-| `CPUTimer`       | x      | x     | x       | x   |
-| `LoadAverage`    | x      | x     |         |     |
-| `VMStat`         |        | x     |         |     |
-| `NetworkCounters`|        | x     |         |     |
+| `Host` Features   | Darwin | Linux | Windows | AIX | FreeBSD |
+|-------------------|--------|-------|---------|-----|---------|
+| `Info()`          | x      | x     | x       | x   | x       |
+| `Memory()`        | x      | x     | x       | x   | x       |
+| `CPUTimer`        | x      | x     | x       | x   | x       |
+| `LoadAverage`     | x      | x     |         |     |         |
+| `VMStat`          |        | x     |         |     |         |
+| `NetworkCounters` |        | x     |         |     |         |
 
-| `Process` Features     | Darwin | Linux | Windows | AIX |
-|------------------------|--------|-------|---------|-----|
-| `Info()`               | x      | x     | x       | x   |
-| `Memory()`             | x      | x     | x       | x   |
-| `User()`               | x      | x     | x       | x   |
-| `Parent()`             | x      | x     | x       | x   |
-| `CPUTimer`             | x      | x     | x       | x   |
-| `Environment`          | x      | x     |         | x   |
-| `OpenHandleEnumerator` |        | x     |         |     |
-| `OpenHandleCounter`    |        | x     |         |     |
-| `Seccomp`              |        | x     |         |     |
-| `Capabilities`         |        | x     |         |     |
-| `NetworkCounters`      |        | x     |         |     |
+| `Process` Features     | Darwin | Linux | Windows | AIX | FreeBSD |
+|------------------------|--------|-------|---------|-----|---------|
+| `Info()`               | x      | x     | x       | x   | x       |
+| `Memory()`             | x      | x     | x       | x   | x       |
+| `User()`               | x      | x     | x       | x   | x       |
+| `Parent()`             | x      | x     | x       | x   | x       |
+| `CPUTimer`             | x      | x     | x       | x   | x       |
+| `Environment`          | x      | x     |         | x   | x       |
+| `OpenHandleEnumerator` |        | x     |         |     | x       |
+| `OpenHandleCounter`    |        | x     |         |     | x       |
+| `Seccomp`              |        | x     |         |     |         |
+| `Capabilities`         |        | x     |         |     |         |
+| `NetworkCounters`      |        | x     |         |     | x       |
 
 ### GOOS / GOARCH Pairs
 
@@ -62,6 +62,7 @@ This table lists the OS and architectures for which a "provider" is implemented.
 | aix/ppc64      | x            |        |
 | darwin/amd64   | optional *   | x      |
 | darwin/arm64   | optional *   | x      |
+| freebsd/amd64  | x            | x      |
 | linux/386      |              |        |
 | linux/amd64    |              | x      |
 | linux/arm      |              |        |

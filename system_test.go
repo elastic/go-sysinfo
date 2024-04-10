@@ -44,6 +44,7 @@ type ProcessFeatures struct {
 	OpenHandleCounter    bool
 	Seccomp              bool
 	Capabilities         bool
+	NetworkCounters      bool
 }
 
 var expectedProcessFeatures = map[string]*ProcessFeatures{
@@ -56,6 +57,7 @@ var expectedProcessFeatures = map[string]*ProcessFeatures{
 		OpenHandleCounter:    true,
 		Seccomp:              true,
 		Capabilities:         true,
+		NetworkCounters:      true,
 	},
 	"windows": {
 		OpenHandleCounter: true,
@@ -67,6 +69,7 @@ var expectedProcessFeatures = map[string]*ProcessFeatures{
 		Environment:          true,
 		OpenHandleEnumerator: true,
 		OpenHandleCounter:    true,
+		NetworkCounters:      true,
 	},
 }
 
@@ -89,6 +92,7 @@ func TestProcessFeaturesMatrix(t *testing.T) {
 	_, features.OpenHandleCounter = process.(types.OpenHandleCounter)
 	_, features.Seccomp = process.(types.Seccomp)
 	_, features.Capabilities = process.(types.Capabilities)
+	_, features.NetworkCounters = process.(types.NetworkCounters)
 	assert.Equal(t, expectedProcessFeatures[runtime.GOOS], &features)
 
 	logAsJSON(t, map[string]interface{}{
