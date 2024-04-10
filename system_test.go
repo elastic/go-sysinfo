@@ -34,11 +34,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/go-sysinfo/internal/cgo"
 	"github.com/elastic/go-sysinfo/types"
 )
 
 type ProcessFeatures struct {
-	ProcessInfo          bool
 	Environment          bool
 	OpenHandleEnumerator bool
 	OpenHandleCounter    bool
@@ -48,13 +48,9 @@ type ProcessFeatures struct {
 
 var expectedProcessFeatures = map[string]*ProcessFeatures{
 	"darwin": {
-		ProcessInfo:          true,
-		Environment:          true,
-		OpenHandleEnumerator: false,
-		OpenHandleCounter:    false,
+		Environment: true,
 	},
 	"linux": {
-		ProcessInfo:          true,
 		Environment:          true,
 		OpenHandleEnumerator: true,
 		OpenHandleCounter:    true,
@@ -62,44 +58,39 @@ var expectedProcessFeatures = map[string]*ProcessFeatures{
 		Capabilities:         true,
 	},
 	"windows": {
-		ProcessInfo:          true,
-		OpenHandleEnumerator: false,
-		OpenHandleCounter:    true,
+		OpenHandleCounter: true,
 	},
 	"aix": {
-		ProcessInfo:          true,
-		Environment:          true,
-		OpenHandleEnumerator: false,
-		OpenHandleCounter:    false,
+		Environment: true,
 	},
 	"freebsd": {
-		ProcessInfo:          true,
 		Environment:          true,
 		OpenHandleEnumerator: true,
 		OpenHandleCounter:    true,
 	},
 }
 
-func TestProcessFeaturesMatrix(t *testing.T) {
-	const GOOS = runtime.GOOS
-	var features ProcessFeatures
+var startTime = time.Now().UTC()
 
+func TestProcessFeaturesMatrix(t *testing.T) {
 	process, err := Self()
-	if err == types.ErrNotImplemented {
-		assert.Nil(t, expectedProcessFeatures[GOOS], "unexpected ErrNotImplemented for %v", GOOS)
+	switch {
+	// Direct equality comparison because this is the API contract.
+	case types.ErrNotImplemented == err:
+		assert.Nil(t, expectedProcessFeatures[runtime.GOOS], "unexpected ErrNotImplemented for %v", runtime.GOOS)
 		return
-	} else if err != nil {
+	case err != nil:
 		t.Fatal(err)
 	}
-	features.ProcessInfo = true
 
+	var features ProcessFeatures
 	_, features.Environment = process.(types.Environment)
 	_, features.OpenHandleEnumerator = process.(types.OpenHandleEnumerator)
 	_, features.OpenHandleCounter = process.(types.OpenHandleCounter)
 	_, features.Seccomp = process.(types.Seccomp)
 	_, features.Capabilities = process.(types.Capabilities)
+	assert.Equal(t, expectedProcessFeatures[runtime.GOOS], &features)
 
-	assert.Equal(t, expectedProcessFeatures[GOOS], &features)
 	logAsJSON(t, map[string]interface{}{
 		"features": features,
 	})
@@ -132,24 +123,12 @@ func TestSelf(t *testing.T) {
 	output["process.info"] = info
 	assert.EqualValues(t, os.Getpid(), info.PID)
 	assert.Equal(t, os.Args, info.Args)
-	assert.WithinDuration(t, info.StartTime, time.Now(), 10*time.Second)
-
-	wd, err := os.Getwd()
-	if err != nil {
-		t.Fatal(err)
+	switch {
+	case runtime.GOOS == "darwin" && !cgo.Enabled:
+	default:
+		assert.WithinDurationf(t, startTime, info.StartTime, 10*time.Second, "StartTime does not match test start")
+		assertWorkingDirectory(t, info.CWD)
 	}
-
-	wdStat, err := os.Stat(wd)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	cwdStat, err := os.Stat(info.CWD)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	assert.EqualValues(t, os.SameFile(wdStat, cwdStat), true)
 
 	exe, err := os.Executable()
 	if err != nil {
@@ -355,5 +334,28 @@ func TestProcesses(t *testing.T) {
 		t.Logf("pid=%v name='%s' exe='%s' args=%+v ppid=%d cwd='%s' start_time=%v",
 			info.PID, info.Name, info.Exe, info.Args, info.PPID, info.CWD,
 			info.StartTime)
+	}
+}
+
+func assertWorkingDirectory(t *testing.T, observedWD string) {
+	t.Helper()
+
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedInfo, err := os.Stat(wd)
+	if err != nil {
+		t.Fatal(err)
+	}
+	observedInfo, err := os.Stat(observedWD)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !os.SameFile(expectedInfo, observedInfo) {
+		t.Errorf("working directory does not match observed working directory, want=%#v, got=%#v",
+			expectedInfo, observedInfo)
 	}
 }
