@@ -18,9 +18,8 @@
 package freebsd
 
 import (
+	"fmt"
 	"syscall"
-
-	"github.com/pkg/errors"
 )
 
 const kernelHostUUIDMIB = "kern.hostuuid"
@@ -28,7 +27,7 @@ const kernelHostUUIDMIB = "kern.hostuuid"
 func MachineID() (string, error) {
 	uuid, err := syscall.Sysctl(kernelHostUUIDMIB)
 	if err != nil {
-		return "", errors.Wrap(err, "failed to get machine id")
+		return "", fmt.Errorf("failed to get machine id: %w", err)
 	}
 
 	return uuid, nil

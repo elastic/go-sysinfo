@@ -24,12 +24,11 @@ import "C"
 
 import (
 	"context"
+	"errors"
 	"os"
 	"path/filepath"
 	"time"
 
-	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 	"github.com/prometheus/procfs"
 
 	"github.com/elastic/go-sysinfo/internal/registry"
@@ -109,7 +108,7 @@ type reader struct {
 
 func (r *reader) addErr(err error) bool {
 	if err != nil {
-		if errors.Cause(err) != types.ErrNotImplemented {
+		if !errors.Is(err, types.ErrNotImplemented) {
 			r.errs = append(r.errs, err)
 		}
 		return true
@@ -119,7 +118,7 @@ func (r *reader) addErr(err error) bool {
 
 func (r *reader) Err() error {
 	if len(r.errs) > 0 {
-		return &multierror.MultiError{Errors: r.errs}
+		return errors.Join(r.errs...)
 	}
 	return nil
 }

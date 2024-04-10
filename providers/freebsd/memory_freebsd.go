@@ -31,10 +31,9 @@ package freebsd
 import "C"
 
 import (
+	"fmt"
 	"syscall"
 	"unsafe"
-
-	"github.com/pkg/errors"
 )
 
 const (
@@ -50,7 +49,7 @@ const (
 func PageSize() (uint32, error) {
 	var pageSize uint32
 	if err := sysctlByName(hwPagesizeMIB, &pageSize); err != nil {
-		return 0, errors.Wrap(err, "failed to get hw.pagesize")
+		return 0, fmt.Errorf("failed to get hw.pagesize: %w", err)
 	}
 
 	return pageSize, nil
@@ -59,7 +58,7 @@ func PageSize() (uint32, error) {
 func SwapMaxPages() (uint32, error) {
 	var maxPages uint32
 	if err := sysctlByName(hwPhysmemMIB, &maxPages); err != nil {
-		return 0, errors.Wrap(err, "failed to get vm.swap_maxpages")
+		return 0, fmt.Errorf("failed to get vm.swap_maxpages: %w", err)
 	}
 
 	return maxPages, nil
@@ -68,7 +67,7 @@ func SwapMaxPages() (uint32, error) {
 func TotalMemory() (uint64, error) {
 	var size uint64
 	if err := sysctlByName(hwPhysmemMIB, &size); err != nil {
-		return 0, errors.Wrap(err, "failed to get hw.physmem")
+		return 0, fmt.Errorf("failed to get hw.physmem: %w", err)
 	}
 
 	return size, nil
@@ -77,7 +76,7 @@ func TotalMemory() (uint64, error) {
 func VmTotal() (vmTotal, error) {
 	var vm vmTotal
 	if err := sysctlByName(vmVmtotalMIB, &vm); err != nil {
-		return vmTotal{}, errors.Wrap(err, "failed to get vm.vmtotal")
+		return vmTotal{}, fmt.Errorf("failed to get vm.vmtotal: %w", err)
 	}
 
 	return vm, nil
@@ -86,7 +85,7 @@ func VmTotal() (vmTotal, error) {
 func NumFreeBuffers() (uint32, error) {
 	var numfreebuffers uint32
 	if err := sysctlByName(vfsNumfreebuffersMIB, &numfreebuffers); err != nil {
-		return 0, errors.Wrap(err, "failed to get vfs.numfreebuffers")
+		return 0, fmt.Errorf("failed to get vfs.numfreebuffers: %w", err)
 	}
 
 	return numfreebuffers, nil
@@ -101,14 +100,14 @@ func KvmGetSwapInfo() (kvmSwap, error) {
 	defer C.free(unsafe.Pointer(kvmOpenC))
 
 	if kdC, err := C.kvm_open(nil, devNullC, nil, syscall.O_RDONLY, kvmOpenC); kdC == nil {
-		return kvmSwap{}, errors.Wrap(err, "failed to open kvm")
+		return kvmSwap{}, fmt.Errorf("failed to open kvm: %w", err)
 	}
 
 	defer C.kvm_close((*C.struct___kvm)(unsafe.Pointer(kdC)))
 
 	var swap kvmSwap
 	if n, err := C.kvm_getswapinfo((*C.struct___kvm)(unsafe.Pointer(kdC)), (*C.struct_kvm_swap)(unsafe.Pointer(&swap)), 1, 0); n != 0 {
-		return kvmSwap{}, errors.Wrap(err, "failed to get kvm_getswapinfo")
+		return kvmSwap{}, fmt.Errorf("failed to get kvm_getswapinfo: %w", err)
 	}
 
 	return swap, nil
