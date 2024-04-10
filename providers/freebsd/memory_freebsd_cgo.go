@@ -58,12 +58,13 @@ func PageSize() (uint32, error) {
 }
 
 func SwapMaxPages() (uint32, error) {
-	maxPages, err := unix.SysctlUint32(hwPhysmemMIB)
+	maxPages, err := unix.SysctlUint64(hwPhysmemMIB)
 	if err != nil {
 		return 0, fmt.Errorf("failed to get %s: %w", hwPhysmemMIB, err)
 	}
 
-	return maxPages, nil
+	// TODO: Change return type to uint64.
+	return uint32(maxPages), nil
 }
 
 func TotalMemory() (uint64, error) {
