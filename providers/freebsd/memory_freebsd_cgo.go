@@ -93,24 +93,18 @@ func NumFreeBuffers() (uint32, error) {
 	return numFreeBuffers, nil
 }
 
-func KvmGetSwapInfo() (kvmSwap, error) {
-	var kdC *C.struct_kvm_t
-
-	devNullC := C.CString(devNull)
-	defer C.free(unsafe.Pointer(devNullC))
-	kvmOpenC := C.CString(kvmOpen)
-	defer C.free(unsafe.Pointer(kvmOpenC))
-
-	if kdC, err := C.kvm_open(nil, devNullC, nil, unix.O_RDONLY, kvmOpenC); kdC == nil {
-		return kvmSwap{}, fmt.Errorf("failed to open kvm: %w", err)
+func kvmGetSwapInfo() (*kvmSwap, error) {
+	var errstr *C.char
+	kd := C.kvm_open(nil, nil, nil, unix.O_RDONLY, errstr)
+	if errstr != nil {
+		return nil, fmt.Errorf("failed calling kvm_open: %s", C.GoString(errstr))
 	}
-
-	defer C.kvm_close((*C.struct___kvm)(unsafe.Pointer(kdC)))
+	defer C.kvm_close(kd)
 
 	var swap kvmSwap
-	if n, err := C.kvm_getswapinfo((*C.struct___kvm)(unsafe.Pointer(kdC)), (*C.struct_kvm_swap)(unsafe.Pointer(&swap)), 1, 0); n != 0 {
-		return kvmSwap{}, fmt.Errorf("failed to get kvm_getswapinfo: %w", err)
+	if n, err := C.kvm_getswapinfo(kd, (*C.struct_kvm_swap)(unsafe.Pointer(&swap)), 1, 0); n != 0 {
+		return nil, fmt.Errorf("failed to get kvm_getswapinfo: %w", err)
 	}
 
-	return swap, nil
+	return &swap, nil
 }

@@ -33,7 +33,6 @@ import (
 	"github.com/elastic/go-sysinfo/types"
 )
 
-
 func init() {
 	registry.Register(newFreeBSDSystem(""))
 }
@@ -164,7 +163,7 @@ func (r *reader) memInfo(m *types.HostMemoryInfo) {
 
 	m.Available = m.Free + (uint64(numFreeBuffers) * uint64(pageSize))
 
-	swap, err := KvmGetSwapInfo()
+	swap, err := kvmGetSwapInfo()
 	if r.addErr(err) {
 		return
 	}
