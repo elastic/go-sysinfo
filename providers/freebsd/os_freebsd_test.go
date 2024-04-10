@@ -28,21 +28,21 @@ import (
 )
 
 func TestOperatingSystem(t *testing.T) {
-	t.Run("freebsd14", func(t *testing.T) {
+	t.Run("freebsd", func(t *testing.T) {
 		os, err := getOSInfo("")
 		if err != nil {
 			t.Fatal(err)
 		}
-		assert.Equal(t, types.OSInfo{
-			Type:     "",
-			Family:   "freebsd",
-			Platform: "freebsd",
-			Name:     "FreeBSD",
-			Version:  "14.0-RELEASE",
-			Major:    14,
-			Minor:    0,
-			Patch:    0,
-		}, *os)
+		assert.IsType(t, types.OSInfo{}, *os)
+		assert.Equal(t, "freebsd", os.Type)
+		assert.Equal(t, "freebsd", os.Family)
+		assert.Equal(t, "freebsd", os.Platform)
+		assert.Equal(t, "FreeBSD", os.Name)
+		assert.Regexp(t, `\d{1,2}\.\d{1,2}-(RELEASE|STABLE|CURRENT|RC[0-9]|ALPHA(\d{0,2})|BETA(\d{0,2}))(-p\d)?`, os.Version)
+		assert.Regexp(t, `\d{1,2}`, os.Major)
+		assert.Regexp(t, `\d{1,2}`, os.Minor)
+		assert.Regexp(t, `\d{1,2}`, os.Patch)
+		assert.Regexp(t, `(RELEASE|STABLE|CURRENT|RC[0-9]|ALPHA([0-9]{0,2})|BETA([0-9]{0,2}))`, os.Build)
 		t.Logf("%#v", os)
 	})
 }

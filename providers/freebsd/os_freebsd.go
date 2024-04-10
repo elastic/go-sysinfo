@@ -29,9 +29,8 @@ import (
 )
 
 const (
-	ostypeMIB     = "kern.ostype"
-	osreleaseMIB  = "kern.osrelease"
-	osrevisionMIB = "kern.osrevision"
+	ostypeMIB    = "kern.ostype"
+	osreleaseMIB = "kern.osrelease"
 )
 
 func OperatingSystem() (*types.OSInfo, error) {
@@ -40,6 +39,7 @@ func OperatingSystem() (*types.OSInfo, error) {
 
 func getOSInfo(baseDir string) (*types.OSInfo, error) {
 	info := &types.OSInfo{
+		Type:     "freebsd",
 		Family:   "freebsd",
 		Platform: "freebsd",
 	}
@@ -50,25 +50,28 @@ func getOSInfo(baseDir string) (*types.OSInfo, error) {
 	}
 	info.Name = ostype
 
+	// Example: 13.0-RELEASE-p11
 	osrelease, err := unix.Sysctl(osreleaseMIB)
 	if err != nil {
 		return info, err
 	}
 	info.Version = osrelease
 
-	elems := strings.Split(osrelease, "-")
-	majorminor := strings.Split(elems[0], ".")
+	releaseParts := strings.Split(osrelease, "-")
 
-	if len(majorminor) > 0 {
-		info.Major, _ = strconv.Atoi(majorminor[0])
+	majorMinor := strings.Split(releaseParts[0], ".")
+	if len(majorMinor) > 0 {
+		info.Major, _ = strconv.Atoi(majorMinor[0])
+	}
+	if len(majorMinor) > 1 {
+		info.Minor, _ = strconv.Atoi(majorMinor[1])
 	}
 
-	if len(majorminor) > 1 {
-		info.Minor, _ = strconv.Atoi(majorminor[1])
+	if len(releaseParts) > 1 {
+		info.Build = releaseParts[1]
 	}
-
-	if len(elems) > 2 {
-		info.Patch, _ = strconv.Atoi(strings.TrimPrefix(elems[2], "p"))
+	if len(releaseParts) > 2 {
+		info.Patch, _ = strconv.Atoi(strings.TrimPrefix(releaseParts[2], "p"))
 	}
 
 	return info, nil
