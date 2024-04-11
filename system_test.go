@@ -233,7 +233,7 @@ func TestSelf(t *testing.T) {
 
 		count, err := v.OpenHandleCount()
 		if assert.NoError(t, err) {
-			t.Log("open handles count:", count)
+			output["process.open_handle_count"] = count
 		}
 	}
 
