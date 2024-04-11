@@ -135,10 +135,11 @@ func (r *reader) cpuTime(cpu *types.CPUTimes) {
 }
 
 func (r *reader) memInfo(m *types.HostMemoryInfo) {
-	pageSize, err := pageSizeBytes()
+	ps, err := pageSizeBytes()
 	if r.addErr(err) {
 		return
 	}
+	pageSize := uint64(ps)
 
 	m.Total, err = totalPhysicalMem()
 	if r.addErr(err) {

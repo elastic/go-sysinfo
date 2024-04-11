@@ -48,10 +48,10 @@ func totalPhysicalMem() (uint64, error) {
 	return v, nil
 }
 
-func pageSizeBytes() (uint64, error) {
+func pageSizeBytes() (uint32, error) {
 	const mib = "vm.stats.vm.v_page_size"
 
-	v, err := unix.SysctlUint64(mib)
+	v, err := unix.SysctlUint32(mib)
 	if err != nil {
 		return 0, fmt.Errorf("failed to get %s: %w", mib, err)
 	}
