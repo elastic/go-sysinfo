@@ -150,6 +150,7 @@ func (r *reader) memInfo(m *types.HostMemoryInfo) {
 	if r.addErr(err) {
 		return
 	}
+	m.Metrics = make(map[string]uint64, 6)
 	m.Metrics["active_bytes"] = uint64(activePages) * pageSize
 
 	wirePages, err := wirePageCount()
