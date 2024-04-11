@@ -135,50 +135,64 @@ func (r *reader) cpuTime(cpu *types.CPUTimes) {
 }
 
 func (r *reader) memInfo(m *types.HostMemoryInfo) {
-	pageSize, err := PageSize()
-
+	pageSize, err := pageSizeBytes()
 	if r.addErr(err) {
 		return
 	}
 
-	totalMemory, err := TotalMemory()
+	m.Total, err = totalPhysicalMem()
 	if r.addErr(err) {
 		return
 	}
 
-	m.Total = totalMemory
-
-	vm, err := VmTotal()
+	activePages, err := activePageCount()
 	if r.addErr(err) {
 		return
 	}
+	m.Metrics["active_bytes"] = activePages * pageSize
 
-	m.Free = uint64(vm.Free) * uint64(pageSize)
-	m.Used = m.Total - m.Free
-
-	numFreeBuffers, err := NumFreeBuffers()
+	wirePages, err := wirePageCount()
 	if r.addErr(err) {
 		return
 	}
+	m.Metrics["wired_bytes"] = wirePages * pageSize
 
-	m.Available = m.Free + (uint64(numFreeBuffers) * uint64(pageSize))
+	inactivePages, err := inactivePageCount()
+	if r.addErr(err) {
+		return
+	}
+	m.Metrics["inactive_bytes"] = inactivePages * pageSize
 
+	cachePages, err := cachePageCount()
+	if r.addErr(err) {
+		return
+	}
+	m.Metrics["cache_bytes"] = cachePages * pageSize
+
+	freePages, err := freePageCount()
+	if r.addErr(err) {
+		return
+	}
+	m.Metrics["free_bytes"] = freePages * pageSize
+
+	buffers, err := buffersUsedBytes()
+	if r.addErr(err) {
+		return
+	}
+	m.Metrics["buffer_bytes"] = buffers
+
+	m.Used = (activePages + wirePages) * pageSize
+	m.Free = freePages * pageSize
+	m.Available = (inactivePages+cachePages+freePages)*pageSize + buffers
+
+	// Virtual (swap) Memory
 	swap, err := kvmGetSwapInfo()
 	if r.addErr(err) {
 		return
 	}
 
-	swapMaxPages, err := SwapMaxPages()
-	if r.addErr(err) {
-		return
-	}
-
-	if swap.Total > swapMaxPages {
-		swap.Total = swapMaxPages
-	}
-
-	m.VirtualTotal = uint64(swap.Total) * uint64(pageSize)
-	m.VirtualUsed = uint64(swap.Used) * uint64(pageSize)
+	m.VirtualTotal = uint64(swap.Total) * pageSize
+	m.VirtualUsed = uint64(swap.Used) * pageSize
 	m.VirtualFree = m.VirtualTotal - m.VirtualUsed
 }
 

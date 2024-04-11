@@ -38,60 +38,90 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-const (
-	hwPhysmemMIB         = "hw.physmem"
-	hwPagesizeMIB        = "hw.pagesize"
-	vmVmtotalMIB         = "vm.vmtotal"
-	vmSwapmaxpagesMIB    = "vm.swap_maxpages"
-	vfsNumfreebuffersMIB = "vfs.numfreebuffers"
-	devNull              = "/dev/null"
-	kvmOpen              = "kvm_open"
-)
+func totalPhysicalMem() (uint64, error) {
+	const mib = "hw.physmem"
 
-func PageSize() (uint32, error) {
-	pageSize, err := unix.SysctlUint32(hwPagesizeMIB)
+	v, err := unix.SysctlUint64(mib)
 	if err != nil {
-		return 0, fmt.Errorf("failed to get %s: %w", hwPagesizeMIB, err)
+		return 0, fmt.Errorf("failed to get %s: %w", mib, err)
 	}
-
-	return pageSize, nil
+	return v, nil
 }
 
-func SwapMaxPages() (uint32, error) {
-	maxPages, err := unix.SysctlUint64(hwPhysmemMIB)
+func pageSizeBytes() (uint64, error) {
+	const mib = "vm.stats.vm.v_page_size"
+
+	v, err := unix.SysctlUint64(mib)
 	if err != nil {
-		return 0, fmt.Errorf("failed to get %s: %w", hwPhysmemMIB, err)
+		return 0, fmt.Errorf("failed to get %s: %w", mib, err)
 	}
 
-	// TODO: Change return type to uint64.
-	return uint32(maxPages), nil
+	return v, nil
 }
 
-func TotalMemory() (uint64, error) {
-	size, err := unix.SysctlUint64(hwPhysmemMIB)
-	if err != nil {
-		return 0, fmt.Errorf("failed to get %s: %w", hwPhysmemMIB, err)
-	}
+func activePageCount() (uint64, error) {
+	const mib = "vm.stats.vm.v_active_count"
 
-	return size, nil
+	v, err := unix.SysctlUint64(mib)
+	if err != nil {
+		return 0, fmt.Errorf("failed to get %s: %w", mib, err)
+	}
+	return v, nil
 }
 
-func VmTotal() (vmTotal, error) {
-	var vm vmTotal
-	if err := sysctlByName(vmVmtotalMIB, &vm); err != nil {
-		return vmTotal{}, fmt.Errorf("failed to get vm.vmtotal: %w", err)
-	}
+func wirePageCount() (uint64, error) {
+	const mib = "vm.stats.vm.v_wire_count"
 
-	return vm, nil
+	v, err := unix.SysctlUint64(mib)
+	if err != nil {
+		return 0, fmt.Errorf("failed to get %s: %w", mib, err)
+	}
+	return v, nil
 }
 
-func NumFreeBuffers() (uint32, error) {
-	numFreeBuffers, err := unix.SysctlUint32(vfsNumfreebuffersMIB)
+func inactivePageCount() (uint64, error) {
+	const mib = "vm.stats.vm.v_inactive_count"
+
+	v, err := unix.SysctlUint64(mib)
 	if err != nil {
-		return 0, fmt.Errorf("failed to get %s: %w", vfsNumfreebuffersMIB, err)
+		return 0, fmt.Errorf("failed to get %s: %w", mib, err)
 	}
 
-	return numFreeBuffers, nil
+	return v, nil
+}
+
+func cachePageCount() (uint64, error) {
+	const mib = "vm.stats.vm.v_cache_count"
+
+	v, err := unix.SysctlUint64(mib)
+	if err != nil {
+		return 0, fmt.Errorf("failed to get %s: %w", mib, err)
+	}
+
+	return v, nil
+}
+
+func freePageCount() (uint64, error) {
+	const mib = "vm.stats.vm.v_free_count"
+
+	v, err := unix.SysctlUint64(mib)
+	if err != nil {
+		return 0, fmt.Errorf("failed to get %s: %w", mib, err)
+	}
+
+	return v, nil
+}
+
+// buffersUsedBytes returns the number memory bytes used as disk cache.
+func buffersUsedBytes() (uint64, error) {
+	const mib = "vfs.bufspace"
+
+	v, err := unix.SysctlUint64(mib)
+	if err != nil {
+		return 0, fmt.Errorf("failed to get %s: %w", mib, err)
+	}
+
+	return v, nil
 }
 
 func kvmGetSwapInfo() (*kvmSwap, error) {
