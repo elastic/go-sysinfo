@@ -388,8 +388,10 @@ func (s freebsdSystem) Processes() ([]types.Process, error) {
 }
 
 func (s freebsdSystem) Process(pid int) (types.Process, error) {
-	p := process{pid: pid}
-	return &p, nil
+	return &process{
+		pid: pid,
+		fs:  s.procFS,
+	}, nil
 }
 
 func (s freebsdSystem) Self() (types.Process, error) {
