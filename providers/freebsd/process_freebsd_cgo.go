@@ -225,7 +225,8 @@ type process struct {
 }
 
 func timevalToDuration(tm C.struct_timeval) time.Duration {
-	return (time.Duration(tm.tv_sec) * 1000000) + (time.Duration(tm.tv_usec) * 1000)
+	return time.Duration(tm.tv_sec)*time.Second +
+		time.Duration(tm.tv_usec)*time.Microsecond
 }
 
 func (p *process) CPUTime() (types.CPUTimes, error) {
