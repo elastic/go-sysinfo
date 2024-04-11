@@ -23,12 +23,24 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
+	"unsafe"
 
 	"github.com/elastic/go-sysinfo/types"
 
 	"golang.org/x/sys/unix"
 )
+
+var tickDuration = sync.OnceValues(func() (time.Duration, error) {
+	const mib = "kern.clockrate"
+
+	c, err := unix.SysctlClockinfo(mib)
+	if err != nil {
+		return 0, fmt.Errorf("failed to get %s: %w", mib, err)
+	}
+	return time.Duration(c.Tick) * time.Microsecond, nil
+})
 
 func activePageCount() (uint32, error) {
 	const mib = "vm.stats.vm.v_active_count"
@@ -84,6 +96,40 @@ func cachePageCount() (uint32, error) {
 	}
 
 	return v, nil
+}
+
+const sizeOfUint64 = int(unsafe.Sizeof(uint64(0)))
+
+// cpuStateTimes uses sysctl kern.cp_time to get the amount of time spent in
+// different CPU states.
+func cpuStateTimes() (*types.CPUTimes, error) {
+	tickDuration, err := tickDuration()
+	if err != nil {
+		return nil, err
+	}
+
+	const mib = "kern.cp_time"
+	buf, err := unix.SysctlRaw("kern.cp_time")
+	if err != nil {
+		return nil, fmt.Errorf("failed to get %s: %w", mib, err)
+	}
+
+	var clockTicks [unix.CPUSTATES]uint64
+	if len(buf) < len(clockTicks)*sizeOfUint64 {
+		return nil, fmt.Errorf("kern.cp_time data is too short (got %d bytes)", len(buf))
+	}
+	for i := range clockTicks {
+		val := *(*uint64)(unsafe.Pointer(&buf[sizeOfUint64*i]))
+		clockTicks[i] = val
+	}
+
+	return &types.CPUTimes{
+		User:   time.Duration(clockTicks[unix.CP_USER]) * tickDuration,
+		System: time.Duration(clockTicks[unix.CP_SYS]) * tickDuration,
+		Idle:   time.Duration(clockTicks[unix.CP_IDLE]) * tickDuration,
+		IRQ:    time.Duration(clockTicks[unix.CP_INTR]) * tickDuration,
+		Nice:   time.Duration(clockTicks[unix.CP_NICE]) * tickDuration,
+	}, nil
 }
 
 func freePageCount() (uint32, error) {

@@ -120,16 +120,11 @@ func (r *reader) Err() error {
 }
 
 func (r *reader) cpuTime(cpu *types.CPUTimes) {
-	cptime, err := Cptime()
+	times, err := cpuStateTimes()
 	if r.addErr(err) {
 		return
 	}
-
-	cpu.User = time.Duration(cptime["User"])
-	cpu.System = time.Duration(cptime["System"])
-	cpu.Idle = time.Duration(cptime["Idle"])
-	cpu.Nice = time.Duration(cptime["Nice"])
-	cpu.IRQ = time.Duration(cptime["IRQ"])
+	*cpu = *times
 }
 
 func (r *reader) memInfo(m *types.HostMemoryInfo) {

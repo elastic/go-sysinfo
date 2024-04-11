@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestArchitecture(t *testing.T) {
@@ -43,6 +44,16 @@ func TestBootTime(t *testing.T) {
 
 	// Apply a sanity check. This assumes the host has rebooted in the last year.
 	assert.WithinDuration(t, time.Now().UTC(), bootTime, 365*24*time.Hour)
+}
+
+func TestCPUStateTimes(t *testing.T) {
+	times, err := cpuStateTimes()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	require.NotNil(t, times)
+	assert.NotZero(t, *times)
 }
 
 func TestKernelVersion(t *testing.T) {
