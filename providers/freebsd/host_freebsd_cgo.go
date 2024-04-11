@@ -34,19 +34,13 @@ import (
 )
 
 func init() {
-	registry.Register(newFreeBSDSystem(""))
+	registry.Register(newFreeBSDSystem())
 }
 
-type freebsdSystem struct {
-	procFS procFS
-}
+type freebsdSystem struct{}
 
-func newFreeBSDSystem(hostFS string) freebsdSystem {
-	mountPoint := filepath.Join(hostFS, procfs.DefaultMountPoint)
-	fs, _ := procfs.NewFS(mountPoint)
-	return freebsdSystem{
-		procFS: procFS{FS: fs, mountPoint: mountPoint},
-	}
+func newFreeBSDSystem() freebsdSystem {
+	return freebsdSystem{}
 }
 
 func (s freebsdSystem) Host() (types.Host, error) {

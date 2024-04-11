@@ -29,23 +29,25 @@ import (
 var _ registry.HostProvider = freebsdSystem{}
 
 func TestHost(t *testing.T) {
-	host, err := newFreeBSDSystem("").Host()
+	host, err := newFreeBSDSystem().Host()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	info := host.Info()
-	data, _ := json.MarshalIndent(info, "", "  ")
-	t.Log(string(data))
-}
+	t.Run("Info", func(t *testing.T) {
+		info := host.Info()
 
-func TestHostMemoryInfo(t *testing.T) {
-	host, err := newFreeBSDSystem("").Host()
-	if err != nil {
-		t.Fatal(err)
-	}
-	_, err = host.Memory()
-	if err != nil {
-		t.Fatal(err)
-	}
+		data, _ := json.MarshalIndent(info, "", "  ")
+		t.Log(string(data))
+	})
+
+	t.Run("Memory", func(t *testing.T) {
+		mem, err := host.Memory()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		data, _ := json.MarshalIndent(mem, "", "  ")
+		t.Log(string(data))
+	})
 }

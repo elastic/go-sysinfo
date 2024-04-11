@@ -51,7 +51,7 @@ that are implemented.
 | `OpenHandleCounter`    |        | x     |         |     | x       |
 | `Seccomp`              |        | x     |         |     |         |
 | `Capabilities`         |        | x     |         |     |         |
-| `NetworkCounters`      |        | x     |         |     | x       |
+| `NetworkCounters`      |        | x     |         |     |         |
 
 ### GOOS / GOARCH Pairs
 

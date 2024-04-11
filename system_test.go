@@ -69,7 +69,6 @@ var expectedProcessFeatures = map[string]*ProcessFeatures{
 		Environment:          true,
 		OpenHandleEnumerator: true,
 		OpenHandleCounter:    true,
-		NetworkCounters:      true,
 	},
 }
 

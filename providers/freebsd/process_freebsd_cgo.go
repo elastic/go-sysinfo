@@ -110,10 +110,6 @@ func getProcInfo(op, arg int) ([]process, error) {
 	return procs, nil
 }
 
-func (p *process) path(pa ...string) string {
-	return p.fs.path(append([]string{strconv.Itoa(p.PID())}, pa...)...)
-}
-
 func copyArray(from **C.char) []string {
 	if from == nil {
 		return nil
@@ -226,7 +222,6 @@ func getProcCWD(p *process) (string, error) {
 
 type process struct {
 	pid   int
-	fs    procFS
 	kinfo C.struct_kinfo_proc
 }
 
@@ -308,29 +303,6 @@ func (p *process) User() (types.UserInfo, error) {
 	}, nil
 }
 
-// NetworkCounters reports network stats for the process.
-func (p *process) NetworkCounters() (*types.NetworkCountersInfo, error) {
-	snmpRaw, err := os.ReadFile(p.path("net/snmp"))
-	if err != nil {
-		return nil, err
-	}
-	snmp, err := getNetSnmpStats(snmpRaw)
-	if err != nil {
-		return nil, err
-	}
-
-	netstatRaw, err := os.ReadFile(p.path("net/netstat"))
-	if err != nil {
-		return nil, err
-	}
-	netstat, err := getNetstatStats(netstatRaw)
-	if err != nil {
-		return nil, err
-	}
-
-	return &types.NetworkCountersInfo{SNMP: snmp, Netstat: netstat}, nil
-}
-
 func (p *process) PID() int {
 	return p.pid
 }
@@ -388,10 +360,7 @@ func (s freebsdSystem) Processes() ([]types.Process, error) {
 }
 
 func (s freebsdSystem) Process(pid int) (types.Process, error) {
-	return &process{
-		pid: pid,
-		fs:  s.procFS,
-	}, nil
+	return &process{pid: pid}, nil
 }
 
 func (s freebsdSystem) Self() (types.Process, error) {
