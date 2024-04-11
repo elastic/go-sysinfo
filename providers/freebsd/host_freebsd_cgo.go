@@ -66,8 +66,7 @@ func (h *host) CPUTime() (types.CPUTimes, error) {
 	cpu := types.CPUTimes{}
 	r := &reader{}
 	r.cpuTime(&cpu)
-
-	return cpu, nil
+	return cpu, r.Err()
 }
 
 func (h *host) Memory() (*types.HostMemoryInfo, error) {
@@ -122,7 +121,6 @@ func (r *reader) Err() error {
 
 func (r *reader) cpuTime(cpu *types.CPUTimes) {
 	cptime, err := Cptime()
-
 	if r.addErr(err) {
 		return
 	}
@@ -211,7 +209,6 @@ func (r *reader) bootTime(h *host) {
 	if r.addErr(err) {
 		return
 	}
-
 	h.info.BootTime = v
 }
 
