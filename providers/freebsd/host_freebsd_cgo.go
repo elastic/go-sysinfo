@@ -199,7 +199,7 @@ func (r *reader) memInfo(m *types.HostMemoryInfo) {
 }
 
 func (r *reader) architecture(h *host) {
-	v, err := Architecture()
+	v, err := architecture()
 	if r.addErr(err) {
 		return
 	}
@@ -207,7 +207,7 @@ func (r *reader) architecture(h *host) {
 }
 
 func (r *reader) bootTime(h *host) {
-	v, err := BootTime()
+	v, err := bootTime()
 	if r.addErr(err) {
 		return
 	}
@@ -233,7 +233,7 @@ func (r *reader) network(h *host) {
 }
 
 func (r *reader) kernelVersion(h *host) {
-	v, err := KernelVersion()
+	v, err := kernelVersion()
 	if r.addErr(err) {
 		return
 	}
@@ -241,7 +241,7 @@ func (r *reader) kernelVersion(h *host) {
 }
 
 func (r *reader) os(h *host) {
-	v, err := OperatingSystem()
+	v, err := operatingSystem()
 	if r.addErr(err) {
 		return
 	}
@@ -253,7 +253,7 @@ func (r *reader) time(h *host) {
 }
 
 func (r *reader) uniqueID(h *host) {
-	v, err := MachineID()
+	v, err := machineID()
 	if r.addErr(err) {
 		return
 	}

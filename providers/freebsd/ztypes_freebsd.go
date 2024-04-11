@@ -21,24 +21,6 @@
 
 package freebsd
 
-type vmTotal struct {
-	Rq     int16
-	Dw     int16
-	Pw     int16
-	Sl     int16
-	_      int16 // cgo doesn't generate the same alignment as C does
-	Sw     int16
-	Vm     int32
-	Avm    int32
-	Rm     int32
-	Arm    int32
-	Vmshr  int32
-	Avmshr int32
-	Rmshr  int32
-	Armshr int32
-	Free   int32
-}
-
 type kvmSwap struct {
 	Devname   [32]int8
 	Used      uint32
