@@ -122,6 +122,12 @@ func (r *reader) cpuTime(cpu *types.CPUTimes) {
 }
 
 func (r *reader) memInfo(m *types.HostMemoryInfo) {
+	// Memory counter calculations:
+	//   total = physical memory
+	//   used = active + wired
+	//   free = free
+	//   available = buffers + inactive + cache + free
+
 	ps, err := pageSizeBytes()
 	if r.addErr(err) {
 		return
