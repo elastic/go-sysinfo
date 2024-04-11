@@ -59,30 +59,30 @@ func pageSizeBytes() (uint32, error) {
 	return v, nil
 }
 
-func activePageCount() (uint64, error) {
+func activePageCount() (uint32, error) {
 	const mib = "vm.stats.vm.v_active_count"
 
-	v, err := unix.SysctlUint64(mib)
+	v, err := unix.SysctlUint32(mib)
 	if err != nil {
 		return 0, fmt.Errorf("failed to get %s: %w", mib, err)
 	}
 	return v, nil
 }
 
-func wirePageCount() (uint64, error) {
+func wirePageCount() (uint32, error) {
 	const mib = "vm.stats.vm.v_wire_count"
 
-	v, err := unix.SysctlUint64(mib)
+	v, err := unix.SysctlUint32(mib)
 	if err != nil {
 		return 0, fmt.Errorf("failed to get %s: %w", mib, err)
 	}
 	return v, nil
 }
 
-func inactivePageCount() (uint64, error) {
+func inactivePageCount() (uint32, error) {
 	const mib = "vm.stats.vm.v_inactive_count"
 
-	v, err := unix.SysctlUint64(mib)
+	v, err := unix.SysctlUint32(mib)
 	if err != nil {
 		return 0, fmt.Errorf("failed to get %s: %w", mib, err)
 	}
@@ -90,10 +90,10 @@ func inactivePageCount() (uint64, error) {
 	return v, nil
 }
 
-func cachePageCount() (uint64, error) {
+func cachePageCount() (uint32, error) {
 	const mib = "vm.stats.vm.v_cache_count"
 
-	v, err := unix.SysctlUint64(mib)
+	v, err := unix.SysctlUint32(mib)
 	if err != nil {
 		return 0, fmt.Errorf("failed to get %s: %w", mib, err)
 	}
@@ -101,10 +101,10 @@ func cachePageCount() (uint64, error) {
 	return v, nil
 }
 
-func freePageCount() (uint64, error) {
+func freePageCount() (uint32, error) {
 	const mib = "vm.stats.vm.v_free_count"
 
-	v, err := unix.SysctlUint64(mib)
+	v, err := unix.SysctlUint32(mib)
 	if err != nil {
 		return 0, fmt.Errorf("failed to get %s: %w", mib, err)
 	}
