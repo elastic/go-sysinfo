@@ -42,6 +42,17 @@ var tickDuration = sync.OnceValues(func() (time.Duration, error) {
 	return time.Duration(c.Tick) * time.Microsecond, nil
 })
 
+var pageSizeBytes = sync.OnceValues(func() (uint32, error) {
+	const mib = "vm.stats.vm.v_page_size"
+
+	v, err := unix.SysctlUint32(mib)
+	if err != nil {
+		return 0, fmt.Errorf("failed to get %s: %w", mib, err)
+	}
+
+	return v, nil
+})
+
 func activePageCount() (uint32, error) {
 	const mib = "vm.stats.vm.v_active_count"
 
@@ -214,17 +225,6 @@ func operatingSystem() (*types.OSInfo, error) {
 	}
 
 	return info, nil
-}
-
-func pageSizeBytes() (uint32, error) {
-	const mib = "vm.stats.vm.v_page_size"
-
-	v, err := unix.SysctlUint32(mib)
-	if err != nil {
-		return 0, fmt.Errorf("failed to get %s: %w", mib, err)
-	}
-
-	return v, nil
 }
 
 func totalPhysicalMem() (uint64, error) {

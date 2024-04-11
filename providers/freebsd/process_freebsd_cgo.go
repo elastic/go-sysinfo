@@ -86,7 +86,6 @@ import (
 
 func getProcInfo(op, arg int) ([]process, error) {
 	procstat, err := C.procstat_open_sysctl()
-
 	if procstat == nil {
 		return nil, fmt.Errorf("failed to open procstat sysctl: %w", err)
 	}
@@ -273,6 +272,11 @@ func (p *process) Info() (types.ProcessInfo, error) {
 }
 
 func (p *process) Memory() (types.MemoryInfo, error) {
+	pageSize, err := pageSizeBytes()
+	if err != nil {
+		return types.MemoryInfo{}, err
+	}
+
 	procs, err := getProcInfo(C.KERN_PROC_PID, p.PID())
 	if err != nil {
 		return types.MemoryInfo{}, err
@@ -280,8 +284,8 @@ func (p *process) Memory() (types.MemoryInfo, error) {
 	p.kinfo = procs[0].kinfo
 
 	return types.MemoryInfo{
-		Resident: uint64(p.kinfo.ki_rssize),
-		Virtual:  uint64(p.kinfo.ki_size),
+		Resident: uint64(p.kinfo.ki_rssize) * uint64(pageSize),
+		Virtual:  uint64(p.kinfo.ki_size) * uint64(pageSize),
 	}, nil
 }
 
