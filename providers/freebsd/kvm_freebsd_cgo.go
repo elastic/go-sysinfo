@@ -38,7 +38,10 @@ import (
 	"golang.org/x/sys/unix"
 )
 
+// kvmGetSwapInfo returns swap summary statistics for the system. It accesses
+// the kernel virtual memory (kvm) images by using libkvm.
 func kvmGetSwapInfo() (*kvmSwap, error) {
+	// Obtain a KVM file descriptor.
 	var errstr *C.char
 	kd := C.kvm_open(nil, nil, nil, unix.O_RDONLY, errstr)
 	if errstr != nil {

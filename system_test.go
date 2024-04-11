@@ -258,6 +258,16 @@ func TestSelf(t *testing.T) {
 		}
 	}
 
+	if v, ok := process.(types.NetworkCounters); ok {
+		t.Log("Getting process NetworkCounters()")
+
+		counters, err := v.NetworkCounters()
+		if assert.NoError(t, err) {
+			assert.NotZero(t, counters)
+			output["process.network_counters"] = counters
+		}
+	}
+
 	logAsJSON(t, output)
 }
 
