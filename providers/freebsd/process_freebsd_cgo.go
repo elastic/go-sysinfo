@@ -76,7 +76,6 @@ import "C"
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
@@ -311,9 +310,9 @@ func (p *process) User() (types.UserInfo, error) {
 	}, nil
 }
 
-// NetworkStats reports network stats for an individual PID.
+// NetworkCounters reports network stats for the process.
 func (p *process) NetworkCounters() (*types.NetworkCountersInfo, error) {
-	snmpRaw, err := ioutil.ReadFile(p.path("net/snmp"))
+	snmpRaw, err := os.ReadFile(p.path("net/snmp"))
 	if err != nil {
 		return nil, err
 	}
@@ -322,7 +321,7 @@ func (p *process) NetworkCounters() (*types.NetworkCountersInfo, error) {
 		return nil, err
 	}
 
-	netstatRaw, err := ioutil.ReadFile(p.path("net/netstat"))
+	netstatRaw, err := os.ReadFile(p.path("net/netstat"))
 	if err != nil {
 		return nil, err
 	}
@@ -340,7 +339,6 @@ func (p *process) PID() int {
 
 func (p *process) OpenHandles() ([]string, error) {
 	procstat := C.procstat_open_sysctl()
-
 	if procstat == nil {
 		return nil, errors.New("failed to open procstat sysctl")
 	}
@@ -363,7 +361,6 @@ func (p *process) OpenHandles() ([]string, error) {
 
 func (p *process) OpenHandleCount() (int, error) {
 	procstat := C.procstat_open_sysctl()
-
 	if procstat == nil {
 		return 0, errors.New("failed to open procstat sysctl")
 	}
