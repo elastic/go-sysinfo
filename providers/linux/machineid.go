@@ -20,7 +20,6 @@ package linux
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"github.com/elastic/go-sysinfo/types"
@@ -35,7 +34,7 @@ func MachineID() (string, error) {
 	var err error
 
 	for _, file := range machineIDFiles {
-		contents, err = ioutil.ReadFile(file)
+		contents, err = os.ReadFile(file)
 		if err != nil {
 			if os.IsNotExist(err) {
 				// Try next location

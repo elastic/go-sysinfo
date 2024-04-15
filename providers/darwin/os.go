@@ -19,7 +19,7 @@ package darwin
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strconv"
 	"strings"
 
@@ -37,7 +37,7 @@ const (
 )
 
 func OperatingSystem() (*types.OSInfo, error) {
-	data, err := ioutil.ReadFile(systemVersionPlist)
+	data, err := os.ReadFile(systemVersionPlist)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read plist file: %w", err)
 	}

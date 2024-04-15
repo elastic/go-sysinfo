@@ -19,7 +19,6 @@ package linux
 
 import (
 	"bytes"
-	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
@@ -180,7 +179,7 @@ func (p *process) OpenHandleCount() (int, error) {
 
 func (p *process) Environment() (map[string]string, error) {
 	// TODO: add Environment to procfs
-	content, err := ioutil.ReadFile(p.path("environ"))
+	content, err := os.ReadFile(p.path("environ"))
 	if err != nil {
 		return nil, err
 	}
@@ -205,7 +204,7 @@ func (p *process) Environment() (map[string]string, error) {
 }
 
 func (p *process) Seccomp() (*types.SeccompInfo, error) {
-	content, err := ioutil.ReadFile(p.path("status"))
+	content, err := os.ReadFile(p.path("status"))
 	if err != nil {
 		return nil, err
 	}
@@ -214,7 +213,7 @@ func (p *process) Seccomp() (*types.SeccompInfo, error) {
 }
 
 func (p *process) Capabilities() (*types.CapabilityInfo, error) {
-	content, err := ioutil.ReadFile(p.path("status"))
+	content, err := os.ReadFile(p.path("status"))
 	if err != nil {
 		return nil, err
 	}
@@ -223,7 +222,7 @@ func (p *process) Capabilities() (*types.CapabilityInfo, error) {
 }
 
 func (p *process) User() (types.UserInfo, error) {
-	content, err := ioutil.ReadFile(p.path("status"))
+	content, err := os.ReadFile(p.path("status"))
 	if err != nil {
 		return types.UserInfo{}, err
 	}
@@ -255,7 +254,7 @@ func (p *process) User() (types.UserInfo, error) {
 
 // NetworkStats reports network stats for an individual PID.
 func (p *process) NetworkCounters() (*types.NetworkCountersInfo, error) {
-	snmpRaw, err := ioutil.ReadFile(p.path("net/snmp"))
+	snmpRaw, err := os.ReadFile(p.path("net/snmp"))
 	if err != nil {
 		return nil, err
 	}
@@ -264,7 +263,7 @@ func (p *process) NetworkCounters() (*types.NetworkCountersInfo, error) {
 		return nil, err
 	}
 
-	netstatRaw, err := ioutil.ReadFile(p.path("net/netstat"))
+	netstatRaw, err := os.ReadFile(p.path("net/netstat"))
 	if err != nil {
 		return nil, err
 	}

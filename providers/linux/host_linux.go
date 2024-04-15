@@ -21,7 +21,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -65,7 +64,7 @@ func (h *host) Info() types.HostInfo {
 }
 
 func (h *host) Memory() (*types.HostMemoryInfo, error) {
-	content, err := ioutil.ReadFile(h.procFS.path("meminfo"))
+	content, err := os.ReadFile(h.procFS.path("meminfo"))
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +82,7 @@ func (h *host) FQDN() (string, error) {
 
 // VMStat reports data from /proc/vmstat on linux.
 func (h *host) VMStat() (*types.VMStatInfo, error) {
-	content, err := ioutil.ReadFile(h.procFS.path("vmstat"))
+	content, err := os.ReadFile(h.procFS.path("vmstat"))
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +106,7 @@ func (h *host) LoadAverage() (*types.LoadAverageInfo, error) {
 
 // NetworkCounters reports data from /proc/net on linux
 func (h *host) NetworkCounters() (*types.NetworkCountersInfo, error) {
-	snmpRaw, err := ioutil.ReadFile(h.procFS.path("net/snmp"))
+	snmpRaw, err := os.ReadFile(h.procFS.path("net/snmp"))
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +115,7 @@ func (h *host) NetworkCounters() (*types.NetworkCountersInfo, error) {
 		return nil, err
 	}
 
-	netstatRaw, err := ioutil.ReadFile(h.procFS.path("net/netstat"))
+	netstatRaw, err := os.ReadFile(h.procFS.path("net/netstat"))
 	if err != nil {
 		return nil, err
 	}
