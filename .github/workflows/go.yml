@@ -78,7 +78,7 @@ jobs:
         run: echo "CGO_ENABLED=0" >> $GITHUB_ENV
 
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v4
+        uses: golangci/golangci-lint-action@v6
         if: github.event_name == 'pull_request'
         with:
           version: latest

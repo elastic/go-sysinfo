@@ -22,7 +22,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strconv"
 )
 
@@ -51,7 +51,7 @@ func parseKeyValue(content []byte, separator byte, callback func(key, value []by
 }
 
 func findValue(filename, separator, key string) (string, error) {
-	content, err := ioutil.ReadFile(filename)
+	content, err := os.ReadFile(filename)
 	if err != nil {
 		return "", err
 	}
