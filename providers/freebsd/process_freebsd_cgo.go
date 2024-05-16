@@ -61,10 +61,10 @@ unsigned int countFileStats(struct filestat_list *head) {
 void copyFileStats(struct filestat_list *head, struct filestat *out, unsigned int size) {
   unsigned int index = 0;
   struct filestat *fst;
+  if (size == 0) {
+      return;
+  }
   STAILQ_FOREACH(fst, head, next) {
-    if (!size) {
-      break;
-    }
     memcpy(out, fst, sizeof(*fst));
     ++out;
     --size;
@@ -326,7 +326,7 @@ func (p *process) OpenHandles() ([]string, error) {
 	names := make([]string, 0, len(files))
 
 	for _, file := range files {
-		if file.fs_uflags == 0 {
+		if file.fs_type == 1 {
 			names = append(names, C.GoString(file.fs_path))
 		}
 	}
