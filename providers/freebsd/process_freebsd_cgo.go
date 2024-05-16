@@ -327,7 +327,9 @@ func (p *process) OpenHandles() ([]string, error) {
 
 	for _, file := range files {
 		if file.fs_type == 1 {
-			names = append(names, C.GoString(file.fs_path))
+			if path := C.GoString(file.fs_path); path != "" {
+				names = append(names, path)
+			}
 		}
 	}
 
