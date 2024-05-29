@@ -81,5 +81,5 @@ func NativeArchitecture() (string, error) {
 	nativeArch := string(data)
 	nativeArch = strings.TrimRight(nativeArch, "\n")
 
-	return string(data), nil
+	return nativeArch, nil
 }

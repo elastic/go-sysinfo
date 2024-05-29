@@ -18,6 +18,7 @@
 package linux
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -27,10 +28,12 @@ func TestArchitecture(t *testing.T) {
 	a, err := Architecture()
 	assert.NoError(t, err)
 	assert.NotEmpty(t, a)
+	assert.NotRegexp(t, regexp.MustCompile("^.*\n+$"), a, "should not end in newlines")
 }
 
 func TestNativeArchitecture(t *testing.T) {
 	a, err := NativeArchitecture()
 	assert.NoError(t, err)
 	assert.NotEmpty(t, a)
+	assert.NotRegexp(t, regexp.MustCompile("^.*\n+$"), a, "should not end in newlines")
 }
