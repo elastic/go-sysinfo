@@ -133,46 +133,25 @@ func (r *reader) memInfo(m *types.HostMemoryInfo) {
 		return
 	}
 
-	m.Total, err = totalPhysicalMem()
-	if r.addErr(err) {
-		return
-	}
+	m.Total = totalPhysicalMem(r)
+	activePages := activePageCount(r)
 
-	activePages, err := activePageCount()
-	if r.addErr(err) {
-		return
-	}
 	m.Metrics = make(map[string]uint64, 6)
 	m.Metrics["active_bytes"] = activePages * pageSize
 
-	wirePages, err := wirePageCount()
-	if r.addErr(err) {
-		return
-	}
+	wirePages := wirePageCount(r)
 	m.Metrics["wired_bytes"] = wirePages * pageSize
 
-	inactivePages, err := inactivePageCount()
-	if r.addErr(err) {
-		return
-	}
+	inactivePages := inactivePageCount(r)
 	m.Metrics["inactive_bytes"] = inactivePages * pageSize
 
-	cachePages, err := cachePageCount()
-	if r.addErr(err) {
-		return
-	}
+	cachePages := cachePageCount(r)
 	m.Metrics["cache_bytes"] = cachePages * pageSize
 
-	freePages, err := freePageCount()
-	if r.addErr(err) {
-		return
-	}
+	freePages := freePageCount(r)
 	m.Metrics["free_bytes"] = freePages * pageSize
 
-	buffers, err := buffersUsedBytes()
-	if r.addErr(err) {
-		return
-	}
+	buffers := buffersUsedBytes(r)
 	m.Metrics["buffer_bytes"] = buffers
 
 	m.Used = (activePages + wirePages) * pageSize

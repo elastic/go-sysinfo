@@ -53,14 +53,14 @@ var pageSizeBytes = sync.OnceValues(func() (uint64, error) {
 	return uint64(v), nil
 })
 
-func activePageCount() (uint64, error) {
+func activePageCount(r *reader) uint64 {
 	const mib = "vm.stats.vm.v_active_count"
 
 	v, err := unix.SysctlUint32(mib)
-	if err != nil {
-		return 0, fmt.Errorf("failed to get %s: %w", mib, err)
+	if r.addErr(err) {
+		return 0
 	}
-	return uint64(v), nil
+	return uint64(v)
 }
 
 func architecture() (string, error) {
@@ -87,26 +87,26 @@ func bootTime() (time.Time, error) {
 }
 
 // buffersUsedBytes returns the number memory bytes used as disk cache.
-func buffersUsedBytes() (uint64, error) {
+func buffersUsedBytes(r *reader) uint64 {
 	const mib = "vfs.bufspace"
 
 	v, err := unix.SysctlUint64(mib)
-	if err != nil {
-		return 0, fmt.Errorf("failed to get %s: %w", mib, err)
+	if r.addErr(err) {
+		return 0
 	}
 
-	return v, nil
+	return v
 }
 
-func cachePageCount() (uint64, error) {
+func cachePageCount(r *reader) uint64 {
 	const mib = "vm.stats.vm.v_cache_count"
 
 	v, err := unix.SysctlUint32(mib)
-	if err != nil {
-		return 0, fmt.Errorf("failed to get %s: %w", mib, err)
+	if r.addErr(err) {
+		return 0
 	}
 
-	return uint64(v), nil
+	return uint64(v)
 }
 
 const sizeOfUint64 = int(unsafe.Sizeof(uint64(0)))
@@ -143,26 +143,26 @@ func cpuStateTimes() (*types.CPUTimes, error) {
 	}, nil
 }
 
-func freePageCount() (uint64, error) {
+func freePageCount(r *reader) uint64 {
 	const mib = "vm.stats.vm.v_free_count"
 
 	v, err := unix.SysctlUint32(mib)
-	if err != nil {
-		return 0, fmt.Errorf("failed to get %s: %w", mib, err)
+	if r.addErr(err) {
+		return 0
 	}
 
-	return uint64(v), nil
+	return uint64(v)
 }
 
-func inactivePageCount() (uint64, error) {
+func inactivePageCount(r *reader) uint64 {
 	const mib = "vm.stats.vm.v_inactive_count"
 
 	v, err := unix.SysctlUint32(mib)
-	if err != nil {
-		return 0, fmt.Errorf("failed to get %s: %w", mib, err)
+	if r.addErr(err) {
+		return 0
 	}
 
-	return uint64(v), nil
+	return uint64(v)
 }
 
 func kernelVersion() (string, error) {
@@ -227,22 +227,22 @@ func operatingSystem() (*types.OSInfo, error) {
 	return info, nil
 }
 
-func totalPhysicalMem() (uint64, error) {
+func totalPhysicalMem(r *reader) uint64 {
 	const mib = "hw.physmem"
 
 	v, err := unix.SysctlUint64(mib)
-	if err != nil {
-		return 0, fmt.Errorf("failed to get %s: %w", mib, err)
+	if r.addErr(err) {
+		return 0
 	}
-	return v, nil
+	return v
 }
 
-func wirePageCount() (uint64, error) {
+func wirePageCount(r *reader) uint64 {
 	const mib = "vm.stats.vm.v_wire_count"
 
 	v, err := unix.SysctlUint32(mib)
-	if err != nil {
-		return 0, fmt.Errorf("failed to get %s: %w", mib, err)
+	if r.addErr(err) {
+		return 0
 	}
-	return uint64(v), nil
+	return uint64(v)
 }
