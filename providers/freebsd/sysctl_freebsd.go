@@ -42,7 +42,7 @@ var tickDuration = sync.OnceValues(func() (time.Duration, error) {
 	return time.Duration(c.Tick) * time.Microsecond, nil
 })
 
-var pageSizeBytes = sync.OnceValues(func() (uint32, error) {
+var pageSizeBytes = sync.OnceValues(func() (uint64, error) {
 	const mib = "vm.stats.vm.v_page_size"
 
 	v, err := unix.SysctlUint32(mib)
@@ -50,17 +50,17 @@ var pageSizeBytes = sync.OnceValues(func() (uint32, error) {
 		return 0, fmt.Errorf("failed to get %s: %w", mib, err)
 	}
 
-	return v, nil
+	return uint64(v), nil
 })
 
-func activePageCount() (uint32, error) {
+func activePageCount() (uint64, error) {
 	const mib = "vm.stats.vm.v_active_count"
 
 	v, err := unix.SysctlUint32(mib)
 	if err != nil {
 		return 0, fmt.Errorf("failed to get %s: %w", mib, err)
 	}
-	return v, nil
+	return uint64(v), nil
 }
 
 func architecture() (string, error) {
@@ -98,7 +98,7 @@ func buffersUsedBytes() (uint64, error) {
 	return v, nil
 }
 
-func cachePageCount() (uint32, error) {
+func cachePageCount() (uint64, error) {
 	const mib = "vm.stats.vm.v_cache_count"
 
 	v, err := unix.SysctlUint32(mib)
@@ -106,7 +106,7 @@ func cachePageCount() (uint32, error) {
 		return 0, fmt.Errorf("failed to get %s: %w", mib, err)
 	}
 
-	return v, nil
+	return uint64(v), nil
 }
 
 const sizeOfUint64 = int(unsafe.Sizeof(uint64(0)))
@@ -143,7 +143,7 @@ func cpuStateTimes() (*types.CPUTimes, error) {
 	}, nil
 }
 
-func freePageCount() (uint32, error) {
+func freePageCount() (uint64, error) {
 	const mib = "vm.stats.vm.v_free_count"
 
 	v, err := unix.SysctlUint32(mib)
@@ -151,10 +151,10 @@ func freePageCount() (uint32, error) {
 		return 0, fmt.Errorf("failed to get %s: %w", mib, err)
 	}
 
-	return v, nil
+	return uint64(v), nil
 }
 
-func inactivePageCount() (uint32, error) {
+func inactivePageCount() (uint64, error) {
 	const mib = "vm.stats.vm.v_inactive_count"
 
 	v, err := unix.SysctlUint32(mib)
@@ -162,7 +162,7 @@ func inactivePageCount() (uint32, error) {
 		return 0, fmt.Errorf("failed to get %s: %w", mib, err)
 	}
 
-	return v, nil
+	return uint64(v), nil
 }
 
 func kernelVersion() (string, error) {
@@ -237,12 +237,12 @@ func totalPhysicalMem() (uint64, error) {
 	return v, nil
 }
 
-func wirePageCount() (uint32, error) {
+func wirePageCount() (uint64, error) {
 	const mib = "vm.stats.vm.v_wire_count"
 
 	v, err := unix.SysctlUint32(mib)
 	if err != nil {
 		return 0, fmt.Errorf("failed to get %s: %w", mib, err)
 	}
-	return v, nil
+	return uint64(v), nil
 }
