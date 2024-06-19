@@ -120,7 +120,7 @@ func cpuStateTimes() (*types.CPUTimes, error) {
 	}
 
 	const mib = "kern.cp_time"
-	buf, err := unix.SysctlRaw("kern.cp_time")
+	buf, err := unix.SysctlRaw(mib)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get %s: %w", mib, err)
 	}
