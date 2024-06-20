@@ -35,6 +35,7 @@ func TestArchitecture(t *testing.T) {
 	}
 
 	assert.NotEmpty(t, arch)
+	assert.Regexp(t, `(amd64|i386|powerpc(64(le)?|spe)?|armv(6|7)|aarch64|riscv64*|mips(n)?(32|64)?(el)?|sparc64)`, arch)
 }
 
 func TestBootTime(t *testing.T) {
