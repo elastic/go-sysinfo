@@ -24,6 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"os/exec"
+	"strings"
 	"testing"
 	"time"
 )
@@ -92,7 +93,18 @@ func TestKernelVersion(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// Retrieve currently running kernel version
+	cmd := exec.Command("/bin/freebsd-version", "-r")
+	fbsdout, err := cmd.Output()
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fbsdver := strings.TrimSuffix(string(fbsdout), "\n")
+
 	assert.NotEmpty(t, kernel)
+	assert.EqualValues(t, kernel, fbsdver)
 }
 
 func TestMachineID(t *testing.T) {
