@@ -102,6 +102,7 @@ func TestMachineID(t *testing.T) {
 	}
 
 	assert.NotEmpty(t, machineID)
+	assert.Regexp(t, "^[a-zA-Z0-9]{8}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}$", machineID)
 }
 
 func TestOperatingSystem(t *testing.T) {
