@@ -107,10 +107,7 @@ func (r *reader) addErr(err error) bool {
 }
 
 func (r *reader) Err() error {
-	if len(r.errs) > 0 {
-		return errors.Join(r.errs...)
-	}
-	return nil
+	return errors.Join(r.errs...)
 }
 
 func (r *reader) cpuTime(cpu *types.CPUTimes) {
