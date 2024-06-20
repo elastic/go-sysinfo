@@ -20,11 +20,13 @@
 package freebsd
 
 import (
-	"testing"
-	"time"
-
+	"encoding/json"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"os/exec"
+	"strings"
+	"testing"
+	"time"
 )
 
 func TestArchitecture(t *testing.T) {
@@ -34,6 +36,7 @@ func TestArchitecture(t *testing.T) {
 	}
 
 	assert.NotEmpty(t, arch)
+	assert.Regexp(t, `(amd64|i386|powerpc|arm(64)?|riscv|mips|sparc64|pc98)`, arch)
 }
 
 func TestBootTime(t *testing.T) {
@@ -42,8 +45,36 @@ func TestBootTime(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Apply a sanity check. This assumes the host has rebooted in the last year.
-	assert.WithinDuration(t, time.Now().UTC(), bootTime, 365*24*time.Hour)
+	bootDiff := time.Since(bootTime)
+	// t.Logf("bootTime in seconds: %#v", int64(bootDiff.Seconds()))
+
+	cmd := exec.Command("/usr/bin/uptime", "--libxo=json")
+	upcmd, err := cmd.Output()
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Logf(string(upcmd))
+
+	type UptimeOutput struct {
+		UptimeInformation struct {
+			Uptime int64 `json:"uptime"`
+		} `json:"uptime-information"`
+	}
+
+	var upInfo UptimeOutput
+	err = json.Unmarshal(upcmd, &upInfo)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	upsec := upInfo.UptimeInformation.Uptime
+	uptime := time.Duration(upsec * int64(time.Second))
+	// t.Logf("uptime in seconds: %#v", int64(uptime.Seconds()))
+
+	assert.InDelta(t, uptime, bootDiff, float64(5*time.Second))
 }
 
 func TestCPUStateTimes(t *testing.T) {
@@ -62,7 +93,18 @@ func TestKernelVersion(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// Retrieve currently running kernel version
+	cmd := exec.Command("/bin/freebsd-version", "-r")
+	fbsdout, err := cmd.Output()
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fbsdver := strings.TrimSuffix(string(fbsdout), "\n")
+
 	assert.NotEmpty(t, kernel)
+	assert.EqualValues(t, kernel, fbsdver)
 }
 
 func TestMachineID(t *testing.T) {
@@ -72,6 +114,7 @@ func TestMachineID(t *testing.T) {
 	}
 
 	assert.NotEmpty(t, machineID)
+	assert.Regexp(t, "^[a-zA-Z0-9]{8}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}$", machineID)
 }
 
 func TestOperatingSystem(t *testing.T) {

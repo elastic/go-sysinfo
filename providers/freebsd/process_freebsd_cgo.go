@@ -285,7 +285,7 @@ func (p *process) Memory() (types.MemoryInfo, error) {
 	p.kinfo = procs[0].kinfo
 
 	return types.MemoryInfo{
-		Resident: uint64(p.kinfo.ki_rssize) * uint64(pageSize),
+		Resident: uint64(p.kinfo.ki_rssize) * pageSize,
 		Virtual:  uint64(p.kinfo.ki_size),
 	}, nil
 }

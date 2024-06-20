@@ -107,10 +107,7 @@ func (r *reader) addErr(err error) bool {
 }
 
 func (r *reader) Err() error {
-	if len(r.errs) > 0 {
-		return errors.Join(r.errs...)
-	}
-	return nil
+	return errors.Join(r.errs...)
 }
 
 func (r *reader) cpuTime(cpu *types.CPUTimes) {
@@ -128,57 +125,35 @@ func (r *reader) memInfo(m *types.HostMemoryInfo) {
 	//   free = free
 	//   available = buffers + inactive + cache + free
 
-	ps, err := pageSizeBytes()
-	if r.addErr(err) {
-		return
-	}
-	pageSize := uint64(ps)
-
-	m.Total, err = totalPhysicalMem()
+	pageSize, err := pageSizeBytes()
 	if r.addErr(err) {
 		return
 	}
 
-	activePages, err := activePageCount()
-	if r.addErr(err) {
-		return
-	}
+	m.Total = totalPhysicalMem(r)
+	activePages := activePageCount(r)
+
 	m.Metrics = make(map[string]uint64, 6)
-	m.Metrics["active_bytes"] = uint64(activePages) * pageSize
+	m.Metrics["active_bytes"] = activePages * pageSize
 
-	wirePages, err := wirePageCount()
-	if r.addErr(err) {
-		return
-	}
-	m.Metrics["wired_bytes"] = uint64(wirePages) * pageSize
+	wirePages := wirePageCount(r)
+	m.Metrics["wired_bytes"] = wirePages * pageSize
 
-	inactivePages, err := inactivePageCount()
-	if r.addErr(err) {
-		return
-	}
-	m.Metrics["inactive_bytes"] = uint64(inactivePages) * pageSize
+	inactivePages := inactivePageCount(r)
+	m.Metrics["inactive_bytes"] = inactivePages * pageSize
 
-	cachePages, err := cachePageCount()
-	if r.addErr(err) {
-		return
-	}
-	m.Metrics["cache_bytes"] = uint64(cachePages) * pageSize
+	cachePages := cachePageCount(r)
+	m.Metrics["cache_bytes"] = cachePages * pageSize
 
-	freePages, err := freePageCount()
-	if r.addErr(err) {
-		return
-	}
-	m.Metrics["free_bytes"] = uint64(freePages) * pageSize
+	freePages := freePageCount(r)
+	m.Metrics["free_bytes"] = freePages * pageSize
 
-	buffers, err := buffersUsedBytes()
-	if r.addErr(err) {
-		return
-	}
+	buffers := buffersUsedBytes(r)
 	m.Metrics["buffer_bytes"] = buffers
 
-	m.Used = uint64(activePages+wirePages) * pageSize
-	m.Free = uint64(freePages) * pageSize
-	m.Available = uint64(inactivePages+cachePages+freePages)*pageSize + buffers
+	m.Used = (activePages + wirePages) * pageSize
+	m.Free = freePages * pageSize
+	m.Available = (inactivePages+cachePages+freePages)*pageSize + buffers
 
 	// Virtual (swap) Memory
 	swap, err := kvmGetSwapInfo()
