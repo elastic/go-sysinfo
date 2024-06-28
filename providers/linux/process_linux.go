@@ -188,6 +188,7 @@ func (p *process) OpenHandleCount() (int, error) {
 
 // Environment returns a list of environment variables for the process
 func (p *process) Environment() (map[string]string, error) {
+	// TODO: add Environment to procfs
 	content, err := os.ReadFile(p.path("environ"))
 	if err != nil {
 		return nil, err

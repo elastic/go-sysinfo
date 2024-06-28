@@ -18,9 +18,11 @@
 package linux
 
 import (
+	"bufio"
 	"bytes"
 	"errors"
 	"fmt"
+	"os"
 	"strconv"
 )
 
@@ -48,9 +50,34 @@ func parseKeyValue(content []byte, separator byte, callback func(key, value []by
 	return nil
 }
 
-// decodeBitMap parses the bitmap provided by value, and looks up any set bits in the table provided by `lookupName`
-func decodeBitMap(bmpValue string, lookupName func(int) string) ([]string, error) {
-	mask, err := strconv.ParseUint(bmpValue, 16, 64)
+func findValue(filename, separator, key string) (string, error) {
+	content, err := os.ReadFile(filename)
+	if err != nil {
+		return "", err
+	}
+
+	var line []byte
+	sc := bufio.NewScanner(bytes.NewReader(content))
+	for sc.Scan() {
+		if bytes.HasPrefix(sc.Bytes(), []byte(key)) {
+			line = sc.Bytes()
+			break
+		}
+	}
+	if len(line) == 0 {
+		return "", fmt.Errorf("%v not found", key)
+	}
+
+	parts := bytes.SplitN(line, []byte(separator), 2)
+	if len(parts) != 2 {
+		return "", fmt.Errorf("unexpected line format for '%v'", string(line))
+	}
+
+	return string(bytes.TrimSpace(parts[1])), nil
+}
+
+func decodeBitMap(s string, lookupName func(int) string) ([]string, error) {
+	mask, err := strconv.ParseUint(s, 16, 64)
 	if err != nil {
 		return nil, err
 	}

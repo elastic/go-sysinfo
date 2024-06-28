@@ -18,42 +18,24 @@
 package linux
 
 import (
-	"bytes"
-	"fmt"
-	"os"
+	"regexp"
+	"testing"
 
-	"github.com/elastic/go-sysinfo/types"
+	"github.com/stretchr/testify/assert"
 )
 
-// Possible (current and historic) locations of the machine-id file.
-// These will be searched in order.
-var machineIDFiles = []string{"/etc/machine-id", "/var/lib/dbus/machine-id", "/var/db/dbus/machine-id"}
+var reNewline = regexp.MustCompile("^.*\n+$")
 
-func MachineID() (string, error) {
-	var contents []byte
-	var err error
+func TestArchitecture(t *testing.T) {
+	a, err := Architecture()
+	assert.NoError(t, err)
+	assert.NotEmpty(t, a)
+	assert.NotRegexp(t, reNewline, a, "should not end in newlines")
+}
 
-	for _, file := range machineIDFiles {
-		contents, err = os.ReadFile(file)
-		if err != nil {
-			if os.IsNotExist(err) {
-				// Try next location
-				continue
-			}
-
-			// Return with error on any other error
-			return "", fmt.Errorf("failed to read %v: %w", file, err)
-		}
-
-		// Found it
-		break
-	}
-
-	if os.IsNotExist(err) {
-		// None of the locations existed
-		return "", types.ErrNotImplemented
-	}
-
-	contents = bytes.TrimSpace(contents)
-	return string(contents), nil
+func TestNativeArchitecture(t *testing.T) {
+	a, err := NativeArchitecture()
+	assert.NoError(t, err)
+	assert.NotEmpty(t, a)
+	assert.NotRegexp(t, reNewline, a, "should not end in newlines")
 }

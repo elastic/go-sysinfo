@@ -20,13 +20,14 @@
 package shared
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"os"
 	"strings"
 )
 
-// FQDN attempts to lookup the host's fully-qualified domain name and returns it.
+// FQDNWithContext attempts to lookup the host's fully-qualified domain name and returns it.
 // It does so using the following algorithm:
 //
 //  1. It gets the hostname from the OS. If this step fails, it returns an error.
@@ -40,18 +41,23 @@ import (
 //
 //  4. If steps 2 and 3 both fail, an empty string is returned as the FQDN along with
 //     errors from those steps.
-func FQDN() (string, error) {
+func FQDNWithContext(ctx context.Context) (string, error) {
 	hostname, err := os.Hostname()
 	if err != nil {
 		return "", fmt.Errorf("could not get hostname to look for FQDN: %w", err)
 	}
 
-	return fqdn(hostname)
+	return fqdn(ctx, hostname)
 }
 
-func fqdn(hostname string) (string, error) {
+// FQDN just calls FQDNWithContext with a background context.
+func FQDN() (string, error) {
+	return FQDNWithContext(context.Background())
+}
+
+func fqdn(ctx context.Context, hostname string) (string, error) {
 	var errs error
-	cname, err := net.LookupCNAME(hostname)
+	cname, err := net.DefaultResolver.LookupCNAME(ctx, hostname)
 	if err != nil {
 		errs = fmt.Errorf("could not get FQDN, all methods failed: failed looking up CNAME: %w",
 			err)
@@ -60,13 +66,13 @@ func fqdn(hostname string) (string, error) {
 		return strings.ToLower(strings.TrimSuffix(cname, ".")), nil
 	}
 
-	ips, err := net.LookupIP(hostname)
+	ips, err := net.DefaultResolver.LookupIP(ctx, "ip", hostname)
 	if err != nil {
 		errs = fmt.Errorf("%s: failed looking up IP: %w", errs, err)
 	}
 
 	for _, ip := range ips {
-		names, err := net.LookupAddr(ip.String())
+		names, err := net.DefaultResolver.LookupAddr(ctx, ip.String())
 		if err != nil || len(names) == 0 {
 			continue
 		}

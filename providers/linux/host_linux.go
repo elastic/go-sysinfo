@@ -18,6 +18,7 @@
 package linux
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -25,7 +26,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/joeshaw/multierror"
 	"github.com/prometheus/procfs"
 
 	"github.com/elastic/go-sysinfo/internal/registry"
@@ -69,8 +69,7 @@ func (h *host) Info() types.HostInfo {
 
 // Memory returns memory info
 func (h *host) Memory() (*types.HostMemoryInfo, error) {
-	path := h.procFS.path("meminfo")
-	content, err := os.ReadFile(path)
+	content, err := os.ReadFile(h.procFS.path("meminfo"))
 	if err != nil {
 		return nil, fmt.Errorf("error reading meminfo file %s: %w", path, err)
 	}
@@ -78,9 +77,12 @@ func (h *host) Memory() (*types.HostMemoryInfo, error) {
 	return parseMemInfo(content)
 }
 
-// FQDN returns the Fully Qualified Domain Name
+func (h *host) FQDNWithContext(ctx context.Context) (string, error) {
+	return shared.FQDNWithContext(ctx)
+}
+
 func (h *host) FQDN() (string, error) {
-	return shared.FQDN()
+	return h.FQDNWithContext(context.Background())
 }
 
 // VMStat reports data from /proc/vmstat on linux.
@@ -161,6 +163,7 @@ func newHost(fs procFS) (*host, error) {
 	h := &host{stat: stat, procFS: fs}
 	r := &reader{}
 	r.architecture(h)
+	r.nativeArchitecture(h)
 	r.bootTime(h)
 	r.containerized(h)
 	r.hostname(h)
@@ -189,7 +192,7 @@ func (r *reader) addErr(err error) bool {
 
 func (r *reader) Err() error {
 	if len(r.errs) > 0 {
-		return &multierror.MultiError{Errors: r.errs}
+		return errors.Join(r.errs...)
 	}
 	return nil
 }
@@ -200,6 +203,14 @@ func (r *reader) architecture(h *host) {
 		return
 	}
 	h.info.Architecture = v
+}
+
+func (r *reader) nativeArchitecture(h *host) {
+	v, err := NativeArchitecture()
+	if r.addErr(err) {
+		return
+	}
+	h.info.NativeArchitecture = v
 }
 
 func (r *reader) bootTime(h *host) {

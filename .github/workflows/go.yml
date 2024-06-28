@@ -6,15 +6,18 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-go@v4
+      - uses: actions/setup-go@v5
         with:
-          go-version: 1.20.x
+          go-version: 1.22.x
 
       - name: go.mod tidy
         run: go mod tidy && git diff --exit-code
@@ -30,8 +33,8 @@ jobs:
     strategy:
       matrix:
         go:
-          - 1.20.x
-          - 1.18.x
+          - 1.22.x
+          - 1.21.x
         os:
           - macos-11
           - macos-12
@@ -50,15 +53,15 @@ jobs:
           - {cgo: cgo, os: ubuntu-20.04}
           - {cgo: cgo, os: ubuntu-22.04}
           # Limit the OS variants tested with the earliest supported Go version (save resources).
-          - {go: 1.18.10, os: macos-11}
-          - {go: 1.18.10, os: macos-12}
-          - {go: 1.18.10, os: windows-2019}
-          - {go: 1.18.10, os: ubuntu-22.04}
+          - {go: 1.21.x, os: macos-11}
+          - {go: 1.21.x, os: macos-12}
+          - {go: 1.21.x, os: windows-2019}
+          - {go: 1.21.x, os: ubuntu-22.04}
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-go@v4
+      - uses: actions/setup-go@v5
         id: setup_go
         with:
           go-version: ${{ matrix.go }}
@@ -67,15 +70,15 @@ jobs:
         run: echo "GO_VERSION=${{ steps.setup_go.outputs.go-version }}" >> $GITHUB_ENV
 
       - name: Set CGO_ENABLED=1
-        if: ${{ matrix.cgo }} == "cgo"
+        if: matrix.cgo == 'cgo'
         run: echo "CGO_ENABLED=1" >> $GITHUB_ENV
 
       - name: Set CGO_ENABLED=0
-        if: ${{ matrix.cgo }} == "nocgo"
+        if: matrix.cgo == 'nocgo'
         run: echo "CGO_ENABLED=0" >> $GITHUB_ENV
 
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@v6
         if: github.event_name == 'pull_request'
         with:
           version: latest
@@ -91,3 +94,35 @@ jobs:
       - name: Test
         if: runner.os == 'Windows'
         run:  .ci/scripts/test.bat
+
+  test-freebsd:
+    runs-on: ubuntu-latest
+    env:
+      # Only GITHUB_* are passed into the VM.
+      GITHUB_GOLANG_VERSION: 1.22.2
+    name: test (1.22.2, freebsd-14.0, cgo)
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Test
+        # TODO: Skip until freebsd provider is merged. Then this 'if' should be removed.
+        if: ${{ hashFiles('providers/freebsd/') != '' }}
+        id: test
+        uses: vmactions/freebsd-vm@f8be330398166d1eb0601f01353839d4052367b2  #v1.0.7
+        with:
+          usesh: true
+          prepare: |
+            freebsd-version
+            pwd
+            ls -lah
+            whoami
+
+            pkg install -y curl
+            curl -sL -o /usr/bin/gvm https://github.com/andrewkroh/gvm/releases/download/v0.5.2/gvm-freebsd-amd64
+            chmod +x /usr/bin/gvm
+            eval "$(gvm ${GITHUB_GOLANG_VERSION})"
+            go version
+
+          run: |
+            eval "$(gvm ${GITHUB_GOLANG_VERSION})"
+            go test -v ./...

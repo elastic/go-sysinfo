@@ -1,0 +1,3 @@
+```release-note:enhancement
+Refactor the Linux FQDN test cases to remove the dependency on github.com/docker/docker.
+```
