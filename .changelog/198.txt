@@ -1,3 +1,0 @@
-```release-note:enhancement
-Add API for metrics from an alternate filesystem root
-```

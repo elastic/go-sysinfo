@@ -47,7 +47,7 @@ var (
 	processProvider ProcessProvider
 )
 
-// Register a metrics provider. `provider` should implement one or more of `ProcessProvider`, `HostProvider`, `HostFSCreator` or `ProcessFSCreator`
+// Register a metrics provider. `provider` should implement one or more of `ProcessProvider` or `HostProvider`
 func Register(provider interface{}) {
 	if h, ok := provider.(HostProvider); ok {
 		if hostProvider != nil {
