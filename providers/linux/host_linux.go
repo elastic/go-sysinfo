@@ -48,7 +48,7 @@ func newLinuxSystem(hostFS string) linuxSystem {
 	mountPoint := filepath.Join(hostFS, procfs.DefaultMountPoint)
 	fs, _ := procfs.NewFS(mountPoint)
 	return linuxSystem{
-		procFS: procFS{FS: fs, mountPoint: mountPoint},
+		procFS: procFS{FS: fs, mountPoint: mountPoint, baseMount: hostFS},
 	}
 }
 
@@ -69,7 +69,8 @@ func (h *host) Info() types.HostInfo {
 
 // Memory returns memory info
 func (h *host) Memory() (*types.HostMemoryInfo, error) {
-	content, err := os.ReadFile(h.procFS.path("meminfo"))
+	path := h.procFS.path("meminfo")
+	content, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("error reading meminfo file %s: %w", path, err)
 	}
@@ -255,7 +256,7 @@ func (r *reader) kernelVersion(h *host) {
 }
 
 func (r *reader) os(h *host) {
-	v, err := OperatingSystem()
+	v, err := OperatingSystem(h.procFS.baseMount)
 	if r.addErr(err) {
 		return
 	}
@@ -277,6 +278,7 @@ func (r *reader) uniqueID(h *host) {
 type procFS struct {
 	procfs.FS
 	mountPoint string
+	baseMount  string
 }
 
 func (fs *procFS) path(p ...string) string {

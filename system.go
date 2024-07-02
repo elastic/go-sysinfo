@@ -30,6 +30,14 @@ import (
 	_ "github.com/elastic/go-sysinfo/providers/windows"
 )
 
+type ProviderOption func(*registry.ProviderOptions)
+
+var WithHostFS = func(hostfs string) ProviderOption {
+	return func(po *registry.ProviderOptions) {
+		po.Hostfs = hostfs
+	}
+}
+
 // Go returns information about the Go runtime.
 func Go() types.GoInfo {
 	return types.GoInfo{
@@ -44,18 +52,12 @@ func Go() types.GoInfo {
 // host information collection is not implemented for this platform then
 // types.ErrNotImplemented is returned.
 // On Darwin (macOS) a types.ErrNotImplemented is returned with cgo disabled.
-func Host() (types.Host, error) {
-	provider := registry.GetHostProvider()
-	if provider == nil {
-		return nil, types.ErrNotImplemented
+func Host(opts ...ProviderOption) (types.Host, error) {
+	options := registry.ProviderOptions{}
+	for _, opt := range opts {
+		opt(&options)
 	}
-	return provider.Host()
-}
-
-// HostFS is the same as Host, but allows for a custom root hostfs mountpoint
-// a custom filesystem root is only supported on linux, and this will fallback to the default provider on other platforms
-func HostFS(hostfs string) (types.Host, error) {
-	provider := registry.GetHostProviderWithRoot(hostfs)
+	provider := registry.GetHostProvider(options)
 	if provider == nil {
 		return nil, types.ErrNotImplemented
 	}
@@ -66,18 +68,12 @@ func HostFS(hostfs string) (types.Host, error) {
 // with the given PID. The types.Process object can be used to query information
 // about the process.  If process information collection is not implemented for
 // this platform then types.ErrNotImplemented is returned.
-func Process(pid int) (types.Process, error) {
-	provider := registry.GetProcessProvider()
-	if provider == nil {
-		return nil, types.ErrNotImplemented
+func Process(pid int, opts ...ProviderOption) (types.Process, error) {
+	options := registry.ProviderOptions{}
+	for _, opt := range opts {
+		opt(&options)
 	}
-	return provider.Process(pid)
-}
-
-// ProcessFS is the same as Process, but allows for a custom root hostfs mountpoint
-// a custom filesystem root is only supported on linux, and this will fallback to the default provider on other platforms
-func ProcessFS(hostfs string, pid int) (types.Process, error) {
-	provider := registry.GetProcessProviderWithRoot(hostfs)
+	provider := registry.GetProcessProvider(options)
 	if provider == nil {
 		return nil, types.ErrNotImplemented
 	}
@@ -87,18 +83,12 @@ func ProcessFS(hostfs string, pid int) (types.Process, error) {
 // Processes return a list of all processes. If process information collection
 // is not implemented for this platform then types.ErrNotImplemented is
 // returned.
-func Processes() ([]types.Process, error) {
-	provider := registry.GetProcessProvider()
-	if provider == nil {
-		return nil, types.ErrNotImplemented
+func Processes(opts ...ProviderOption) ([]types.Process, error) {
+	options := registry.ProviderOptions{}
+	for _, opt := range opts {
+		opt(&options)
 	}
-	return provider.Processes()
-}
-
-// ProcessesFS is the same as Processes, but allows for a custom root hostfs mountpoint
-// a custom filesystem root is only supported on linux, and this will fallback to the default provider on other platforms
-func ProcessesFS(hostfs string) ([]types.Process, error) {
-	provider := registry.GetProcessProviderWithRoot(hostfs)
+	provider := registry.GetProcessProvider(options)
 	if provider == nil {
 		return nil, types.ErrNotImplemented
 	}
@@ -108,8 +98,12 @@ func ProcessesFS(hostfs string) ([]types.Process, error) {
 // Self return a types.Process object representing this process. If process
 // information collection is not implemented for this platform then
 // types.ErrNotImplemented is returned.
-func Self() (types.Process, error) {
-	provider := registry.GetProcessProvider()
+func Self(opts ...ProviderOption) (types.Process, error) {
+	options := registry.ProviderOptions{}
+	for _, opt := range opts {
+		opt(&options)
+	}
+	provider := registry.GetProcessProvider(options)
 	if provider == nil {
 		return nil, types.ErrNotImplemented
 	}

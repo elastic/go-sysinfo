@@ -68,11 +68,12 @@ func init() {
 	}
 }
 
-func OperatingSystem() (*types.OSInfo, error) {
-	return getOSInfo("")
+func OperatingSystem(procfs string) (*types.OSInfo, error) {
+	return getOSInfo(procfs)
 }
 
 func getOSInfo(baseDir string) (*types.OSInfo, error) {
+	fmt.Printf("using baseDir: %s\n", baseDir)
 	osInfo, err := getOSRelease(baseDir)
 	if err != nil {
 		// Fallback

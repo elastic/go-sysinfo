@@ -38,11 +38,13 @@ type ProcessProvider interface {
 	Self() (types.Process, error)
 }
 
+type ProviderOptions struct {
+	Hostfs string
+}
+
 var (
-	hostProvider            HostProvider
-	hostProviderWithRoot    HostFSCreator
-	processProvider         ProcessProvider
-	processProviderWithRoot ProcessFSCreator
+	hostProvider    HostProvider
+	processProvider ProcessProvider
 )
 
 // Register a metrics provider. `provider` should implement one or more of `ProcessProvider`, `HostProvider`, `HostFSCreator` or `ProcessFSCreator`
@@ -61,49 +63,10 @@ func Register(provider interface{}) {
 		processProvider = p
 	}
 
-	if creator, ok := provider.(HostFSCreator); ok {
-		if hostProviderWithRoot != nil {
-			panic("hostProviderWithRoot already registered")
-		}
-		hostProviderWithRoot = creator
-	}
-
-	if creator, ok := provider.(ProcessFSCreator); ok {
-		if processProviderWithRoot != nil {
-			panic("processProviderWithRoot is already registered")
-		}
-		processProviderWithRoot = creator
-	}
 }
 
 // GetHostProvider returns the HostProvider registered for the system. May return nil.
-func GetHostProvider() HostProvider {
-	if hostProviderWithRoot != nil {
-		return hostProviderWithRoot("")
-	}
-	return hostProvider
-}
-
-// GetHostProviderWithRoot creates a host provider for the given sysfs root. May return nil.
-func GetHostProviderWithRoot(hostFS string) HostProvider {
-	if hostProviderWithRoot != nil {
-		return hostProviderWithRoot(hostFS)
-	}
-	return hostProvider
-}
+func GetHostProvider(opts ProviderOptions) HostProvider { return hostProvider }
 
 // GetProcessProvider returns the ProcessProvider registered on the system. May return nil.
-func GetProcessProvider() ProcessProvider {
-	if processProviderWithRoot != nil {
-		return processProviderWithRoot("")
-	}
-	return processProvider
-}
-
-// GetProcessProviderWithRoot creates a process provider for the sysfs root. May return nil
-func GetProcessProviderWithRoot(hostFS string) ProcessProvider {
-	if processProviderWithRoot != nil {
-		return processProviderWithRoot(hostFS)
-	}
-	return processProvider
-}
+func GetProcessProvider(opts ProviderOptions) ProcessProvider { return processProvider }

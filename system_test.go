@@ -79,7 +79,7 @@ func TestSystemHostFS(t *testing.T) {
 		t.Skip("test is linux-only")
 	}
 
-	handler, err := HostFS("providers/linux/testdata/ubuntu1710")
+	handler, err := Host(WithHostFS("providers/linux/testdata/ubuntu1710"))
 	require.NoError(t, err)
 	memInfo, err := handler.Memory()
 	require.NoError(t, err)
