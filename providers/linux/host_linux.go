@@ -35,8 +35,8 @@ import (
 
 func init() {
 	// register wrappers that implement the HostFS versions of the ProcessProvider and HostProvider
-	registry.Register(func(hostfs string) registry.HostProvider { return newLinuxSystem(hostfs) })
-	registry.Register(func(hostfs string) registry.ProcessProvider { return newLinuxSystem(hostfs) })
+	registry.Register(func(opts registry.ProviderOptions) registry.HostProvider { return newLinuxSystem(opts.Hostfs) })
+	registry.Register(func(opts registry.ProviderOptions) registry.ProcessProvider { return newLinuxSystem(opts.Hostfs) })
 
 }
 

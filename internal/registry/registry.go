@@ -23,8 +23,8 @@ import (
 	"github.com/elastic/go-sysinfo/types"
 )
 
-type HostFSCreator = func(string) HostProvider
-type ProcessFSCreator = func(string) ProcessProvider
+type HostOptsCreator = func(ProviderOptions) HostProvider
+type ProcessOptsCreator = func(ProviderOptions) ProcessProvider
 
 // HostProvider defines interfaces that provide host-specific metrics
 type HostProvider interface {
@@ -43,12 +43,28 @@ type ProviderOptions struct {
 }
 
 var (
-	hostProvider    HostProvider
-	processProvider ProcessProvider
+	hostProvider            HostProvider
+	processProvider         ProcessProvider
+	processProviderWithOpts ProcessOptsCreator
+	hostProviderWithOpts    HostOptsCreator
 )
 
 // Register a metrics provider. `provider` should implement one or more of `ProcessProvider` or `HostProvider`
 func Register(provider interface{}) {
+	if h, ok := provider.(ProcessOptsCreator); ok {
+		if processProviderWithOpts != nil {
+			panic(fmt.Sprintf("ProcessOptsCreator already registered"))
+		}
+		processProviderWithOpts = h
+	}
+
+	if h, ok := provider.(HostOptsCreator); ok {
+		if processProviderWithOpts != nil {
+			panic(fmt.Sprintf("ProcessOptsCreator already registered"))
+		}
+		hostProviderWithOpts = h
+	}
+
 	if h, ok := provider.(HostProvider); ok {
 		if hostProvider != nil {
 			panic(fmt.Sprintf("HostProvider already registered: %v", hostProvider))
@@ -66,7 +82,18 @@ func Register(provider interface{}) {
 }
 
 // GetHostProvider returns the HostProvider registered for the system. May return nil.
-func GetHostProvider(opts ProviderOptions) HostProvider { return hostProvider }
+func GetHostProvider(opts ProviderOptions) HostProvider {
+	if hostProviderWithOpts != nil {
+		return hostProviderWithOpts(opts)
+	}
+	return hostProvider
+
+}
 
 // GetProcessProvider returns the ProcessProvider registered on the system. May return nil.
-func GetProcessProvider(opts ProviderOptions) ProcessProvider { return processProvider }
+func GetProcessProvider(opts ProviderOptions) ProcessProvider {
+	if processProviderWithOpts != nil {
+		return processProviderWithOpts(opts)
+	}
+	return processProvider
+}
