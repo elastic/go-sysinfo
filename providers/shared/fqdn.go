@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux || darwin || aix
+//go:build linux || darwin || aix || freebsd
 
 package shared
 

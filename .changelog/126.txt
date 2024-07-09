@@ -1,0 +1,3 @@
+```release-note:enhancement
+freebsd: Implement a new provider for FreeBSD that requires CGO.
+```
