@@ -73,7 +73,6 @@ func OperatingSystem(procfs string) (*types.OSInfo, error) {
 }
 
 func getOSInfo(baseDir string) (*types.OSInfo, error) {
-	fmt.Printf("using baseDir: %s\n", baseDir)
 	osInfo, err := getOSRelease(baseDir)
 	if err != nil {
 		// Fallback

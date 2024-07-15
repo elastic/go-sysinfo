@@ -32,7 +32,9 @@ import (
 
 type ProviderOption func(*registry.ProviderOptions)
 
-var WithHostFS = func(hostfs string) ProviderOption {
+// WithHostFS returns a provider with a custom HostFS root path,
+// enabling use of the library from within a container, or an alternate root path.
+func WithHostFS(hostfs string) ProviderOption {
 	return func(po *registry.ProviderOptions) {
 		po.Hostfs = hostfs
 	}
@@ -48,16 +50,31 @@ func Go() types.GoInfo {
 	}
 }
 
+func applyOptsAndReturnProvider(opts ...ProviderOption) registry.ProviderOptions {
+	options := registry.ProviderOptions{}
+	for _, opt := range opts {
+		opt(&options)
+	}
+	return options
+}
+
+// setupProcessProvider returns a ProcessProvider.
+// Most of the exported functions here deal with processes,
+// so this just gets wrapped by all the external functions
+func setupProcessProvider(opts ...ProviderOption) (registry.ProcessProvider, error) {
+	provider := registry.GetProcessProvider(applyOptsAndReturnProvider(opts...))
+	if provider == nil {
+		return nil, types.ErrNotImplemented
+	}
+	return provider, nil
+}
+
 // Host returns information about host on which this process is running. If
 // host information collection is not implemented for this platform then
 // types.ErrNotImplemented is returned.
 // On Darwin (macOS) a types.ErrNotImplemented is returned with cgo disabled.
 func Host(opts ...ProviderOption) (types.Host, error) {
-	options := registry.ProviderOptions{}
-	for _, opt := range opts {
-		opt(&options)
-	}
-	provider := registry.GetHostProvider(options)
+	provider := registry.GetHostProvider(applyOptsAndReturnProvider(opts...))
 	if provider == nil {
 		return nil, types.ErrNotImplemented
 	}
@@ -69,13 +86,9 @@ func Host(opts ...ProviderOption) (types.Host, error) {
 // about the process.  If process information collection is not implemented for
 // this platform then types.ErrNotImplemented is returned.
 func Process(pid int, opts ...ProviderOption) (types.Process, error) {
-	options := registry.ProviderOptions{}
-	for _, opt := range opts {
-		opt(&options)
-	}
-	provider := registry.GetProcessProvider(options)
-	if provider == nil {
-		return nil, types.ErrNotImplemented
+	provider, err := setupProcessProvider(opts...)
+	if err != nil {
+		return nil, err
 	}
 	return provider.Process(pid)
 }
@@ -84,13 +97,9 @@ func Process(pid int, opts ...ProviderOption) (types.Process, error) {
 // is not implemented for this platform then types.ErrNotImplemented is
 // returned.
 func Processes(opts ...ProviderOption) ([]types.Process, error) {
-	options := registry.ProviderOptions{}
-	for _, opt := range opts {
-		opt(&options)
-	}
-	provider := registry.GetProcessProvider(options)
-	if provider == nil {
-		return nil, types.ErrNotImplemented
+	provider, err := setupProcessProvider(opts...)
+	if err != nil {
+		return nil, err
 	}
 	return provider.Processes()
 }
@@ -99,13 +108,9 @@ func Processes(opts ...ProviderOption) ([]types.Process, error) {
 // information collection is not implemented for this platform then
 // types.ErrNotImplemented is returned.
 func Self(opts ...ProviderOption) (types.Process, error) {
-	options := registry.ProviderOptions{}
-	for _, opt := range opts {
-		opt(&options)
-	}
-	provider := registry.GetProcessProvider(options)
-	if provider == nil {
-		return nil, types.ErrNotImplemented
+	provider, err := setupProcessProvider(opts...)
+	if err != nil {
+		return nil, err
 	}
 	return provider.Self()
 }

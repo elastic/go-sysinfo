@@ -53,14 +53,14 @@ var (
 func Register(provider interface{}) {
 	if h, ok := provider.(ProcessOptsCreator); ok {
 		if processProviderWithOpts != nil {
-			panic(fmt.Sprintf("ProcessOptsCreator already registered"))
+			panic(fmt.Sprintf("ProcessOptsCreator already registered: %T", processProviderWithOpts))
 		}
 		processProviderWithOpts = h
 	}
 
 	if h, ok := provider.(HostOptsCreator); ok {
-		if processProviderWithOpts != nil {
-			panic(fmt.Sprintf("ProcessOptsCreator already registered"))
+		if hostProviderWithOpts != nil {
+			panic(fmt.Sprintf("HostOptsCreator already registered: %T", hostProviderWithOpts))
 		}
 		hostProviderWithOpts = h
 	}
