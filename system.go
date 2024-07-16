@@ -34,6 +34,11 @@ type ProviderOption func(*registry.ProviderOptions)
 
 // WithHostFS returns a provider with a custom HostFS root path,
 // enabling use of the library from within a container, or an alternate root path.
+// For example, WithHostFS("/hostfs") could be used when these mounts are present
+// in the container:
+//
+//   - /proc:/hostfs/proc
+//   - /sys/fs/cgroup:/hostfs/sys/fs/cgroup
 func WithHostFS(hostfs string) ProviderOption {
 	return func(po *registry.ProviderOptions) {
 		po.Hostfs = hostfs
