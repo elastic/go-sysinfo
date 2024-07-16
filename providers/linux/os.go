@@ -68,8 +68,10 @@ func init() {
 	}
 }
 
-func OperatingSystem(procfs string) (*types.OSInfo, error) {
-	return getOSInfo(procfs)
+// OperatingSystem returns OS info. This does not take an alternate hostfs.
+// to get OS info from an alternate root path, use reader.os()
+func OperatingSystem() (*types.OSInfo, error) {
+	return getOSInfo("")
 }
 
 func getOSInfo(baseDir string) (*types.OSInfo, error) {

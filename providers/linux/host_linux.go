@@ -256,7 +256,7 @@ func (r *reader) kernelVersion(h *host) {
 }
 
 func (r *reader) os(h *host) {
-	v, err := OperatingSystem(h.procFS.baseMount)
+	v, err := getOSInfo(h.procFS.baseMount)
 	if r.addErr(err) {
 		return
 	}
