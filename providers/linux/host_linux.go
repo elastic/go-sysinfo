@@ -268,7 +268,7 @@ func (r *reader) time(h *host) {
 }
 
 func (r *reader) uniqueID(h *host) {
-	v, err := MachineID()
+	v, err := MachineIDHostfs(h.procFS.baseMount)
 	if r.addErr(err) {
 		return
 	}
