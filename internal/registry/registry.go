@@ -23,8 +23,10 @@ import (
 	"github.com/elastic/go-sysinfo/types"
 )
 
-type HostOptsCreator = func(ProviderOptions) HostProvider
-type ProcessOptsCreator = func(ProviderOptions) ProcessProvider
+type (
+	HostOptsCreator    = func(ProviderOptions) HostProvider
+	ProcessOptsCreator = func(ProviderOptions) ProcessProvider
+)
 
 // HostProvider defines interfaces that provide host-specific metrics
 type HostProvider interface {
@@ -78,7 +80,6 @@ func Register(provider interface{}) {
 		}
 		processProvider = p
 	}
-
 }
 
 // GetHostProvider returns the HostProvider registered for the system. May return nil.
@@ -87,7 +88,6 @@ func GetHostProvider(opts ProviderOptions) HostProvider {
 		return hostProviderWithOpts(opts)
 	}
 	return hostProvider
-
 }
 
 // GetProcessProvider returns the ProcessProvider registered on the system. May return nil.
