@@ -87,6 +87,19 @@ func TestSystemHostFS(t *testing.T) {
 	require.Equal(t, memInfo.Free, uint64(2612703232))
 }
 
+func TestSystemProcessHostFS(t *testing.T) {
+	if runtime.GOOS != "linux" {
+		t.Skip("test is linux-only")
+	}
+
+	handler, err := Process(33925, WithHostFS("providers/linux/testdata/fedora40"))
+	require.NoError(t, err)
+
+	_, err = handler.Memory()
+	require.NoError(t, err)
+
+}
+
 func TestProcessFeaturesMatrix(t *testing.T) {
 	const GOOS = runtime.GOOS
 	var features ProcessFeatures
