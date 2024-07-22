@@ -36,9 +36,9 @@ type ProviderOption func(*registry.ProviderOptions)
 // enabling use of the library from within a container, or an alternate root path on linux.
 // For example, WithHostFS("/hostfs") can be used when /hostfs points to the root filesystem of the container host.
 // For full functionality, the alternate hostfs should have:
-// - /proc
-// - /var
-// - /etc
+//   - /proc
+//   - /var
+//   - /etc
 func WithHostFS(hostfs string) ProviderOption {
 	return func(po *registry.ProviderOptions) {
 		po.Hostfs = hostfs
