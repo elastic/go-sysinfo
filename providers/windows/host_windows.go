@@ -89,7 +89,7 @@ func (h *host) FQDNWithContext(_ context.Context) (string, error) {
 		return "", fmt.Errorf("could not get windows FQDN: %s", err)
 	}
 
-	return strings.ToLower(strings.TrimSuffix(fqdn, ".")), nil
+	return strings.TrimSuffix(fqdn, "."), nil
 }
 
 func (h *host) FQDN() (string, error) {
@@ -161,7 +161,7 @@ func (r *reader) hostname(h *host) {
 	if r.addErr(err) {
 		return
 	}
-	h.info.Hostname = strings.ToLower(v)
+	h.info.Hostname = v
 }
 
 func getComputerNameEx(name uint32) (string, error) {

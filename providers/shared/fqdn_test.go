@@ -36,7 +36,7 @@ func TestFQDN(t *testing.T) {
 		timeout          time.Duration
 	}{
 		// This test case depends on network, particularly DNS,
-		// being available.  If it starts to fail often enough
+		// being available. If it starts to fail often enough
 		// due to occasional network/DNS unavailability, we should
 		// probably just delete this test case.
 		"long_real_hostname": {
@@ -56,7 +56,7 @@ func TestFQDN(t *testing.T) {
 		},
 		"long_mixed_case_hostname": {
 			osHostname:       "eLaSTic.co",
-			expectedFQDN:     "elastic.co",
+			expectedFQDN:     "eLaSTic.co",
 			expectedErrRegex: "",
 		},
 		"nonexistent_timeout": {
