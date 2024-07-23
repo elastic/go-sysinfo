@@ -93,6 +93,7 @@ func decodeBitMap(s string, lookupName func(int) string) ([]string, error) {
 	return names, nil
 }
 
+// parses a meminfo field, returning either a raw numerical value, or the kB value converted to bytes
 func parseBytesOrNumber(data []byte) (uint64, error) {
 	parts := bytes.Fields(data)
 

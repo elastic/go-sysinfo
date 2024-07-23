@@ -1,0 +1,3 @@
+```release-note:enhancement
+The sysinfo APIs (e.g. `Host()`, `Process()`) now accept an optional argument to force reading from an alternative filesystem root. This can be useful inside of containers to read data from the Linux host.
+```
