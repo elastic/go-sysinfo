@@ -51,6 +51,7 @@ func FQDNWithContext(ctx context.Context) (string, error) {
 }
 
 // FQDN just calls FQDNWithContext with a background context.
+// Deprecated.
 func FQDN() (string, error) {
 	return FQDNWithContext(context.Background())
 }
@@ -63,7 +64,7 @@ func fqdn(ctx context.Context, hostname string) (string, error) {
 			err)
 	}
 	if cname != "" {
-		return strings.ToLower(strings.TrimSuffix(cname, ".")), nil
+		return strings.TrimSuffix(cname, "."), nil
 	}
 
 	ips, err := net.DefaultResolver.LookupIP(ctx, "ip", hostname)
@@ -76,7 +77,7 @@ func fqdn(ctx context.Context, hostname string) (string, error) {
 		if err != nil || len(names) == 0 {
 			continue
 		}
-		return strings.ToLower(strings.TrimSuffix(names[0], ".")), nil
+		return strings.TrimSuffix(names[0], "."), nil
 	}
 
 	return "", errs

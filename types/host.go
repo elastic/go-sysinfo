@@ -30,7 +30,7 @@ type Host interface {
 	Info() HostInfo
 	Memory() (*HostMemoryInfo, error)
 
-	// FQDNWithContext returns the fully-qualified domain name of the host, lowercased.
+	// FQDNWithContext returns the fully-qualified domain name of the host.
 	FQDNWithContext(ctx context.Context) (string, error)
 
 	// FQDN calls FQDNWithContext with a background context.
@@ -77,7 +77,7 @@ type HostInfo struct {
 	NativeArchitecture string    `json:"native_architecture"`     // Native OS hardware architecture (e.g. x86_64, arm, ppc, mips).
 	BootTime           time.Time `json:"boot_time"`               // Host boot time.
 	Containerized      *bool     `json:"containerized,omitempty"` // Is the process containerized.
-	Hostname           string    `json:"name"`                    // Hostname, lowercased.
+	Hostname           string    `json:"name"`                    // Hostname.
 	IPs                []string  `json:"ip,omitempty"`            // List of all IPs.
 	KernelVersion      string    `json:"kernel_version"`          // Kernel version.
 	MACs               []string  `json:"mac"`                     // List of MAC addresses.
