@@ -22,6 +22,7 @@ package shared
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net"
 	"os"
 	"strings"
@@ -57,12 +58,15 @@ func FQDN() (string, error) {
 }
 
 func fqdn(ctx context.Context, hostname string) (string, error) {
+	slog.Info("hostname: " + hostname)
 	var errs error
 	cname, err := net.DefaultResolver.LookupCNAME(ctx, hostname)
 	if err != nil {
 		errs = fmt.Errorf("could not get FQDN, all methods failed: failed looking up CNAME: %w",
 			err)
 	}
+	slog.Info("LookupCNAME: cname: " + cname)
+
 	if cname != "" {
 		return strings.TrimSuffix(cname, "."), nil
 	}
@@ -77,6 +81,7 @@ func fqdn(ctx context.Context, hostname string) (string, error) {
 		if err != nil || len(names) == 0 {
 			continue
 		}
+		slog.Info("LookupAddr: names[0]: " + names[0])
 		return strings.TrimSuffix(names[0], "."), nil
 	}
 
