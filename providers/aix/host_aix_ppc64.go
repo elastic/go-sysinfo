@@ -34,7 +34,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/elastic/go-sysinfo/internal/registry"
@@ -191,7 +190,7 @@ func (r *reader) hostname(h *host) {
 	if r.addErr(err) {
 		return
 	}
-	h.info.Hostname = strings.ToLower(v)
+	h.info.Hostname = v
 }
 
 func (r *reader) network(h *host) {

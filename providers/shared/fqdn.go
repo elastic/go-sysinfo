@@ -51,6 +51,7 @@ func FQDNWithContext(ctx context.Context) (string, error) {
 }
 
 // FQDN just calls FQDNWithContext with a background context.
+// Deprecated.
 func FQDN() (string, error) {
 	return FQDNWithContext(context.Background())
 }
@@ -62,8 +63,18 @@ func fqdn(ctx context.Context, hostname string) (string, error) {
 		errs = fmt.Errorf("could not get FQDN, all methods failed: failed looking up CNAME: %w",
 			err)
 	}
+
 	if cname != "" {
-		return strings.ToLower(strings.TrimSuffix(cname, ".")), nil
+		cname = strings.TrimSuffix(cname, ".")
+
+		// Go might lowercase the cname "for convenience". Therefore, if cname
+		// is the same as hostname, return hostname as is.
+		// See https://github.com/golang/go/blob/go1.22.5/src/net/hosts.go#L38
+		if strings.ToLower(cname) == strings.ToLower(hostname) {
+			return hostname, nil
+		}
+
+		return cname, nil
 	}
 
 	ips, err := net.DefaultResolver.LookupIP(ctx, "ip", hostname)
@@ -76,7 +87,7 @@ func fqdn(ctx context.Context, hostname string) (string, error) {
 		if err != nil || len(names) == 0 {
 			continue
 		}
-		return strings.ToLower(strings.TrimSuffix(names[0], ".")), nil
+		return strings.TrimSuffix(names[0], "."), nil
 	}
 
 	return "", errs
