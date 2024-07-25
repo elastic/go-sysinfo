@@ -1,4 +1,3 @@
 ```release-note:breaking-change
-The FQDN is returned as is, it isn't lowercased anymore. This reverts https://github.com/elastic/go-sysinfo/pull/180.
-Complying with ECS for `host.name` and `host.hostname` (https://www.elastic.co/guide/en/ecs/current/ecs-host.html#field-host-name) should not be handled by go-sysinfo. The users of go-sysinfo should ensure compliance with ECS if necessary.
+`Host.FQDNWithContext()` and the deprecated `Host.FQDN()` now return the FQDN as is; it isn't lowercased anymore. This also affects `types.HostInfo#Hostname` which, when it's the FQDN, won't be lowercased.
 ```
