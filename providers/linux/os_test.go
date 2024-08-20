@@ -54,6 +54,7 @@ func TestOperatingSystem(t *testing.T) {
 		}
 		assert.Equal(t, types.OSInfo{
 			Type:     "linux",
+			Family:   "alpine",
 			Platform: "alpine",
 			Name:     "Alpine Linux",
 			Version:  "3.17.3",
