@@ -9,6 +9,10 @@ on:
 permissions:
   contents: read
 
+env:
+  # Use the local toolchain. Never download.
+  GOTOOLCHAIN: local
+
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -17,7 +21,7 @@ jobs:
 
       - uses: actions/setup-go@v5
         with:
-          go-version: 1.22.x
+          go-version: 1.23.x
 
       - name: go.mod tidy
         run: go mod tidy && git diff --exit-code
@@ -33,8 +37,8 @@ jobs:
     strategy:
       matrix:
         go:
+          - 1.23.x
           - 1.22.x
-          - 1.21.x
         os:
           - macos-12
           - macos-13
@@ -53,10 +57,10 @@ jobs:
           - {cgo: cgo, os: ubuntu-20.04}
           - {cgo: cgo, os: ubuntu-22.04}
           # Limit the OS variants tested with the earliest supported Go version (save resources).
-          - {go: 1.21.x, os: macos-12}
-          - {go: 1.21.x, os: macos-13}
-          - {go: 1.21.x, os: windows-2019}
-          - {go: 1.21.x, os: ubuntu-22.04}
+          - {go: 1.22.x, os: macos-12}
+          - {go: 1.22.x, os: macos-13}
+          - {go: 1.22.x, os: windows-2019}
+          - {go: 1.22.x, os: ubuntu-22.04}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -99,8 +103,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # Only GITHUB_* are passed into the VM.
-      GITHUB_GOLANG_VERSION: 1.22.2
-    name: test (1.22.2, freebsd-14.0, cgo)
+      GITHUB_GOLANG_VERSION: 1.23.0
+    name: test (1.23.0, freebsd-14.0, cgo)
     steps:
       - uses: actions/checkout@v4
 
