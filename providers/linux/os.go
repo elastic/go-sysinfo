@@ -48,7 +48,8 @@ var (
 
 // familyMap contains a mapping of family -> []platforms.
 var familyMap = map[string][]string{
-	"arch": {"arch", "antergos", "manjaro"},
+	"alpine": {"alpine"},
+	"arch":   {"arch", "antergos", "manjaro"},
 	"redhat": {
 		"redhat", "fedora", "centos", "scientific", "oraclelinux", "ol",
 		"amzn", "rhel", "almalinux", "openeuler", "rocky",
