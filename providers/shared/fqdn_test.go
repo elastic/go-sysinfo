@@ -26,14 +26,22 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/go-sysinfo/providers"
 )
 
 func TestFQDN(t *testing.T) {
+	lowercaseHostname := providers.LowercaseHostname()
+	defer func() {
+		providers.SetLowerHostname(lowercaseHostname)
+	}()
+
 	tests := map[string]struct {
-		osHostname       string
-		expectedFQDN     string
-		expectedErrRegex string
-		timeout          time.Duration
+		lowercaseHostname bool
+		osHostname        string
+		expectedFQDN      string
+		expectedErrRegex  string
+		timeout           time.Duration
 	}{
 		// This test case depends on network, particularly DNS,
 		// being available. If it starts to fail often enough
@@ -59,6 +67,12 @@ func TestFQDN(t *testing.T) {
 			expectedFQDN:     "eLaSTic.co",
 			expectedErrRegex: "",
 		},
+		"long_mixed_case_hostname_lowercaseHostname": {
+			lowercaseHostname: true,
+			osHostname:        "eLaSTic.co",
+			expectedFQDN:      "elastic.co",
+			expectedErrRegex:  "",
+		},
 		"nonexistent_timeout": {
 			osHostname:       "foobarbaz",
 			expectedFQDN:     "",
@@ -77,6 +91,7 @@ func TestFQDN(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), timeout)
 			defer cancel()
 
+			providers.SetLowerHostname(test.lowercaseHostname)
 			actualFQDN, err := fqdn(ctx, test.osHostname)
 			require.Equal(t, test.expectedFQDN, actualFQDN)
 

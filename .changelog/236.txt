@@ -1,0 +1,3 @@
+```release-note:enhancement
+Allow to choose hostname and FQDN to be lowercased or not
+```

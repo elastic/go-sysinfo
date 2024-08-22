@@ -28,9 +28,10 @@ import (
 
 	stdwindows "golang.org/x/sys/windows"
 
-	windows "github.com/elastic/go-windows"
+	"github.com/elastic/go-windows"
 
 	"github.com/elastic/go-sysinfo/internal/registry"
+	"github.com/elastic/go-sysinfo/providers"
 	"github.com/elastic/go-sysinfo/providers/shared"
 	"github.com/elastic/go-sysinfo/types"
 )
@@ -160,6 +161,10 @@ func (r *reader) hostname(h *host) {
 	v, err := os.Hostname()
 	if r.addErr(err) {
 		return
+	}
+
+	if providers.LowercaseHostname() {
+		v = strings.ToLower(v)
 	}
 	h.info.Hostname = v
 }

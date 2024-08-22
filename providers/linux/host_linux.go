@@ -23,11 +23,13 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/prometheus/procfs"
 
 	"github.com/elastic/go-sysinfo/internal/registry"
+	"github.com/elastic/go-sysinfo/providers"
 	"github.com/elastic/go-sysinfo/providers/shared"
 	"github.com/elastic/go-sysinfo/types"
 )
@@ -176,7 +178,8 @@ func newHost(fs procFS) (*host, error) {
 }
 
 type reader struct {
-	errs []error
+	errs          []error
+	lowerHostname bool
 }
 
 func (r *reader) addErr(err error) bool {
@@ -232,6 +235,10 @@ func (r *reader) hostname(h *host) {
 	v, err := os.Hostname()
 	if r.addErr(err) {
 		return
+	}
+
+	if providers.LowercaseHostname() {
+		v = strings.ToLower(v)
 	}
 	h.info.Hostname = v
 }
