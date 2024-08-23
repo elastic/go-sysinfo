@@ -31,8 +31,8 @@ import (
 )
 
 const (
-	wantHostname = "hostName"
-	wantDomain   = "some.Domain"
+	wantHostname = "hostname"
+	wantDomain   = "some.domain"
 	wantFQDN     = wantHostname + "." + wantDomain
 )
 
