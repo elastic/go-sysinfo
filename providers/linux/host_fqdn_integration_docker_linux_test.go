@@ -28,6 +28,39 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestHost_hostname(t *testing.T) {
+	testCases := []struct {
+		name      string
+		want      string
+		lowercase bool
+	}{
+		{
+			name:      "hostname",
+			want:      "hostName",
+			lowercase: false,
+		},
+		{
+			name:      "lowercase hostname",
+			want:      "hostname",
+			lowercase: true,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			host, err := newLinuxSystem("", tc.lowercase).Host()
+			if err != nil {
+				t.Fatalf("could not get host info: %v\n", err)
+			}
+
+			got := host.Info()
+			if got.Hostname != tc.want {
+				t.Errorf("got hostname %q; want hostname %q",
+					got.Hostname, tc.want)
+			}
+		})
+	}
+}
 func TestHost_FQDN_set(t *testing.T) {
 	host, err := newLinuxSystem("", false).Host()
 	if err != nil {

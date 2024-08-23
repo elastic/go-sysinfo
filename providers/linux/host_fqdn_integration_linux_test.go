@@ -31,12 +31,13 @@ import (
 )
 
 const (
-	wantHostname = "hostname"
-	wantDomain   = "some.domain"
-	wantFQDN     = wantHostname + "." + wantDomain
+	wantHostnameMixedCase = "hostName"
+	wantHostname          = "hostname"
+	wantDomain            = "some.domain"
+	wantFQDN              = wantHostname + "." + wantDomain
 )
 
-func TestHost_FQDN(t *testing.T) {
+func TestHost_Docker(t *testing.T) {
 	if _, err := execabs.LookPath("docker"); err != nil {
 		t.Skipf("Skipping because docker was not found: %v", err)
 	}
@@ -70,6 +71,16 @@ func TestHost_FQDN(t *testing.T) {
 		},
 		{
 			name: "TestHost_FQDN_not_set",
+			Cmd: []string{
+				"go", "test", "-v", "-count", "1",
+				"-tags", "integration,docker",
+				"-run", "^TestHost_FQDN_not_set$",
+				"./providers/linux",
+			},
+		},
+		{
+			name:     "TestHost_hostname",
+			Hostname: wantHostnameMixedCase,
 			Cmd: []string{
 				"go", "test", "-v", "-count", "1",
 				"-tags", "integration,docker",
