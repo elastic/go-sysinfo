@@ -32,7 +32,7 @@ var (
 )
 
 func TestProcessNetstat(t *testing.T) {
-	proc, err := newLinuxSystem("").Self()
+	proc, err := newLinuxSystem("", false).Self()
 	if err != nil {
 		t.Fatal(err)
 	}
