@@ -31,23 +31,31 @@ import (
 	"github.com/elastic/go-windows"
 
 	"github.com/elastic/go-sysinfo/internal/registry"
-	"github.com/elastic/go-sysinfo/providers"
 	"github.com/elastic/go-sysinfo/providers/shared"
 	"github.com/elastic/go-sysinfo/types"
 )
 
 func init() {
-	registry.Register(windowsSystem{})
+	// register wrappers that implement the HostFS versions of the ProcessProvider and HostProvider
+	registry.Register(func(opts registry.ProviderOptions) registry.HostProvider {
+		return windowsSystem{lowerHostname: opts.LowerHostname}
+	})
+	registry.Register(func(opts registry.ProviderOptions) registry.ProcessProvider {
+		return windowsSystem{lowerHostname: opts.LowerHostname}
+	})
 }
 
-type windowsSystem struct{}
+type windowsSystem struct {
+	lowerHostname bool
+}
 
 func (s windowsSystem) Host() (types.Host, error) {
-	return newHost()
+	return newHost(s.lowerHostname)
 }
 
 type host struct {
-	info types.HostInfo
+	info          types.HostInfo
+	lowerHostname bool
 }
 
 func (h *host) Info() types.HostInfo {
@@ -90,16 +98,21 @@ func (h *host) FQDNWithContext(_ context.Context) (string, error) {
 		return "", fmt.Errorf("could not get windows FQDN: %s", err)
 	}
 
-	return strings.TrimSuffix(fqdn, "."), nil
+	fqdn = strings.TrimSuffix(fqdn, ".")
+	if h.lowerHostname {
+		fqdn = strings.ToLower(fqdn)
+	}
+
+	return fqdn, nil
 }
 
 func (h *host) FQDN() (string, error) {
 	return h.FQDNWithContext(context.Background())
 }
 
-func newHost() (*host, error) {
-	h := &host{}
-	r := &reader{}
+func newHost(lowerHostname bool) (*host, error) {
+	h := &host{lowerHostname: lowerHostname}
+	r := &reader{lowerHostname: lowerHostname}
 	r.architecture(h)
 	r.nativeArchitecture(h)
 	r.bootTime(h)
@@ -113,7 +126,8 @@ func newHost() (*host, error) {
 }
 
 type reader struct {
-	errs []error
+	errs          []error
+	lowerHostname bool
 }
 
 func (r *reader) addErr(err error) bool {
@@ -163,7 +177,7 @@ func (r *reader) hostname(h *host) {
 		return
 	}
 
-	if providers.LowercaseHostname() {
+	if r.lowerHostname {
 		v = strings.ToLower(v)
 	}
 	h.info.Hostname = v

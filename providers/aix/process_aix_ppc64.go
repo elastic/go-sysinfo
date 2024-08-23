@@ -35,7 +35,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -77,8 +76,8 @@ func (aixSystem) Process(pid int) (types.Process, error) {
 }
 
 // Self returns the current process.
-func (s aixSystem) Self() (types.Process, error) {
-	return s.Process(os.Getpid())
+func (a aixSystem) Self() (types.Process, error) {
+	return a.Process(os.Getpid())
 }
 
 type process struct {

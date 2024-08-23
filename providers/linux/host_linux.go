@@ -29,37 +29,43 @@ import (
 	"github.com/prometheus/procfs"
 
 	"github.com/elastic/go-sysinfo/internal/registry"
-	"github.com/elastic/go-sysinfo/providers"
 	"github.com/elastic/go-sysinfo/providers/shared"
 	"github.com/elastic/go-sysinfo/types"
 )
 
 func init() {
 	// register wrappers that implement the HostFS versions of the ProcessProvider and HostProvider
-	registry.Register(func(opts registry.ProviderOptions) registry.HostProvider { return newLinuxSystem(opts.Hostfs) })
-	registry.Register(func(opts registry.ProviderOptions) registry.ProcessProvider { return newLinuxSystem(opts.Hostfs) })
+	registry.Register(func(opts registry.ProviderOptions) registry.HostProvider {
+		return newLinuxSystem(opts.Hostfs, opts.LowerHostname)
+	})
+	registry.Register(func(opts registry.ProviderOptions) registry.ProcessProvider {
+		return newLinuxSystem(opts.Hostfs, opts.LowerHostname)
+	})
 }
 
 type linuxSystem struct {
-	procFS procFS
+	procFS        procFS
+	lowerHostname bool
 }
 
-func newLinuxSystem(hostFS string) linuxSystem {
+func newLinuxSystem(hostFS string, lowerHostname bool) linuxSystem {
 	mountPoint := filepath.Join(hostFS, procfs.DefaultMountPoint)
 	fs, _ := procfs.NewFS(mountPoint)
 	return linuxSystem{
-		procFS: procFS{FS: fs, mountPoint: mountPoint, baseMount: hostFS},
+		procFS:        procFS{FS: fs, mountPoint: mountPoint, baseMount: hostFS},
+		lowerHostname: lowerHostname,
 	}
 }
 
 func (s linuxSystem) Host() (types.Host, error) {
-	return newHost(s.procFS)
+	return newHost(s.procFS, s.lowerHostname)
 }
 
 type host struct {
-	procFS procFS
-	stat   procfs.Stat
-	info   types.HostInfo
+	procFS        procFS
+	stat          procfs.Stat
+	info          types.HostInfo
+	lowerHostname bool
 }
 
 // Info returns host info
@@ -79,7 +85,12 @@ func (h *host) Memory() (*types.HostMemoryInfo, error) {
 }
 
 func (h *host) FQDNWithContext(ctx context.Context) (string, error) {
-	return shared.FQDNWithContext(ctx)
+	fqdn, err := shared.FQDNWithContext(ctx)
+	if h.lowerHostname {
+		fqdn = strings.ToLower(fqdn)
+	}
+
+	return fqdn, err
 }
 
 func (h *host) FQDN() (string, error) {
@@ -155,14 +166,14 @@ func (h *host) CPUTime() (types.CPUTimes, error) {
 	}, nil
 }
 
-func newHost(fs procFS) (*host, error) {
+func newHost(fs procFS, lowerHostname bool) (*host, error) {
 	stat, err := fs.Stat()
 	if err != nil {
 		return nil, fmt.Errorf("failed to read proc stat: %w", err)
 	}
 
-	h := &host{stat: stat, procFS: fs}
-	r := &reader{}
+	h := &host{stat: stat, procFS: fs, lowerHostname: lowerHostname}
+	r := &reader{lowerHostname: lowerHostname}
 	r.architecture(h)
 	r.nativeArchitecture(h)
 	r.bootTime(h)
@@ -237,7 +248,7 @@ func (r *reader) hostname(h *host) {
 		return
 	}
 
-	if providers.LowercaseHostname() {
+	if r.lowerHostname {
 		v = strings.ToLower(v)
 	}
 	h.info.Hostname = v

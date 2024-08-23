@@ -28,23 +28,31 @@ import (
 	"time"
 
 	"github.com/elastic/go-sysinfo/internal/registry"
-	"github.com/elastic/go-sysinfo/providers"
 	"github.com/elastic/go-sysinfo/providers/shared"
 	"github.com/elastic/go-sysinfo/types"
 )
 
 func init() {
-	registry.Register(darwinSystem{})
+	// register wrappers that implement the HostFS versions of the ProcessProvider and HostProvider
+	registry.Register(func(opts registry.ProviderOptions) registry.HostProvider {
+		return darwinSystem{lowerHostname: opts.LowerHostname}
+	})
+	registry.Register(func(opts registry.ProviderOptions) registry.ProcessProvider {
+		return darwinSystem{lowerHostname: opts.LowerHostname}
+	})
 }
 
-type darwinSystem struct{}
+type darwinSystem struct {
+	lowerHostname bool
+}
 
 func (s darwinSystem) Host() (types.Host, error) {
-	return newHost()
+	return newHost(s.lowerHostname)
 }
 
 type host struct {
-	info types.HostInfo
+	info          types.HostInfo
+	lowerHostname bool
 }
 
 func (h *host) Info() types.HostInfo {
@@ -140,7 +148,12 @@ func (h *host) Memory() (*types.HostMemoryInfo, error) {
 }
 
 func (h *host) FQDNWithContext(ctx context.Context) (string, error) {
-	return shared.FQDNWithContext(ctx)
+	fqdn, err := shared.FQDNWithContext(ctx)
+	if h.lowerHostname {
+		fqdn = strings.ToLower(fqdn)
+	}
+
+	return fqdn, err
 }
 
 func (h *host) FQDN() (string, error) {
@@ -162,9 +175,9 @@ func (h *host) LoadAverage() (*types.LoadAverageInfo, error) {
 	}, nil
 }
 
-func newHost() (*host, error) {
-	h := &host{}
-	r := &reader{}
+func newHost(lowerHostname bool) (*host, error) {
+	h := &host{lowerHostname: lowerHostname}
+	r := &reader{lowerHostname: lowerHostname}
 	r.architecture(h)
 	r.nativeArchitecture(h)
 	r.bootTime(h)
@@ -178,7 +191,8 @@ func newHost() (*host, error) {
 }
 
 type reader struct {
-	errs []error
+	errs          []error
+	lowerHostname bool
 }
 
 func (r *reader) addErr(err error) bool {
@@ -228,7 +242,7 @@ func (r *reader) hostname(h *host) {
 		return
 	}
 
-	if providers.LowercaseHostname() {
+	if r.lowerHostname {
 		v = strings.ToLower(v)
 	}
 	h.info.Hostname = v

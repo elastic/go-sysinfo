@@ -22,6 +22,7 @@ package linux
 import (
 	"context"
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -29,7 +30,7 @@ import (
 )
 
 func TestHost_FQDN_set(t *testing.T) {
-	host, err := newLinuxSystem("").Host()
+	host, err := newLinuxSystem("", false).Host()
 	if err != nil {
 		t.Fatal(fmt.Errorf("could not get host information: %w", err))
 	}
@@ -44,8 +45,25 @@ func TestHost_FQDN_set(t *testing.T) {
 	}
 }
 
+func TestHost_FQDN_set_lowerHostname(t *testing.T) {
+	want := strings.ToLower(wantFQDN)
+	host, err := newLinuxSystem("", true).Host()
+	if err != nil {
+		t.Fatal(fmt.Errorf("could not get host information: %w", err))
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	gotFQDN, err := host.FQDNWithContext(ctx)
+	require.NoError(t, err)
+	if gotFQDN != want {
+		t.Errorf("got FQDN %q, want: %q", gotFQDN, want)
+	}
+}
+
 func TestHost_FQDN_not_set(t *testing.T) {
-	host, err := newLinuxSystem("").Host()
+	host, err := newLinuxSystem("", false).Host()
 	if err != nil {
 		t.Fatal(fmt.Errorf("could not get host information: %w", err))
 	}

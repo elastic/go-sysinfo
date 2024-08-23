@@ -45,6 +45,12 @@ func WithHostFS(hostfs string) ProviderOption {
 	}
 }
 
+func WithLowerHostname() ProviderOption {
+	return func(po *registry.ProviderOptions) {
+		po.LowerHostname = true
+	}
+}
+
 // Go returns information about the Go runtime.
 func Go() types.GoInfo {
 	return types.GoInfo{

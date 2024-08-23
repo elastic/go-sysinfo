@@ -30,7 +30,7 @@ import (
 var _ registry.HostProvider = linuxSystem{}
 
 func TestHost(t *testing.T) {
-	host, err := newLinuxSystem("").Host()
+	host, err := newLinuxSystem("", false).Host()
 	if err != nil {
 		t.Logf("could not get all host info: %v\n", err)
 	}
@@ -41,7 +41,7 @@ func TestHost(t *testing.T) {
 }
 
 func TestHostMemoryInfo(t *testing.T) {
-	host, err := newLinuxSystem("testdata/ubuntu1710").Host()
+	host, err := newLinuxSystem("testdata/ubuntu1710", false).Host()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -56,7 +56,7 @@ func TestHostMemoryInfo(t *testing.T) {
 }
 
 func TestHostVMStat(t *testing.T) {
-	host, err := newLinuxSystem("testdata/ubuntu1710").Host()
+	host, err := newLinuxSystem("testdata/ubuntu1710", false).Host()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -73,7 +73,7 @@ func TestHostVMStat(t *testing.T) {
 }
 
 func TestHostLoadAverage(t *testing.T) {
-	host, err := newLinuxSystem("testdata/ubuntu1710").Host()
+	host, err := newLinuxSystem("testdata/ubuntu1710", false).Host()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -90,7 +90,7 @@ func TestHostLoadAverage(t *testing.T) {
 }
 
 func TestHostNetworkCounters(t *testing.T) {
-	host, err := newLinuxSystem("testdata/fedora30").Host()
+	host, err := newLinuxSystem("testdata/fedora30", false).Host()
 	if err != nil {
 		t.Fatal(err)
 	}

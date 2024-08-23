@@ -41,7 +41,8 @@ type ProcessProvider interface {
 }
 
 type ProviderOptions struct {
-	Hostfs string
+	Hostfs        string
+	LowerHostname bool
 }
 
 var (

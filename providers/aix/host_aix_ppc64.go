@@ -38,7 +38,6 @@ import (
 	"time"
 
 	"github.com/elastic/go-sysinfo/internal/registry"
-	"github.com/elastic/go-sysinfo/providers"
 	"github.com/elastic/go-sysinfo/providers/shared"
 	"github.com/elastic/go-sysinfo/types"
 )
@@ -47,18 +46,27 @@ import (
 // As cgo will return some psinfo's fields with *byte, binary.Read will refuse this type.
 
 func init() {
-	registry.Register(aixSystem{})
+	// register wrappers that implement the HostFS versions of the ProcessProvider and HostProvider
+	registry.Register(func(opts registry.ProviderOptions) registry.HostProvider {
+		return aixSystem{lowerHostname: opts.LowerHostname}
+	})
+	registry.Register(func(opts registry.ProviderOptions) registry.ProcessProvider {
+		return aixSystem{lowerHostname: opts.LowerHostname}
+	})
 }
 
-type aixSystem struct{}
+type aixSystem struct {
+	lowerHostname bool
+}
 
 // Host returns a new AIX host.
-func (aixSystem) Host() (types.Host, error) {
-	return newHost()
+func (a aixSystem) Host() (types.Host, error) {
+	return newHost(a.lowerHostname)
 }
 
 type host struct {
-	info types.HostInfo
+	info          types.HostInfo
+	lowerHostname bool
 }
 
 // Architecture returns the architecture of the host
@@ -71,7 +79,7 @@ func (h *host) Info() types.HostInfo {
 	return h.info
 }
 
-// Info returns the current CPU usage of the host.
+// CPUTime returns the current CPU usage of the host.
 func (*host) CPUTime() (types.CPUTimes, error) {
 	clock := uint64(C.sysconf(C._SC_CLK_TCK))
 	tick2nsec := func(val uint64) uint64 {
@@ -129,16 +137,21 @@ func (*host) Memory() (*types.HostMemoryInfo, error) {
 }
 
 func (h *host) FQDNWithContext(ctx context.Context) (string, error) {
-	return shared.FQDNWithContext(ctx)
+	fqdn, err := shared.FQDNWithContext(ctx)
+	if h.lowerHostname {
+		fqdn = strings.ToLower(fqdn)
+	}
+
+	return fqdn, err
 }
 
 func (h *host) FQDN() (string, error) {
 	return h.FQDNWithContext(context.Background())
 }
 
-func newHost() (*host, error) {
-	h := &host{}
-	r := &reader{}
+func newHost(lowerHostname bool) (*host, error) {
+	h := &host{lowerHostname: lowerHostname}
+	r := &reader{lowerHostname: lowerHostname}
 	r.architecture(h)
 	r.bootTime(h)
 	r.hostname(h)
@@ -151,7 +164,8 @@ func newHost() (*host, error) {
 }
 
 type reader struct {
-	errs []error
+	errs          []error
+	lowerHostname bool
 }
 
 func (r *reader) addErr(err error) bool {
@@ -193,7 +207,7 @@ func (r *reader) hostname(h *host) {
 		return
 	}
 
-	if providers.LowercaseHostname() {
+	if r.lowerHostname {
 		v = strings.ToLower(v)
 	}
 	h.info.Hostname = v

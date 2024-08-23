@@ -25,8 +25,6 @@ import (
 	"net"
 	"os"
 	"strings"
-
-	"github.com/elastic/go-sysinfo/providers"
 )
 
 // FQDNWithContext attempts to lookup the host's fully-qualified domain name and returns it.
@@ -68,10 +66,6 @@ func fqdn(ctx context.Context, hostname string) (string, error) {
 
 	if cname != "" {
 		cname = strings.TrimSuffix(cname, ".")
-
-		if providers.LowercaseHostname() {
-			return strings.ToLower(cname), nil
-		}
 
 		// Go might lowercase the cname "for convenience". Therefore, if cname
 		// is the same as hostname, return hostname as is.
