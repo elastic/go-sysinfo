@@ -84,4 +84,4 @@ This table lists the OS and architectures for which a "provider" is implemented.
 
 go-sysinfo supports the [two most recent Go releases][ci_go_versions].
 
-[ci_go_versions]: https://github.com/elastic/go-sysinfo/blob/main/.github/workflows/go.yml#L40-41
+[ci_go_versions]: https://github.com/elastic/go-sysinfo/blob/main/.github/workflows/go.yml#L40-L41
