@@ -97,7 +97,6 @@ func TestSystemProcessHostFS(t *testing.T) {
 
 	_, err = handler.Memory()
 	require.NoError(t, err)
-
 }
 
 func TestProcessFeaturesMatrix(t *testing.T) {

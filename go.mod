@@ -4,9 +4,9 @@ go 1.21
 
 require (
 	github.com/elastic/go-windows v1.0.0
-	github.com/prometheus/procfs v0.8.0
+	github.com/prometheus/procfs v0.15.1
 	github.com/stretchr/testify v1.7.0
-	golang.org/x/sys v0.13.0
+	golang.org/x/sys v0.25.0
 	howett.net/plist v0.0.0-20181124034731-591f970eefbb
 )
 
