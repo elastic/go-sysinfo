@@ -40,9 +40,9 @@ jobs:
           - 1.23.x
           - 1.22.x
         os:
-          - macos-12
           - macos-13
           - macos-14
+          - macos-15
           - windows-2019
           - windows-2022
           - ubuntu-20.04
@@ -57,8 +57,8 @@ jobs:
           - {cgo: cgo, os: ubuntu-20.04}
           - {cgo: cgo, os: ubuntu-22.04}
           # Limit the OS variants tested with the earliest supported Go version (save resources).
-          - {go: 1.22.x, os: macos-12}
           - {go: 1.22.x, os: macos-13}
+          - {go: 1.22.x, os: macos-14}
           - {go: 1.22.x, os: windows-2019}
           - {go: 1.22.x, os: ubuntu-22.04}
     runs-on: ${{ matrix.os }}
