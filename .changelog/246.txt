@@ -1,0 +1,3 @@
+```release-note:enhancement
+Fetch all ip addresses in a single stdlib call
+```
