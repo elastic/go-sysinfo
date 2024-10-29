@@ -27,9 +27,6 @@ func Network() (ips, macs []string, err error) {
 		return nil, nil, err
 	}
 
-	ips = make([]string, 0, len(ifcs))
-	macs = make([]string, 0, len(ifcs))
-
 	// This function fetches all the addresses in a single syscall. Fetching addresses individually for each interface
 	// can be expensive when the host has a lot of interfaces. This usually happens when the host is doing virtualized
 	// networking for guests, in Kubernetes for example.
@@ -37,10 +34,12 @@ func Network() (ips, macs []string, err error) {
 	if err != nil {
 		return nil, nil, err
 	}
+	ips = make([]string, 0, len(addrs))
 	for _, addr := range addrs {
 		ips = append(ips, addr.String())
 	}
 
+	macs = make([]string, 0, len(ifcs))
 	for _, ifc := range ifcs {
 		mac := ifc.HardwareAddr.String()
 		if mac != "" {
