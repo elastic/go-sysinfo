@@ -35,7 +35,7 @@ const (
 	osRelease      = "/etc/os-release"
 	lsbRelease     = "/etc/lsb-release"
 	distribRelease = "/etc/*-release"
-	versionGrok    = `(?P<version>(?P<major>[0-9]+)\.?(?P<minor>[0-9]+)?\.?(?P<patch>\w+)?)(?: \((?P<codename>[-\w ]+)\))?`
+	versionGrok    = `(?P<version>(?P<major>[0-9]+)(?:[.-]?(?:SP)?(?P<minor>[0-9]+))?(?:[.-](?P<patch>[0-9]+|\w+))?)(?: \((?P<codename>[-\w ]+)\))?`
 )
 
 var (
