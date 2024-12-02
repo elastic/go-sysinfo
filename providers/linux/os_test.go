@@ -418,4 +418,36 @@ func TestOperatingSystem(t *testing.T) {
 		}, *os)
 		t.Logf("%#v", os)
 	})
+	t.Run("sles15sp5", func(t *testing.T) {
+		os, err := getOSInfo("testdata/sles15sp5")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
+			Family:   "suse",
+			Platform: "sles",
+			Name:     "SLES",
+			Version:  "15-SP5",
+			Major:    15,
+			Minor:    5,
+		}, *os)
+		t.Logf("%#v", os)
+	})
+	t.Run("sled15sp5", func(t *testing.T) {
+		os, err := getOSInfo("testdata/sled15sp5")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
+			Family:   "suse",
+			Platform: "sled",
+			Name:     "SLED",
+			Version:  "15-SP5",
+			Major:    15,
+			Minor:    5,
+		}, *os)
+		t.Logf("%#v", os)
+	})
 }

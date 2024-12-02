@@ -32,10 +32,11 @@ import (
 )
 
 const (
-	osRelease      = "/etc/os-release"
-	lsbRelease     = "/etc/lsb-release"
-	distribRelease = "/etc/*-release"
-	versionGrok    = `(?P<version>(?P<major>[0-9]+)\.?(?P<minor>[0-9]+)?\.?(?P<patch>\w+)?)(?: \((?P<codename>[-\w ]+)\))?`
+	osRelease       = "/etc/os-release"
+	lsbRelease      = "/etc/lsb-release"
+	distribRelease  = "/etc/*-release"
+	versionGrok     = `(?P<version>(?P<major>[0-9]+)\.?(?P<minor>[0-9]+)?\.?(?P<patch>\w+)?)(?: \((?P<codename>[-\w ]+)\))?`
+	versionGrokSuse = `(?P<version>(?P<major>[0-9]+)(?:[.-]?(?:SP)?(?P<minor>[0-9]+))?(?:[.-](?P<patch>[0-9]+|\w+))?)(?: \((?P<codename>[-\w ]+)\))?`
 )
 
 var (
@@ -44,6 +45,9 @@ var (
 
 	// versionRegexp parses version numbers (e.g. 6 or 6.1 or 6.1.0 or 6.1.0_20150102).
 	versionRegexp = regexp.MustCompile(versionGrok)
+
+	// versionRegexpSuse parses version numbers for SUSE (e.g. 15-SP1).
+	versionRegexpSuse = regexp.MustCompile(versionGrokSuse)
 )
 
 // familyMap contains a mapping of family -> []platforms.
@@ -186,26 +190,31 @@ func makeOSInfo(osRelease map[string]string) (*types.OSInfo, error) {
 		}
 	}
 
-	if os.Version != "" {
-		// Try parsing info from the version.
-		keys := versionRegexp.SubexpNames()
-		for i, m := range versionRegexp.FindStringSubmatch(os.Version) {
-			switch keys[i] {
-			case "major":
-				os.Major, _ = strconv.Atoi(m)
-			case "minor":
-				os.Minor, _ = strconv.Atoi(m)
-			case "patch":
-				os.Patch, _ = strconv.Atoi(m)
-			case "codename":
-				if os.Codename == "" {
-					os.Codename = m
-				}
-			}
-		}
+	if osRelease["ID_LIKE"] == "suse" {
+		extractVersionDetails(os, os.Version, versionRegexpSuse)
+	} else if os.Version != "" {
+		extractVersionDetails(os, os.Version, versionRegexp)
 	}
 
 	return os, nil
+}
+
+func extractVersionDetails(os *types.OSInfo, version string, re *regexp.Regexp) {
+	keys := re.SubexpNames()
+	for i, match := range re.FindStringSubmatch(version) {
+		switch keys[i] {
+		case "major":
+			os.Major, _ = strconv.Atoi(match)
+		case "minor":
+			os.Minor, _ = strconv.Atoi(match)
+		case "patch":
+			os.Patch, _ = strconv.Atoi(match)
+		case "codename":
+			if os.Codename == "" {
+				os.Codename = match
+			}
+		}
+	}
 }
 
 func findDistribRelease(baseDir string) (*types.OSInfo, error) {
