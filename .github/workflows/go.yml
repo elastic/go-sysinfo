@@ -45,8 +45,8 @@ jobs:
           - macos-15
           - windows-2019
           - windows-2022
-          - ubuntu-20.04
           - ubuntu-22.04
+          - ubuntu-24.04
         cgo:
           - cgo
           - nocgo
@@ -54,8 +54,8 @@ jobs:
           # Exclude cgo testing for platforms that don't use CGO.
           - {cgo: cgo, os: windows-2019}
           - {cgo: cgo, os: windows-2022}
-          - {cgo: cgo, os: ubuntu-20.04}
           - {cgo: cgo, os: ubuntu-22.04}
+          - {cgo: cgo, os: ubuntu-24.04}
           # Limit the OS variants tested with the earliest supported Go version (save resources).
           - {go: 1.22.x, os: macos-13}
           - {go: 1.22.x, os: macos-14}
