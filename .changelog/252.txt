@@ -1,0 +1,3 @@
+```release-note:bug
+linux: Improve parsing Linux kernel version for determining native host architecture, x86_64 was not recognized
+```

@@ -27,6 +27,7 @@ import (
 const (
 	procSysKernelArch = "/proc/sys/kernel/arch"
 	procVersion       = "/proc/version"
+	arch8664          = "x86_64"
 	archAmd64         = "amd64"
 	archArm64         = "arm64"
 	archAarch64       = "aarch64"
@@ -60,14 +61,14 @@ func NativeArchitecture() (string, error) {
 		if os.IsNotExist(err) {
 			// fallback to checking version string for older kernels
 			version, err := os.ReadFile(procVersion)
-			if err != nil {
-				return "", nil
+			if err != nil && !os.IsNotExist(err) {
+				return "", fmt.Errorf("failed to read kernel version: %w", err)
 			}
 
 			versionStr := string(version)
-			if strings.Contains(versionStr, archAmd64) {
+			if strings.Contains(versionStr, archAmd64) || strings.Contains(versionStr, arch8664) {
 				return archAmd64, nil
-			} else if strings.Contains(versionStr, archArm64) {
+			} else if strings.Contains(versionStr, archArm64) || strings.Contains(versionStr, archAarch64) {
 				// for parity with Architecture() and /proc/sys/kernel/arch
 				// as aarch64 and arm64 are used interchangeably
 				return archAarch64, nil
