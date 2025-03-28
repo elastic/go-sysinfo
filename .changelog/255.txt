@@ -1,0 +1,3 @@
+```release-note:enhancement
+Bump go-windows to 1.0.2
+```
