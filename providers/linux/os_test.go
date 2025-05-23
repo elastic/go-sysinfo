@@ -247,6 +247,24 @@ func TestOperatingSystem(t *testing.T) {
 		}, *os)
 		t.Logf("%#v", os)
 	})
+	t.Run("redhat10", func(t *testing.T) {
+		// Data from 'docker pull redhat/ubi10:10.0'.
+		os, err := getOSInfo("testdata/redhat10")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
+			Family:   "redhat",
+			Platform: "rhel",
+			Name:     "Red Hat Enterprise Linux",
+			Version:  "10.0 (Coughlan)",
+			Major:    10,
+			Minor:    0,
+			Codename: "Coughlan",
+		}, *os)
+		t.Logf("%#v", os)
+	})
 	t.Run("rockylinux9", func(t *testing.T) {
 		// Data from 'docker pull rockylinux:9.0'.
 		os, err := getOSInfo("testdata/rockylinux9")
