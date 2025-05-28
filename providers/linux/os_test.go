@@ -46,6 +46,24 @@ func TestOperatingSystem(t *testing.T) {
 		}, *os)
 		t.Logf("%#v", os)
 	})
+	t.Run("almalinux10", func(t *testing.T) {
+		// Data from 'docker pull almalinux:10'.
+		os, err := getOSInfo("testdata/almalinux10")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
+			Family:   "redhat",
+			Platform: "almalinux",
+			Name:     "AlmaLinux",
+			Version:  "10.0 (Purple Lion)",
+			Major:    10,
+			Minor:    0,
+			Codename: "Purple Lion",
+		}, *os)
+		t.Logf("%#v", os)
+	})
 	t.Run("alpine3.17", func(t *testing.T) {
 		// Data from 'docker pull alpine:3.17.3'.
 		os, err := getOSInfo("testdata/alpine3.17")
