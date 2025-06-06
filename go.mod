@@ -1,6 +1,6 @@
 module github.com/elastic/go-sysinfo
 
-go 1.21
+go 1.23.0
 
 require (
 	github.com/elastic/go-windows v1.0.2
