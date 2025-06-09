@@ -21,13 +21,13 @@ jobs:
 
       - uses: actions/setup-go@v5
         with:
-          go-version: 1.23.x
+          go-version: stable
 
       - name: go.mod tidy
         run: go mod tidy && git diff --exit-code
 
       - name: license header
-        run: go run github.com/elastic/go-licenser@v0.4.1 -d
+        run: go run github.com/elastic/go-licenser@v0.4.2 -d
 
       - name: cross-compile
         run: .ci/scripts/check-cross-compile.sh
@@ -37,14 +37,15 @@ jobs:
     strategy:
       matrix:
         go:
-          - 1.23.x
-          - 1.22.x
+          - stable
+          - oldstable
         os:
           - macos-13
           - macos-14
           - macos-15
           - windows-2019
           - windows-2022
+          - windows-2025
           - ubuntu-22.04
           - ubuntu-24.04
         cgo:
@@ -54,13 +55,15 @@ jobs:
           # Exclude cgo testing for platforms that don't use CGO.
           - {cgo: cgo, os: windows-2019}
           - {cgo: cgo, os: windows-2022}
+          - {cgo: cgo, os: windows-2025}
           - {cgo: cgo, os: ubuntu-22.04}
           - {cgo: cgo, os: ubuntu-24.04}
           # Limit the OS variants tested with the earliest supported Go version (save resources).
-          - {go: 1.22.x, os: macos-13}
-          - {go: 1.22.x, os: macos-14}
-          - {go: 1.22.x, os: windows-2019}
-          - {go: 1.22.x, os: ubuntu-22.04}
+          - {go: oldstable, os: macos-13}
+          - {go: oldstable, os: macos-14}
+          - {go: oldstable, os: windows-2019}
+          - {go: oldstable, os: windows-2022}
+          - {go: oldstable, os: ubuntu-22.04}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -101,12 +104,17 @@ jobs:
 
   test-freebsd:
     runs-on: ubuntu-latest
-    env:
-      # Only GITHUB_* are passed into the VM.
-      GITHUB_GOLANG_VERSION: 1.23.0
-    name: test (1.23.0, freebsd-14.0, cgo)
+    name: test (stable, freebsd-14.2, cgo)
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        id: setup_go
+        with:
+          go-version: stable
+
+      - name: Set GITHUB_GOLANG_VERSION
+        run: echo "GITHUB_GOLANG_VERSION=${{ steps.setup_go.outputs.go-version }}" >> $GITHUB_ENV
 
       - name: Test
         # TODO: Skip until freebsd provider is merged. Then this 'if' should be removed.
