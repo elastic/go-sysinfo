@@ -43,7 +43,6 @@ jobs:
           - macos-13
           - macos-14
           - macos-15
-          - windows-2019
           - windows-2022
           - windows-2025
           - ubuntu-22.04
@@ -53,7 +52,6 @@ jobs:
           - nocgo
         exclude:
           # Exclude cgo testing for platforms that don't use CGO.
-          - {cgo: cgo, os: windows-2019}
           - {cgo: cgo, os: windows-2022}
           - {cgo: cgo, os: windows-2025}
           - {cgo: cgo, os: ubuntu-22.04}
@@ -61,7 +59,6 @@ jobs:
           # Limit the OS variants tested with the earliest supported Go version (save resources).
           - {go: oldstable, os: macos-13}
           - {go: oldstable, os: macos-14}
-          - {go: oldstable, os: windows-2019}
           - {go: oldstable, os: windows-2022}
           - {go: oldstable, os: ubuntu-22.04}
     runs-on: ${{ matrix.os }}
