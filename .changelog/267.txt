@@ -1,0 +1,3 @@
+```release-note:bug
+aix: Fix compilation error caused by unused "io/ioutil" import.
+```
