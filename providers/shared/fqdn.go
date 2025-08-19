@@ -31,7 +31,7 @@ import (
 // It can be replaced with a custom defaultResolver for testing purposes.
 var defaultResolver resolver = net.DefaultResolver
 
-// defaultResolver is an interface that abstracts the DNS/IP resolution methods used
+// resolver is an interface that abstracts the DNS/IP resolution methods used
 // in FQDNWithContext. This allows for easier testing and mocking of DNS lookups.
 type resolver interface {
 	LookupCNAME(ctx context.Context, host string) (string, error)
