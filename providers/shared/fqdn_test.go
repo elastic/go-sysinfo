@@ -21,7 +21,11 @@ package shared
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"net"
 	"testing"
 	"time"
 
@@ -89,6 +93,155 @@ func TestFQDN(t *testing.T) {
 	}
 }
 
+func TestMockFQDN_ValidCNAME(t *testing.T) {
+	defer func() {
+		defaultResolver = net.DefaultResolver
+	}()
+
+	tests := map[string]struct {
+		osHostname   string
+		cname        string
+		expectedFQDN string
+	}{
+		"existing_cname": {
+			osHostname:   "short_hostname",
+			cname:        "short_hostname.elastic.co.",
+			expectedFQDN: "short_hostname.elastic.co",
+		},
+		"existing_cname_upper_case": {
+			osHostname:   "Short_Hostname",
+			cname:        "short_hostname.",
+			expectedFQDN: "Short_Hostname",
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			ctx := context.Background()
+
+			defaultResolver = &mockResolver{}
+			defaultResolver.(*mockResolver).On("LookupCNAME", ctx, test.osHostname).Once().Return(test.cname, nil)
+
+			actualFQDN, err := fqdn(ctx, test.osHostname)
+			require.NoError(t, err)
+			assert.Equal(t, test.expectedFQDN, actualFQDN)
+
+			mock.AssertExpectationsForObjects(t, defaultResolver)
+		})
+	}
+}
+
+func TestMockFQDN_EmptyCNAME(t *testing.T) {
+	defer func() {
+		defaultResolver = net.DefaultResolver
+	}()
+
+	type ipNames struct {
+		names []string
+		ip    string
+		err   error
+	}
+
+	tests := map[string]struct {
+		osHostname   string
+		ips          []net.IP
+		ipsNames     []ipNames
+		expectedFQDN string
+	}{
+		"single_ip": {
+			osHostname:   "short_hostname",
+			ips:          []net.IP{net.ParseIP("192.168.1.29")},
+			ipsNames:     []ipNames{{ip: "192.168.1.29", names: []string{"short_hostname.elastic.co."}}},
+			expectedFQDN: "short_hostname.elastic.co",
+		},
+		"localhost_skipped": {
+			osHostname: "short_hostname",
+			ips: []net.IP{
+				net.ParseIP("127.0.0.1"),
+				net.ParseIP("::1"),
+				net.ParseIP("192.168.1.29"),
+				net.ParseIP("172.1.1.2"),
+			},
+			ipsNames:     []ipNames{{ip: "192.168.1.29", names: []string{"short_hostname.elastic.co."}}},
+			expectedFQDN: "short_hostname.elastic.co",
+		},
+		"skip_ips_w/o_names": {
+			osHostname:   "short_hostname",
+			ips:          []net.IP{net.ParseIP("192.168.1.30"), net.ParseIP("192.168.1.29"), net.ParseIP("172.1.1.2")},
+			ipsNames:     []ipNames{{ip: "192.168.1.30"}, {ip: "192.168.1.29", names: []string{"short_hostname.elastic.co."}}},
+			expectedFQDN: "short_hostname.elastic.co",
+		},
+		"lookup_errors_are_skipped": {
+			osHostname: "short_hostname",
+			ips:        []net.IP{net.ParseIP("192.168.1.30"), net.ParseIP("192.168.1.29"), net.ParseIP("172.1.1.2")},
+			ipsNames: []ipNames{
+				{ip: "192.168.1.30", names: []string{"short_hostname.elastic.co."}, err: errors.New("skipped error")},
+				{ip: "192.168.1.29", names: []string{"short_hostname.elastic.co."}},
+			},
+			expectedFQDN: "short_hostname.elastic.co",
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			ctx := context.Background()
+
+			defaultResolver = &mockResolver{}
+			defaultResolver.(*mockResolver).On("LookupCNAME", ctx, test.osHostname).Once().Return("", nil)
+			defaultResolver.(*mockResolver).On("LookupIP", ctx, "ip", test.osHostname).Once().Return(test.ips, nil)
+			for _, ipNames := range test.ipsNames {
+				defaultResolver.(*mockResolver).On("LookupAddr", ctx, ipNames.ip).Once().Return(ipNames.names, ipNames.err)
+			}
+
+			actualFQDN, err := fqdn(ctx, test.osHostname)
+			require.NoError(t, err)
+			assert.Equal(t, test.expectedFQDN, actualFQDN)
+
+			mock.AssertExpectationsForObjects(t, defaultResolver)
+		})
+	}
+}
+
+func Test_CNAMELookupError(t *testing.T) {
+	defer func() {
+		defaultResolver = net.DefaultResolver
+	}()
+
+	ctx := context.Background()
+	hostname := "short_hostname"
+	cnameErr := errors.New("cname error")
+
+	defaultResolver = &mockResolver{}
+	// When CNAME lookup fails and LookupIP does not return any IPs, we should return an error
+	defaultResolver.(*mockResolver).On("LookupCNAME", ctx, hostname).Once().Return("", cnameErr)
+	defaultResolver.(*mockResolver).On("LookupIP", ctx, "ip", hostname).Once().Return([]net.IP{}, nil)
+
+	_, err := fqdn(ctx, hostname)
+	assert.ErrorIs(t, err, cnameErr)
+
+	mock.AssertExpectationsForObjects(t, defaultResolver)
+}
+
+func Test_LookupIPError(t *testing.T) {
+	defer func() {
+		defaultResolver = net.DefaultResolver
+	}()
+
+	ctx := context.Background()
+	hostname := "short_hostname"
+	lookupIPErr := errors.New("lookup ip error")
+
+	defaultResolver = &mockResolver{}
+	// When CNAME lookup fails and LookupIP does not return any IPs, we should return an error
+	defaultResolver.(*mockResolver).On("LookupCNAME", ctx, hostname).Once().Return("", nil)
+	defaultResolver.(*mockResolver).On("LookupIP", ctx, "ip", hostname).Once().Return([]net.IP{}, lookupIPErr)
+
+	_, err := fqdn(ctx, hostname)
+	assert.ErrorIs(t, err, lookupIPErr)
+
+	mock.AssertExpectationsForObjects(t, defaultResolver)
+}
+
 func makeErrorRegex(osHostname string, withTimeout bool) string {
 	timeoutStr := ""
 	if withTimeout {
@@ -102,4 +255,23 @@ func makeErrorRegex(osHostname string, withTimeout bool) string {
 		osHostname,
 		osHostname,
 	)
+}
+
+type mockResolver struct {
+	mock.Mock
+}
+
+func (m *mockResolver) LookupCNAME(ctx context.Context, host string) (string, error) {
+	args := m.Called(ctx, host)
+	return args.String(0), args.Error(1)
+}
+
+func (m *mockResolver) LookupIP(ctx context.Context, network, host string) ([]net.IP, error) {
+	args := m.Called(ctx, network, host)
+	return args.Get(0).([]net.IP), args.Error(1)
+}
+
+func (m *mockResolver) LookupAddr(ctx context.Context, addr string) ([]string, error) {
+	args := m.Called(ctx, addr)
+	return args.Get(0).([]string), args.Error(1)
 }
