@@ -1,0 +1,3 @@
+```release-note:bug
+`Host.FQDNWithContext()` fixed to not return localhost as FQDN.
+```
