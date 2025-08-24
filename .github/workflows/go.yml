@@ -17,7 +17,7 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: actions/setup-go@v5
         with:
@@ -63,7 +63,7 @@ jobs:
           - {go: oldstable, os: ubuntu-22.04}
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: actions/setup-go@v5
         id: setup_go
@@ -103,7 +103,7 @@ jobs:
     runs-on: ubuntu-latest
     name: test (stable, freebsd-14.2, cgo)
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: actions/setup-go@v5
         id: setup_go
@@ -117,7 +117,7 @@ jobs:
         # TODO: Skip until freebsd provider is merged. Then this 'if' should be removed.
         if: ${{ hashFiles('providers/freebsd/') != '' }}
         id: test
-        uses: vmactions/freebsd-vm@966989c456d41351f095a421f60e71342d3bce41  #v1.2.1
+        uses: vmactions/freebsd-vm@05856381fab64eeee9b038a0818f6cec649ca17a  #v1.2.3
         with:
           usesh: true
           prepare: |
