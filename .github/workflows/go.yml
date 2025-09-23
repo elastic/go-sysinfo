@@ -40,7 +40,6 @@ jobs:
           - stable
           - oldstable
         os:
-          - macos-13
           - macos-14
           - macos-15
           - windows-2022
@@ -57,7 +56,6 @@ jobs:
           - {cgo: cgo, os: ubuntu-22.04}
           - {cgo: cgo, os: ubuntu-24.04}
           # Limit the OS variants tested with the earliest supported Go version (save resources).
-          - {go: oldstable, os: macos-13}
           - {go: oldstable, os: macos-14}
           - {go: oldstable, os: windows-2022}
           - {go: oldstable, os: ubuntu-22.04}
