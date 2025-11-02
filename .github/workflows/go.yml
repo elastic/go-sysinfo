@@ -116,7 +116,7 @@ jobs:
         # TODO: Skip until freebsd provider is merged. Then this 'if' should be removed.
         if: ${{ hashFiles('providers/freebsd/') != '' }}
         id: test
-        uses: vmactions/freebsd-vm@487ce35b96fae3e60d45b521735f5aa436ecfade  #v1.2.4
+        uses: vmactions/freebsd-vm@c58a3f0f77417d932df47c7874b308c02b2c7cc1  #v1.2.5
         with:
           usesh: true
           prepare: |
