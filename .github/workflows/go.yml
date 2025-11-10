@@ -81,7 +81,7 @@ jobs:
         run: echo "CGO_ENABLED=0" >> $GITHUB_ENV
 
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v8
+        uses: golangci/golangci-lint-action@v9
         if: github.event_name == 'pull_request'
         with:
           version: latest
@@ -116,7 +116,7 @@ jobs:
         # TODO: Skip until freebsd provider is merged. Then this 'if' should be removed.
         if: ${{ hashFiles('providers/freebsd/') != '' }}
         id: test
-        uses: vmactions/freebsd-vm@c58a3f0f77417d932df47c7874b308c02b2c7cc1  #v1.2.5
+        uses: vmactions/freebsd-vm@783ae15c0393f8a2582a139f76cc55f2d887b4a6  #v1.2.6
         with:
           usesh: true
           prepare: |
