@@ -17,7 +17,7 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - uses: actions/setup-go@v6
         with:
@@ -62,7 +62,7 @@ jobs:
           - {go: oldstable, os: ubuntu-22.04}
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - uses: actions/setup-go@v6
         id: setup_go
@@ -102,7 +102,7 @@ jobs:
     runs-on: ubuntu-latest
     name: test (stable, freebsd-14.2, cgo)
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - uses: actions/setup-go@v6
         id: setup_go
