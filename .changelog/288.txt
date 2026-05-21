@@ -1,0 +1,3 @@
+```release-note:bug
+windows: Resolve kernel image path via %SystemRoot% so KernelVersion works on hosts whose system drive is not C:\.
+```
