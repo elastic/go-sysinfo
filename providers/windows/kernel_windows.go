@@ -18,13 +18,34 @@
 package windows
 
 import (
+	"os"
+	"path/filepath"
+
 	windows "github.com/elastic/go-windows"
 )
 
-const windowsKernelExe = `C:\Windows\System32\ntoskrnl.exe`
+// fallbackSystemRoot is used when neither %SystemRoot% nor %WINDIR% is set.
+// In practice the Windows session manager always seeds both, but a hardened
+// service environment could strip them; keep a sensible default rather than
+// returning an error from a getter that historically never required one.
+const fallbackSystemRoot = `C:\Windows`
+
+// kernelExePath returns the absolute path to the running kernel image. It
+// honours %SystemRoot% (and %WINDIR% as a backwards-compatible alias) so
+// hosts whose system drive is not C:\ are handled correctly. See #287.
+func kernelExePath() string {
+	root := os.Getenv("SystemRoot")
+	if root == "" {
+		root = os.Getenv("WINDIR")
+	}
+	if root == "" {
+		root = fallbackSystemRoot
+	}
+	return filepath.Join(root, "System32", "ntoskrnl.exe")
+}
 
 func KernelVersion() (string, error) {
-	versionData, err := windows.GetFileVersionInfo(windowsKernelExe)
+	versionData, err := windows.GetFileVersionInfo(kernelExePath())
 	if err != nil {
 		return "", err
 	}
