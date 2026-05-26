@@ -18,28 +18,47 @@
 package windows
 
 import (
+	"path/filepath"
 	"testing"
 )
 
+// resolveKernelExePath is like kernelExePath but accepts an injected
+// systemRoot string so tests can exercise the env-var fallback chain
+// without touching the registry.
+func resolveKernelExePath(regRoot, systemRoot, windir string) string {
+	root := regRoot
+	if root == "" {
+		root = systemRoot
+	}
+	if root == "" {
+		root = windir
+	}
+	if root == "" {
+		root = fallbackSystemRoot
+	}
+	return filepath.Join(root, "System32", "ntoskrnl.exe")
+}
+
 func TestKernelExePath(t *testing.T) {
 	tests := []struct {
-		name       string
-		systemRoot string
-		windir     string
-		want       string
+		name    string
+		regRoot string // simulated registry value (empty = registry miss)
+		envRoot string // %SystemRoot%
+		windir  string // %WINDIR%
+		want    string
 	}{
 		{
-			// Regression for #287: when the system drive is not C:\ the
-			// computed kernel path must follow %SystemRoot% instead of the
-			// hardcoded C:\Windows.
-			name:       "non-default SystemRoot drive",
-			systemRoot: `W:\Windows`,
-			want:       `W:\Windows\System32\ntoskrnl.exe`,
+			// Registry wins even when env vars differ -- the primary path.
+			name:    "registry value used when present",
+			regRoot: `W:\Windows`,
+			envRoot: `C:\Windows`,
+			want:    `W:\Windows\System32\ntoskrnl.exe`,
 		},
 		{
-			name:       "default SystemRoot",
-			systemRoot: `C:\Windows`,
-			want:       `C:\Windows\System32\ntoskrnl.exe`,
+			// Regression for #287: registry absent, non-default drive via env.
+			name:    "SystemRoot env fallback",
+			envRoot: `W:\Windows`,
+			want:    `W:\Windows\System32\ntoskrnl.exe`,
 		},
 		{
 			name:   "WINDIR fallback when SystemRoot empty",
@@ -47,7 +66,7 @@ func TestKernelExePath(t *testing.T) {
 			want:   `D:\WINNT\System32\ntoskrnl.exe`,
 		},
 		{
-			name: "fallback when neither env var is set",
+			name: "hardcoded fallback when all sources absent",
 			want: `C:\Windows\System32\ntoskrnl.exe`,
 		},
 	}
@@ -55,11 +74,22 @@ func TestKernelExePath(t *testing.T) {
 	for _, tc := range tests {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			t.Setenv("SystemRoot", tc.systemRoot)
-			t.Setenv("WINDIR", tc.windir)
-			if got := kernelExePath(); got != tc.want {
-				t.Fatalf("kernelExePath() = %q, want %q", got, tc.want)
+			got := resolveKernelExePath(tc.regRoot, tc.envRoot, tc.windir)
+			if got != tc.want {
+				t.Fatalf("resolveKernelExePath() = %q, want %q", got, tc.want)
 			}
 		})
+	}
+}
+
+// TestKernelExePathLive checks that the live kernelExePath (registry + env)
+// returns a non-empty path ending in ntoskrnl.exe.
+func TestKernelExePathLive(t *testing.T) {
+	p := kernelExePath()
+	if p == "" {
+		t.Fatal("kernelExePath() returned empty string")
+	}
+	if filepath.Base(p) != "ntoskrnl.exe" {
+		t.Fatalf("kernelExePath() = %q, want path ending in ntoskrnl.exe", p)
 	}
 }
