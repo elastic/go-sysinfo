@@ -1,0 +1,3 @@
+```release-note:bug
+windows: Report the running OS build as the kernel version instead of the file version of `ntoskrnl.exe`, which is not updated by enablement packages.
+```

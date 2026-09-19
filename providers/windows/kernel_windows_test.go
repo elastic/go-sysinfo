@@ -18,6 +18,7 @@
 package windows
 
 import (
+	"fmt"
 	"path/filepath"
 	"testing"
 )
@@ -91,5 +92,24 @@ func TestKernelExePathLive(t *testing.T) {
 	}
 	if filepath.Base(p) != "ntoskrnl.exe" {
 		t.Fatalf("kernelExePath() = %q, want path ending in ntoskrnl.exe", p)
+	}
+}
+
+// TestKernelVersionMatchesRunningBuild checks that the kernel version reports
+// the running build from the registry, which OperatingSystem also reads, even
+// when ntoskrnl.exe still carries the file version of an earlier feature
+// release (#294).
+func TestKernelVersionMatchesRunningBuild(t *testing.T) {
+	osInfo, err := OperatingSystem()
+	if err != nil {
+		t.Fatal(err)
+	}
+	version, err := KernelVersion()
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := fmt.Sprintf("%d.%d.%s", osInfo.Major, osInfo.Minor, osInfo.Build)
+	if version != want {
+		t.Fatalf("KernelVersion() = %q, want %q", version, want)
 	}
 }

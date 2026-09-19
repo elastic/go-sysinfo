@@ -18,6 +18,7 @@
 package windows
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -66,7 +67,53 @@ func kernelExePath() string {
 	return filepath.Join(root, "System32", "ntoskrnl.exe")
 }
 
+// KernelVersion returns the version of the running Windows build as
+// <major>.<minor>.<build>.<ubr>, for example 10.0.22631.7376.
+//
+// Feature updates delivered as enablement packages change the build number
+// without replacing ntoskrnl.exe, so the file version of the kernel image can
+// report the previous feature release. The registry reflects the running
+// build, and the file version is only used when it is unavailable.
 func KernelVersion() (string, error) {
+	if version, err := kernelVersionFromRegistry(); err == nil {
+		return version, nil
+	}
+	return kernelFileVersion()
+}
+
+// kernelVersionFromRegistry composes the running build from
+// HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion. The major and minor
+// version numbers exist since Windows 10.
+func kernelVersionFromRegistry() (string, error) {
+	k, err := registry.OpenKey(registry.LOCAL_MACHINE,
+		`SOFTWARE\Microsoft\Windows NT\CurrentVersion`,
+		registry.READ|registry.WOW64_64KEY)
+	if err != nil {
+		return "", err
+	}
+	defer k.Close()
+
+	major, _, err := k.GetIntegerValue("CurrentMajorVersionNumber")
+	if err != nil {
+		return "", err
+	}
+	minor, _, err := k.GetIntegerValue("CurrentMinorVersionNumber")
+	if err != nil {
+		return "", err
+	}
+	build, _, err := k.GetStringValue("CurrentBuildNumber")
+	if err != nil {
+		return "", err
+	}
+	ubr, _, err := k.GetIntegerValue("UBR")
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%d.%d.%s.%d", major, minor, build, ubr), nil
+}
+
+// kernelFileVersion returns the file version of the kernel image.
+func kernelFileVersion() (string, error) {
 	versionData, err := windows.GetFileVersionInfo(kernelExePath())
 	if err != nil {
 		return "", err
