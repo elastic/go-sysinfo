@@ -1,0 +1,17 @@
+ANSI_COLOR="0;38;2;126;186;228"
+BUG_REPORT_URL="https://github.com/NixOS/nixpkgs/issues"
+BUILD_ID="26.11.20261011.7fd4004"
+CPE_NAME="cpe:/o:nixos:nixos:26.11"
+DEFAULT_HOSTNAME=nixos
+DOCUMENTATION_URL="https://nixos.org/learn.html"
+HOME_URL="https://nixos.org/"
+ID=nixos
+LOGO="nix-snowflake"
+NAME=NixOS
+PRETTY_NAME="NixOS 26.11 (Zokor)"
+SUPPORT_URL="https://nixos.org/community.html"
+VENDOR_NAME=NixOS
+VENDOR_URL="https://nixos.org/"
+VERSION="26.11 (Zokor)"
+VERSION_CODENAME=zokor
+VERSION_ID="26.11"

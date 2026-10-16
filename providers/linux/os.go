@@ -60,6 +60,7 @@ var familyMap = map[string][]string{
 	},
 	"debian": {"debian", "ubuntu", "raspbian", "linuxmint"},
 	"suse":   {"suse", "sles", "opensuse"},
+	"nixos":  {"nixos"},
 }
 
 var platformToFamilyMap map[string]string
