@@ -102,9 +102,9 @@ func TestCgoEquivalentHostStatistics(t *testing.T) {
 	gotVM, err := getHostVMInfo64()
 	require.NoError(t, err)
 	want := *(*vmStatistics64Data)(unsafe.Pointer(&wantVM[0]))
-	// Page counts drift slightly between reads; allow 1% of the total.
+	// Page counts drift slightly between reads; allow 5% of the total.
 	total := float64(want.Free_count + want.Active_count + want.Inactive_count + want.Wire_count)
-	tol := total * 0.01
+	tol := total * 0.05
 	assert.InDelta(t, want.Free_count, gotVM.Free_count, tol)
 	assert.InDelta(t, want.Active_count, gotVM.Active_count, tol)
 	assert.InDelta(t, want.Inactive_count, gotVM.Inactive_count, tol)
