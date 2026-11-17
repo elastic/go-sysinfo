@@ -25,6 +25,7 @@ import (
 	"unsafe"
 
 	"github.com/ebitengine/purego"
+	"golang.org/x/sys/unix"
 )
 
 // The Mach host_statistics calls have no syscall equivalent, so they are
@@ -41,8 +42,9 @@ const (
 	hostCPULoadInfoCount  = 4  // sizeof(host_cpu_load_info_data_t) / sizeof(integer_t)
 	hostVMInfo64Count     = 38 // sizeof(vm_statistics64_data_t) / sizeof(integer_t)
 
-	// clockTicks is sysconf(_SC_CLK_TCK) on macOS, which is the constant CLK_TCK.
-	clockTicks = 100
+	// defaultClockTicks is used if kern.clockrate cannot be read. It is the
+	// macOS value of sysconf(_SC_CLK_TCK) (CLK_TCK).
+	defaultClockTicks = 100
 )
 
 type machFuncs struct {
@@ -90,9 +92,18 @@ func getHostCPULoadInfo() (*cpuUsage, error) {
 	return &cpu, nil
 }
 
-// getClockTicks returns the number of click ticks in one jiffie.
+var clockTicksOnce = sync.OnceValue(func() int {
+	ci, err := unix.SysctlClockinfo("kern.clockrate")
+	if err != nil || ci.Hz <= 0 {
+		return defaultClockTicks
+	}
+	return int(ci.Hz)
+})
+
+// getClockTicks returns the number of click ticks in one jiffie, as reported
+// by the kernel (kern.clockrate), which is what sysconf(_SC_CLK_TCK) returns.
 func getClockTicks() int {
-	return clockTicks
+	return clockTicksOnce()
 }
 
 func getHostVMInfo64() (*vmStatistics64Data, error) {
