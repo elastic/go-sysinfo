@@ -1,8 +1,9 @@
 module github.com/elastic/go-sysinfo
 
-go 1.23.0
+go 1.25.0
 
 require (
+	github.com/ebitengine/purego v0.11.2
 	github.com/elastic/go-windows v1.0.2
 	github.com/prometheus/procfs v0.15.1
 	github.com/stretchr/testify v1.9.0

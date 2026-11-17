@@ -28,5 +28,5 @@ func TestBootTime(t *testing.T) {
 	bt, err := BootTime()
 	assert.NoError(t, err)
 
-	t.Logf(bt.Format(time.RFC1123))
+	t.Log(bt.Format(time.RFC1123))
 }
