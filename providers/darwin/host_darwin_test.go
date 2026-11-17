@@ -36,5 +36,5 @@ func TestHost(t *testing.T) {
 
 	info := host.Info()
 	data, _ := json.MarshalIndent(info, "", "  ")
-	t.Logf(string(data))
+	t.Log(string(data))
 }

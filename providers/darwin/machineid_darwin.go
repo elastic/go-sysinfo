@@ -15,17 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build (amd64 && cgo) || (arm64 && cgo)
+//go:build amd64 || arm64
 
 package darwin
-
-// #include <unistd.h>
-// #include <uuid/uuid.h>
-import "C"
 
 import (
 	"fmt"
 	"unsafe"
+
+	"golang.org/x/sys/unix"
 )
 
 // MachineID returns the Hardware UUID also accessible via
@@ -35,26 +33,17 @@ func MachineID() (string, error) {
 	return getHostUUID()
 }
 
+// getHostUUID calls the gethostuuid syscall (what libc's gethostuuid wraps)
+// and formats the result like uuid_unparse_upper.
 func getHostUUID() (string, error) {
-	var uuidC C.uuid_t
-	var id [unsafe.Sizeof(uuidC)]C.uchar
-	wait := C.struct_timespec{5, 0} // 5 seconds
+	var id [16]byte
+	wait := unix.Timespec{Sec: 5} // 5 seconds
 
-	ret, err := C.gethostuuid(&id[0], &wait)
-	if ret != 0 {
-		if err != nil {
-			return "", fmt.Errorf("gethostuuid failed with %v: %w", ret, err)
-		}
-
-		return "", fmt.Errorf("gethostuuid failed with %v", ret)
+	_, _, errno := unix.Syscall(unix.SYS_GETHOSTUUID,
+		uintptr(unsafe.Pointer(&id[0])), uintptr(unsafe.Pointer(&wait)), 0)
+	if errno != 0 {
+		return "", fmt.Errorf("gethostuuid failed: %w", errno)
 	}
 
-	var uuidStringC C.uuid_string_t
-	var uuid [unsafe.Sizeof(uuidStringC)]C.char
-	_, err = C.uuid_unparse_upper(&id[0], &uuid[0])
-	if err != nil {
-		return "", fmt.Errorf("uuid_unparse_upper failed: %w", err)
-	}
-
-	return C.GoString(&uuid[0]), nil
+	return fmt.Sprintf("%X-%X-%X-%X-%X", id[0:4], id[4:6], id[6:8], id[8:10], id[10:16]), nil
 }

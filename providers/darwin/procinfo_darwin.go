@@ -15,43 +15,58 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build (amd64 && cgo) || (arm64 && cgo)
+//go:build amd64 || arm64
 
 package darwin
 
-// #include <sys/sysctl.h>
-// #include <libproc.h>
-import "C"
-
 import (
 	"errors"
+	"fmt"
 	"unsafe"
+
+	"golang.org/x/sys/unix"
 )
 
 //go:generate sh -c "go tool cgo -godefs defs_darwin.go > ztypes_darwin.go"
 
-func getProcTaskAllInfo(pid int, info *procTaskAllInfo) error {
-	size := C.int(unsafe.Sizeof(*info))
-	ptr := unsafe.Pointer(info)
+// proc_info(2) call numbers and flavors from bsd/sys/proc_info.h in XNU.
+const (
+	procInfoCallPIDInfo = 2 // PROC_INFO_CALL_PIDINFO
 
-	n, err := C.proc_pidinfo(C.int(pid), C.PROC_PIDTASKALLINFO, 0, ptr, size)
+	procPIDTaskAllInfo   = 2 // PROC_PIDTASKALLINFO
+	procPIDVnodePathInfo = 9 // PROC_PIDVNODEPATHINFO
+)
+
+// procInfo invokes the proc_info syscall, which is what libproc's
+// proc_pidinfo wraps. Calling it directly avoids cgo while preserving errno.
+func procInfo(call, pid, flavor int, arg uint64, buf unsafe.Pointer, size int) (int, error) {
+	r, _, errno := unix.Syscall6(unix.SYS_PROC_INFO,
+		uintptr(call), uintptr(pid), uintptr(flavor), uintptr(arg),
+		uintptr(buf), uintptr(size))
+	if errno != 0 {
+		return 0, errno
+	}
+	return int(r), nil
+}
+
+func getProcTaskAllInfo(pid int, info *procTaskAllInfo) error {
+	size := int(unsafe.Sizeof(*info))
+	n, err := procInfo(procInfoCallPIDInfo, pid, procPIDTaskAllInfo, 0, unsafe.Pointer(info), size)
 	if err != nil {
 		return err
 	} else if n != size {
 		return errors.New("failed to read process info with proc_pidinfo")
 	}
-
 	return nil
 }
 
 func getProcVnodePathInfo(pid int, info *procVnodePathInfo) error {
-	size := C.int(unsafe.Sizeof(*info))
-	ptr := unsafe.Pointer(info)
-
-	n := C.proc_pidinfo(C.int(pid), C.PROC_PIDVNODEPATHINFO, 0, ptr, size)
-	if n != size {
+	size := int(unsafe.Sizeof(*info))
+	n, err := procInfo(procInfoCallPIDInfo, pid, procPIDVnodePathInfo, 0, unsafe.Pointer(info), size)
+	if err != nil {
+		return fmt.Errorf("failed to read vnode info with proc_pidinfo: %w", err)
+	} else if n != size {
 		return errors.New("failed to read vnode info with proc_pidinfo")
 	}
-
 	return nil
 }

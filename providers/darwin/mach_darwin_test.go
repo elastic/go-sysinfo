@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build (amd64 && !cgo) || (arm64 && !cgo)
+//go:build amd64 || arm64
 
 package darwin
 
-import "github.com/elastic/go-sysinfo/types"
+import (
+	"testing"
 
-func getProcTaskAllInfo(pid int, info *procTaskAllInfo) error {
-	return types.ErrNotImplemented
-}
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"golang.org/x/sys/unix"
+)
 
-func getProcVnodePathInfo(pid int, info *procVnodePathInfo) error {
-	return types.ErrNotImplemented
+// getClockTicks reads kern.clockrate. The value is compared against
+// sysconf(_SC_CLK_TCK) in TestCgoEquivalentClockTicks when cgo is available.
+func TestClockTicks(t *testing.T) {
+	ci, err := unix.SysctlClockinfo("kern.clockrate")
+	require.NoError(t, err)
+	assert.Positive(t, getClockTicks())
+	assert.EqualValues(t, ci.Hz, getClockTicks())
 }
