@@ -54,18 +54,27 @@ func getClockTicks() int {
 }
 
 func getHostVMInfo64() (*vmStatistics64Data, error) {
-	var count C.mach_msg_type_number_t = C.HOST_VM_INFO64_COUNT
-
 	var vmStat vmStatistics64Data
+	if err := hostVMInfo64(&vmStat); err != nil {
+		return nil, err
+	}
+	return &vmStat, nil
+}
+
+func hostVMInfo64(vmStat *vmStatistics64Data) error {
+	// The count must describe the Go struct, not C.HOST_VM_INFO64_COUNT: newer SDKs
+	// define a larger vm_statistics64 and the kernel writes as many fields as the count allows.
+	count := C.mach_msg_type_number_t(unsafe.Sizeof(*vmStat) / unsafe.Sizeof(C.integer_t(0)))
+
 	status := C.host_statistics64(
 		C.host_t(C.mach_host_self()),
 		C.HOST_VM_INFO64,
-		C.host_info_t(unsafe.Pointer(&vmStat)),
+		C.host_info_t(unsafe.Pointer(vmStat)),
 		&count)
 
 	if status != C.KERN_SUCCESS {
-		return nil, fmt.Errorf("host_statistics64 returned status %d", status)
+		return fmt.Errorf("host_statistics64 returned status %d", status)
 	}
 
-	return &vmStat, nil
+	return nil
 }

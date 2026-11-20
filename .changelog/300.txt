@@ -1,0 +1,3 @@
+```release-note:bug
+darwin: Fix host_statistics64 writing past the vm statistics buffer in Memory(), which corrupted adjacent Go heap memory on newer macOS SDKs.
+```
