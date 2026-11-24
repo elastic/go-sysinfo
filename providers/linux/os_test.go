@@ -486,4 +486,24 @@ func TestOperatingSystem(t *testing.T) {
 		}, *os)
 		t.Logf("%#v", os)
 	})
+	t.Run("nixos", func(t *testing.T) {
+		// Data from a liv nixos 26.11.
+		os, err := getOSInfo("testdata/nixos")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, types.OSInfo{
+			Type:     "linux",
+			Family:   "nixos",
+			Platform: "nixos",
+			Name:     "NixOS",
+			Version:  "26.11 (Zokor)",
+			Major:    26,
+			Minor:    11,
+			Build:    "26.11.20261011.7fd4004",
+			Codename: "zokor",
+		}, *os)
+		t.Logf("%#v", os)
+	})
+
 }
